@@ -656,6 +656,24 @@ def _apply_meta(row: dict[str, Any], meta: dict[str, Any],
     )
 
 
+@lru_cache(maxsize=1)
+def _raw_index() -> dict[int, dict[str, Any]]:
+    return {int(r["effect_id"]): r for r in _raw_ce_rows()}
+
+
+def is_bundle_only_effect(effect_id: int) -> bool:
+    """True when the raw CE entry has a non-rollable tier OR non-attribute
+    group — i.e. the effect only reaches the player via a verified named
+    relic (Remembrance / shop / boss drop) and can't appear from normal rolls.
+    Drives the 'includes unrollable effects' hint in the named-relic dialog."""
+    row = _raw_index().get(int(effect_id))
+    if row is None:
+        return False
+    tier = row.get("tier", "")
+    group = row.get("group", "")
+    return (tier not in ROLLABLE_TIERS) or (group not in ATTRIBUTE_GROUPS)
+
+
 @lru_cache(maxsize=16)
 def load_effects_for_character(character_id: str) -> list[Effect]:
     meta_map = chars_mod.merged_effects_meta(character_id)

@@ -192,68 +192,124 @@ def _attr_row(slot_idx, attr_idx, attr, is_locked_pinned, is_locked_exact, is_fi
                     rx.box(),
                 ),
             ),
-            # Contribution pill: per-attr marginal weighted score. Colour is
-            # tinted by the dominant axis (peach=damage, green=survival,
-            # yellow=utility, mauve=team) so the user can tell at a glance
-            # whether a "+1.5" is a tiny damage bump or a defensive effect
-            # being credited via the survival weight × goal-axis multiplier.
-            rx.cond(
-                attr.contribution != 0.0,
-                rx.tooltip(
-                    rx.box(
-                        rx.hstack(
-                            rx.text(
-                                rx.cond(attr.contribution > 0, "+", ""),
-                                font_size="0.62rem",
-                                font_family="ui-monospace, SFMono-Regular, Menlo, monospace",
+            # Contribution pill: three presentations depending on how much
+            # the engine actually knows about this effect's numeric value:
+            #   · modeled  + non-zero delta → colored pill tinted by axis
+            #   · modeled  + zero delta     → small grey "0" pill (bucket
+            #                                  dominated or gated off)
+            #   · textual                   → grey ⓘ icon (value lives only
+            #                                  in the effect text)
+            #   · flat                      → nothing (flavour / info only)
+            rx.match(
+                attr.contrib_status,
+                (
+                    "modeled",
+                    rx.cond(
+                        attr.contribution != 0.0,
+                        rx.tooltip(
+                            rx.box(
+                                rx.hstack(
+                                    rx.text(
+                                        rx.cond(attr.contribution > 0, "+", ""),
+                                        font_size="0.62rem",
+                                        font_family="ui-monospace, SFMono-Regular, Menlo, monospace",
+                                    ),
+                                    rx.text(
+                                        attr.contribution.to_string(),
+                                        font_size="0.62rem",
+                                        font_weight="700",
+                                        font_family="ui-monospace, SFMono-Regular, Menlo, monospace",
+                                    ),
+                                    spacing="0",
+                                    align="center",
+                                ),
+                                background=rx.match(
+                                    attr.contrib_axis,
+                                    ("survival", "rgba(166,227,161,0.15)"),
+                                    ("utility", "rgba(249,226,175,0.15)"),
+                                    ("team", "rgba(203,166,247,0.15)"),
+                                    "rgba(250,179,135,0.15)",   # damage (peach)
+                                ),
+                                color=rx.match(
+                                    attr.contrib_axis,
+                                    ("survival", PAL["green"]),
+                                    ("utility", PAL["yellow"]),
+                                    ("team", PAL["mauve"]),
+                                    PAL["peach"],
+                                ),
+                                border="1px solid",
+                                border_color=rx.match(
+                                    attr.contrib_axis,
+                                    ("survival", "rgba(166,227,161,0.35)"),
+                                    ("utility", "rgba(249,226,175,0.35)"),
+                                    ("team", "rgba(203,166,247,0.35)"),
+                                    "rgba(250,179,135,0.35)",
+                                ),
+                                padding="2px 7px",
+                                border_radius="4px",
+                                display="inline-flex",
+                                align_items="center",
+                                height="20px",
+                                cursor="help",
                             ),
-                            rx.text(
-                                attr.contribution.to_string(),
-                                font_size="0.62rem",
-                                font_weight="700",
-                                font_family="ui-monospace, SFMono-Regular, Menlo, monospace",
+                            content=(
+                                "Weighted score delta if removed.  "
+                                "Breakdown (pre-weight): "
+                                "damage=" + attr.contrib_damage.to_string()
+                                + "  survival=" + attr.contrib_survival.to_string()
+                                + "  utility=" + attr.contrib_utility.to_string()
+                                + "  team=" + attr.contrib_team.to_string()
+                                + ".  Each axis × its goal weight = shown total. "
+                                "Defensive effects appear here via survival weight."
                             ),
-                            spacing="0",
-                            align="center",
                         ),
-                        background=rx.match(
-                            attr.contrib_axis,
-                            ("survival", "rgba(166,227,161,0.15)"),
-                            ("utility", "rgba(249,226,175,0.15)"),
-                            ("team", "rgba(203,166,247,0.15)"),
-                            "rgba(250,179,135,0.15)",   # damage (peach)
+                        rx.tooltip(
+                            rx.box(
+                                rx.text(
+                                    "0",
+                                    font_size="0.62rem",
+                                    font_weight="700",
+                                    font_family="ui-monospace, SFMono-Regular, Menlo, monospace",
+                                ),
+                                background=PAL["surface0"],
+                                color=PAL["overlay1"],
+                                border=f"1px solid {PAL['surface1']}",
+                                padding="2px 7px",
+                                border_radius="4px",
+                                display="inline-flex",
+                                align_items="center",
+                                height="20px",
+                                cursor="help",
+                            ),
+                            content=(
+                                "Modeled effect, but no marginal contribution in this build: "
+                                "either another effect dominates its bucket, "
+                                "or its condition (uptime slider) is inactive."
+                            ),
                         ),
-                        color=rx.match(
-                            attr.contrib_axis,
-                            ("survival", PAL["green"]),
-                            ("utility", PAL["yellow"]),
-                            ("team", PAL["mauve"]),
-                            PAL["peach"],
-                        ),
-                        border="1px solid",
-                        border_color=rx.match(
-                            attr.contrib_axis,
-                            ("survival", "rgba(166,227,161,0.35)"),
-                            ("utility", "rgba(249,226,175,0.35)"),
-                            ("team", "rgba(203,166,247,0.35)"),
-                            "rgba(250,179,135,0.35)",
-                        ),
-                        padding="2px 7px",
-                        border_radius="4px",
-                        display="inline-flex",
-                        align_items="center",
-                        height="20px",
-                        cursor="help",
                     ),
-                    content=(
-                        "Weighted score delta if removed.  "
-                        "Breakdown (pre-weight): "
-                        "damage=" + attr.contrib_damage.to_string()
-                        + "  survival=" + attr.contrib_survival.to_string()
-                        + "  utility=" + attr.contrib_utility.to_string()
-                        + "  team=" + attr.contrib_team.to_string()
-                        + ".  Each axis × its goal weight = shown total. "
-                        "Defensive effects appear here via survival weight."
+                ),
+                (
+                    "textual",
+                    rx.tooltip(
+                        rx.box(
+                            rx.icon(tag="info", size=11),
+                            background=PAL["surface0"],
+                            color=PAL["overlay1"],
+                            border=f"1px solid {PAL['surface1']}",
+                            padding="2px 6px",
+                            border_radius="4px",
+                            display="inline-flex",
+                            align_items="center",
+                            height="20px",
+                            cursor="help",
+                        ),
+                        content=(
+                            "Effect value is described only in its text "
+                            "(e.g. '…by 20%') — recognised by the solver as a "
+                            "rough estimate, but not fully modeled for this "
+                            "character. Treat the in-game value as authoritative."
+                        ),
                     ),
                 ),
                 rx.box(),
@@ -549,6 +605,35 @@ def slot_card(slot) -> rx.Component:
     lock_state = State.slot_lock_state[slot_idx]
     lock_btn = rx.cond(slot.is_fixed, rx.box(), _slot_lock_btn(slot_idx, lock_state))
 
+    # ⚠ badge surfaces validation rule failures (duplicate ids, roll-group
+    # collision, missing debuff, tier mismatch, foreign character tag). Never
+    # shows for Remembrance fixed slots or named-relic-locked trios.
+    invalid_badge = rx.cond(
+        slot.validation_errors.length() > 0,
+        rx.tooltip(
+            rx.box(
+                rx.hstack(
+                    rx.icon(tag="triangle-alert", size=12),
+                    rx.text("Invalid", font_weight="700"),
+                    spacing="1", align="center",
+                ),
+                background="rgba(243,139,168,0.18)",
+                color=PAL["red"],
+                border="1px solid rgba(243,139,168,0.45)",
+                padding="2px 8px",
+                border_radius="4px",
+                font_size="0.68rem",
+                font_family="ui-monospace, SFMono-Regular, Menlo, monospace",
+                display="inline-flex",
+                align_items="center",
+                height="20px",
+                cursor="help",
+            ),
+            content=slot.validation_tooltip,
+        ),
+        rx.box(),
+    )
+
     header = rx.hstack(
         rx.hstack(
             rx.box(width="10px", height="10px", border_radius="50%",
@@ -557,6 +642,7 @@ def slot_card(slot) -> rx.Component:
             rx.text(slot.name, font_weight="600", font_size="1rem",
                     color=PAL["text"]),
             _vessel_pill(slot.vessel_color),
+            invalid_badge,
             spacing="2", align="center", flex_wrap="wrap",
         ),
         rx.spacer(),

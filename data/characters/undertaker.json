@@ -142,7 +142,7 @@
     "7081200": {
       "label": "L18 3+ Hammers Equipped",
       "bucket": "B_L18",
-      "mult": 1.1,
+      "mult": 1.2,
       "mult_scope": "all",
       "requires": "three_hammers_equipped"
     },

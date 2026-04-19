@@ -8,6 +8,7 @@ resulting build is cached into `build_slots` (list of dicts) for rendering.
 
 from __future__ import annotations
 
+import re
 from dataclasses import asdict
 from typing import Any, Optional
 
@@ -21,6 +22,7 @@ from src.constraints import MODE_DEEP_NIGHT, MODE_STANDARD
 from dataclasses import fields as _dc_fields
 from src.damage_model import PlayContext, compute as _compute_contrib, naked_baseline
 from src.defensive_stats import compute_defensive_stats
+from src.effects_db import is_bundle_only_effect
 from src.effects_db import (
     Effect,
     character_candidates,
@@ -137,6 +139,13 @@ class AttrRow(rx.Base):
     # Dominant axis — drives the pill's background color so defense effects
     # don't look like damage pills.
     contrib_axis: str = "damage"
+    # How much the engine actually knows about this effect's numeric value:
+    #   "modeled"  — bucket / mult / additive / utility_value declared
+    #   "textual"  — value only present in effect_text (e.g. "Increases … by 20%")
+    #   "flat"     — no numeric value at all (flavour / informational)
+    # Drives whether the slot pill shows a colored delta, a grey info hint, or
+    # nothing — so the user never wonders "why no pill?".
+    contrib_status: str = "flat"
 
 
 class SlotData(rx.Base):
@@ -151,6 +160,11 @@ class SlotData(rx.Base):
     debuff: Optional[AttrRow] = None
     needs_debuff: bool = False
     named_relic_id: str = ""
+    # Validation errors against canonical relic rules (duplicate ids, roll
+    # groups, debuff missing, tier mismatch, character tag). Empty list → valid.
+    # Drives the ⚠ badge in the slot header.
+    validation_errors: list[str] = []
+    validation_tooltip: str = ""
 
 
 class BucketStat(rx.Base):
@@ -224,6 +238,10 @@ class NamedRelicRow(rx.Base):
     description: str = ""
     verified: bool = False
     attrs: list[int] = []
+    # True when the relic carries at least one effect that's not available
+    # from normal rolls (N/A tier / ILLEGAL group promoted in memory). Drives
+    # the "includes unrollable effects" badge in the picker.
+    has_bundle_only: bool = False
 
 
 class EditOption(rx.Base):
@@ -273,6 +291,28 @@ class DormantPowerRow(rx.Base):
     is_damage: bool = False
 
 
+_TEXT_PCT_RE = re.compile(r"by\s*(\d+(?:\.\d+)?)\s*%", re.I)
+_TEXT_FLAT_RE = re.compile(
+    r"(?:by|restores?|raises?|increases?|reduces?)\s*(\d+(?:\.\d+)?)\b", re.I
+)
+
+
+def _classify_contrib_status(e: Effect) -> str:
+    """Decide how backed-by-data the effect's value is. Mirrors the priority
+    order used by `damage_model._effect_value_proxy`."""
+    if (
+        e.bucket
+        or (e.mult or 1.0) > 1.0
+        or (e.additive or 0.0) > 0.0
+        or (e.utility_value or 0.0) > 0.0
+    ):
+        return "modeled"
+    txt = (getattr(e, "effect_text", "") or "")
+    if txt and (_TEXT_PCT_RE.search(txt) or _TEXT_FLAT_RE.search(txt)):
+        return "textual"
+    return "flat"
+
+
 def _attr_row(e: Effect, contrib_info: dict | float = 0.0) -> AttrRow:
     """Build an AttrRow. `contrib_info` can be a float (legacy scalar) or a
     dict with per-axis breakdown {weighted, damage, survival, utility, team}
@@ -308,6 +348,7 @@ def _attr_row(e: Effect, contrib_info: dict | float = 0.0) -> AttrRow:
         contrib_utility=round(cu, 2),
         contrib_team=round(ct, 2),
         contrib_axis=axis,
+        contrib_status=_classify_contrib_status(e),
     )
 
 
@@ -1060,6 +1101,7 @@ class State(rx.State):
 
         slots: list[SlotData] = []
         vcolors = self.active_vessel_colors
+        char_tag = chars_mod.get(self.character_id).tag
         named_lookup = {r["id"]: r for r in chars_mod.named_relics_for(self.character_id)}
         # Build a signature → relic_id table for fast bundle matching when
         # the solver itself placed a named relic (no locked_picks needed).
@@ -1100,6 +1142,27 @@ class State(rx.State):
                 if relic_name:
                     display_name = f"Slot {idx + 1} — {relic_name}{suffix}"
 
+            # Validate the relic against canonical rules so the UI can flag
+            # impossible builds (duplicate ids, roll-group conflicts, missing
+            # debuff, tier mismatch, foreign character tag). Remembrance/named
+            # relic slots are skipped — their trios are game-fixed and our
+            # promoted N/A effects would trip sort_order spuriously.
+            errors: list[str] = []
+            if not b.slot.is_fixed and not named_id:
+                tier_set = (
+                    frozenset(b.slot.allowed_tiers) if b.slot.allowed_tiers else None
+                )
+                results = validate_relic(
+                    auto_sort(b.attrs),
+                    debuff=b.debuff,
+                    slot_tier_set=tier_set,
+                    character_tag=char_tag,
+                )
+                errors = [
+                    r.message for r in results
+                    if (not r.ok) and r.severity == "error"
+                ]
+
             slots.append(SlotData(
                 index=idx,
                 name=display_name,
@@ -1115,6 +1178,8 @@ class State(rx.State):
                 debuff=_attr_row(b.debuff) if b.debuff else None,
                 needs_debuff=b.needs_debuff(),
                 named_relic_id=named_id,
+                validation_errors=errors,
+                validation_tooltip=" · ".join(errors),
             ))
         self.build_slots = slots
         self.damage_total = round(contrib.total_boss_window, 2)
@@ -1732,6 +1797,11 @@ class State(rx.State):
             rs[0].get("name", ""),
         ))
         for r, st in filtered:
+            attrs = list(r.get("attrs", []))
+            has_bundle_only = (
+                bool(r.get("attrs_verified"))
+                and any(is_bundle_only_effect(eid) for eid in attrs)
+            )
             out.append(NamedRelicRow(
                 id=r["id"],
                 name=r["name"],
@@ -1742,7 +1812,8 @@ class State(rx.State):
                 character=r.get("character", "any"),
                 description=r.get("description", ""),
                 verified=bool(r.get("attrs_verified")),
-                attrs=list(r.get("attrs", [])),
+                attrs=attrs,
+                has_bundle_only=has_bundle_only,
             ))
         return out
 

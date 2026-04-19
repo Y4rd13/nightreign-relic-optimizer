@@ -238,6 +238,25 @@ def _named_row(r) -> rx.Component:
                                background="rgba(249,226,175,0.08)",
                                border_radius="3px"),
                     ),
+                    rx.cond(
+                        r.has_bundle_only,
+                        rx.tooltip(
+                            rx.box("bundle-only FX",
+                                   color=PAL["lavender"], font_size="0.68rem",
+                                   font_weight="700", padding="1px 6px",
+                                   background="rgba(180,190,254,0.1)",
+                                   border="1px solid rgba(180,190,254,0.3)",
+                                   border_radius="3px",
+                                   cursor="help"),
+                            content=(
+                                "This relic carries effects that can't appear "
+                                "from normal rolls (boss drop or Remembrance "
+                                "bundle only). Locking it unlocks those effects "
+                                "for the solver."
+                            ),
+                        ),
+                        rx.box(),
+                    ),
                     spacing="2", align="center", flex_wrap="wrap",
                 ),
                 rx.cond(

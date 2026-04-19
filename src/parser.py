@@ -122,19 +122,26 @@ def build_registry(
 
 
 if __name__ == "__main__":
-    import sys
+    import argparse
 
-    ct = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(
-        "/mnt/c/Users/dharm/Documents/nightreign/"
-        "Nightreign_RelicV16-125-16-0-1765383293/Nightreign_RelicV16.ct"
+    default_out = Path(__file__).parent.parent / "data" / "effects.json"
+    cli = argparse.ArgumentParser(
+        description=(
+            "Regenerate data/effects.json from a Cheat Engine table (.ct) + "
+            "community catalog (.csv). Only needed when a game patch changes "
+            "the relic roster — the committed data/effects.json already "
+            "contains the full registry at the last-seen game version."
+        ),
     )
-    csv_p = Path(sys.argv[2]) if len(sys.argv) > 2 else Path(
-        "/mnt/c/Users/dharm/Documents/nightreign/nightreign_relic_effects.csv"
-    )
-    out = Path(sys.argv[3]) if len(sys.argv) > 3 else Path(
-        Path(__file__).parent.parent / "data" / "effects.json"
-    )
-    rows = build_registry(ct, csv_p, out)
+    cli.add_argument("--ct", type=Path, required=True,
+                     help="Path to Nightreign_RelicV16.ct (or later version)")
+    cli.add_argument("--csv", type=Path, required=True,
+                     help="Path to nightreign_relic_effects.csv")
+    cli.add_argument("--out", type=Path, default=default_out,
+                     help=f"Where to write the JSON registry (default: {default_out})")
+    args = cli.parse_args()
+
+    rows = build_registry(args.ct, args.csv, args.out)
     by_tier: dict[str, int] = {}
     by_group: dict[str, int] = {}
     stack_count = 0
@@ -143,7 +150,7 @@ if __name__ == "__main__":
         by_group[r.group] = by_group.get(r.group, 0) + 1
         if r.stackable:
             stack_count += 1
-    print(f"Parsed {len(rows)} effects → {out}")
+    print(f"Parsed {len(rows)} effects → {args.out}")
     print(f"  tiers: {by_tier}")
     print(f"  groups: {by_group}")
     print(f"  stackable: {stack_count}")

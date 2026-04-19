@@ -11,6 +11,7 @@ compendium so the solver + UI can show concrete effect text everywhere.
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 from pathlib import Path
@@ -18,7 +19,6 @@ from pathlib import Path
 from openpyxl import load_workbook
 
 ROOT = Path(__file__).resolve().parent.parent
-XLSX = Path("/mnt/c/Users/dharm/Documents/nightreign/data/nightreign data.xlsx")
 CHAR_DIR = ROOT / "data" / "characters"
 
 # Primary remembrance relic per character — picked to be the "late-game"
@@ -62,7 +62,20 @@ def _load_items(wb):
 
 
 def main() -> int:
-    wb = load_workbook(XLSX, data_only=True)
+    cli = argparse.ArgumentParser(
+        description=(
+            "Sync each character's remembrance_slots from the items sheet "
+            "of the relics.pro compendium xlsx. Only needed when a new "
+            "Nightfarer ships or item rolls change."
+        ),
+    )
+    cli.add_argument("--xlsx", type=Path, required=True,
+                     help="Path to the relics.pro compendium .xlsx file")
+    args = cli.parse_args()
+    if not args.xlsx.exists():
+        print(f"ERROR: xlsx not found at {args.xlsx}")
+        return 1
+    wb = load_workbook(args.xlsx, data_only=True)
     items = _load_items(wb)
 
     updated = 0

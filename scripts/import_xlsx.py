@@ -1,7 +1,6 @@
 """One-shot import from the relics.pro compendium xlsx.
 
-Reads /mnt/c/Users/dharm/Documents/nightreign/data/nightreign data.xlsx and
-regenerates:
+Regenerates (from the xlsx provided via --xlsx):
 
   data/effects_enriched.json   — effect_id → { category, effect_text, stack_*,
                                                is_dn, roll, parsed: {...} }
@@ -14,11 +13,12 @@ This script layers the xlsx data on top — CE id ⇄ xlsx id is 100% identical,
 so merging is by id lookup.
 
 Usage:
-  uv run python scripts/import_xlsx.py
+  uv run python scripts/import_xlsx.py --xlsx /path/to/nightreign-data.xlsx
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import shutil
@@ -28,7 +28,6 @@ from pathlib import Path
 from openpyxl import load_workbook
 
 ROOT = Path(__file__).resolve().parent.parent
-XLSX_PATH = Path("/mnt/c/Users/dharm/Documents/nightreign/data/nightreign data.xlsx")
 DATA_DIR = ROOT / "data"
 
 
@@ -406,11 +405,22 @@ def _backup(path: Path) -> None:
 
 
 def main() -> int:
-    if not XLSX_PATH.exists():
-        print(f"ERROR: xlsx not found at {XLSX_PATH}")
+    cli = argparse.ArgumentParser(
+        description=(
+            "Regenerate data/{effects_enriched,named_relics,buffs,bosses}.json "
+            "from the relics.pro compendium xlsx. Only needed when a game "
+            "patch introduces new effects; the committed JSONs already hold "
+            "the last-seen snapshot."
+        ),
+    )
+    cli.add_argument("--xlsx", type=Path, required=True,
+                     help="Path to the relics.pro compendium .xlsx file")
+    args = cli.parse_args()
+    if not args.xlsx.exists():
+        print(f"ERROR: xlsx not found at {args.xlsx}")
         return 1
-    wb = load_workbook(XLSX_PATH, data_only=True)
-    print(f"Loaded {XLSX_PATH}")
+    wb = load_workbook(args.xlsx, data_only=True)
+    print(f"Loaded {args.xlsx}")
     print(f"Sheets: {wb.sheetnames}\n")
 
     effects = import_effects(wb)

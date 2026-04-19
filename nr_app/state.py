@@ -114,6 +114,62 @@ def _unk(k: str) -> tuple[int, int]:
     return int(s), int(a)
 
 
+# Weapon classes that can coat each status via poison/bleed/frost/magic
+# greases or natural infusion. Used by the "no source" warning in the Enemy
+# Afflictions sidebar — a slider raised above 0 without any of these weapons
+# (and without a caster playstyle) can't actually apply the status in-game.
+_STATUS_COAT_WEAPONS: dict[str, frozenset[str]] = {
+    "enemy_poisoned_uptime": frozenset({
+        "dagger", "straight_sword", "thrusting_sword", "curved_sword",
+        "curved_greatsword", "katana", "twinblade",
+    }),
+    "enemy_bleed_uptime": frozenset({
+        "dagger", "straight_sword", "twinblade", "curved_sword",
+        "curved_greatsword", "katana",
+    }),
+    "enemy_frostbite_uptime": frozenset({
+        "dagger", "straight_sword", "greatsword", "katana",
+    }),
+    "enemy_scarlet_rot_uptime": frozenset(),
+    "enemy_asleep_uptime": frozenset(),
+    "enemy_madness_uptime": frozenset(),
+    "enemy_deathblight_uptime": frozenset(),
+}
+
+# Playstyle tags indicating the character can inflict statuses via
+# sorceries / incantations. Casters reach statuses that pure melee can't
+# (scarlet rot, sleep, madness, death blight).
+_CASTER_TAGS: frozenset[str] = frozenset({
+    "cast", "sorcery", "incantation", "incant", "magic",
+})
+
+
+# PlayContext (preset.ctx) key → State field name. Used by load_preset to
+# restore the sliders when a user applies a saved build. The asymmetry between
+# ctx names and state names (e.g. trance_uptime_baseline vs trance_uptime) is
+# legacy — kept to preserve preset backwards-compat.
+_CTX_TO_STATE: dict[str, str] = {
+    "evergaol_clears": "evergaol_clears",
+    "invader_kills": "invader_kills",
+    "three_hammers_equipped": "three_hammers",
+    "dual_wielding": "dual_wielding",
+    "grease_uptime": "grease_uptime",
+    "trance_uptime_baseline": "trance_uptime",
+    "incant_buff_uptime": "incant_uptime",
+    "took_damage_uptime": "took_damage_uptime",
+    "ult_active_uptime": "ult_uptime",
+    "chain_last_hit_fraction": "chain_last_hit",
+    "first_combo_hit_fraction": "first_combo_hit",
+    "enemy_poisoned_uptime": "enemy_poisoned_uptime",
+    "enemy_scarlet_rot_uptime": "enemy_scarlet_rot_uptime",
+    "enemy_frostbite_uptime": "enemy_frostbite_uptime",
+    "enemy_bleed_uptime": "enemy_bleed_uptime",
+    "enemy_asleep_uptime": "enemy_asleep_uptime",
+    "enemy_madness_uptime": "enemy_madness_uptime",
+    "enemy_deathblight_uptime": "enemy_deathblight_uptime",
+}
+
+
 class AttrRow(rx.Base):
     id: int = 0
     sort: int = -1
@@ -455,6 +511,28 @@ class State(rx.State):
     utility_score: float = 0.0
     team_score: float = 0.0
     weighted_score: float = 0.0
+    # "N of M relic effects apply" readout — makes it obvious the solver
+    # filters a lot of the raw catalog out (weapon class, character tag,
+    # non-rollable tiers, …) before even considering effects.
+    pool_stats_text: str = ""
+    # For each affliction slider, whether the current character has a
+    # plausible source to apply that status — weapon class that can coat
+    # it, or a caster playstyle. Drives the ⚠ "no source" warning next to
+    # each slider in the Enemy afflictions section.
+    affliction_has_source: dict[str, bool] = {}
+    # Effective uptimes AFTER folding in uptime_boosts from relics in the
+    # current build — keyed by slider field name (trance_uptime, etc.). Lets
+    # the sidebar show "baseline 0.50 → effective 0.90" so the user sees
+    # what their relic kit actually stacks on top of their playstyle floor.
+    effective_uptimes: dict[str, float] = {}
+    # How many effects in the current build are gated by each slider. Drives
+    # the "×N" badge + tooltip on each slider that says "N effects in your
+    # build actually depend on this uptime being >0".
+    slider_gated_count: dict[str, int] = {}
+    # Weighted-score delta if each slider were pinned to 1.0 (everything else
+    # held at the user's current value). Gives the user a direct readout of
+    # "how much could I gain by cycling Trance more aggressively in-game?"
+    slider_full_delta: dict[str, float] = {}
 
     # ── dialogs ───────────────────────────────────────────────────
     edit_dialog_open: bool = False
@@ -501,6 +579,28 @@ class State(rx.State):
         if b <= 0:
             return 0.0
         return round(self.damage_total / b, 2)
+
+    @rx.var
+    def sidebar_open_sections(self) -> list[str]:
+        """Which sidebar accordion sections default to open on first render,
+        per the selected character's JSON. Falls back to a DPS-leaning
+        default — everything that doesn't force the user to scroll past
+        irrelevant sliders to find their character's knobs.
+
+        Accordion `default_value` only applies at mount, so switching
+        characters mid-session won't auto-re-open sections; the current
+        open set is preserved. That's a minor paper cut acceptable for the
+        simplicity gain of not making the accordion fully controlled."""
+        try:
+            char = chars_mod.get(self.character_id)
+            declared = char.globals_.get("sidebar_open_sections")
+            if declared:
+                return list(declared)
+        except KeyError:
+            pass
+        # Default: only the top-of-sidebar essentials open.
+        return ["Character", "Mode", "Vessel", "Boss routing",
+                "Controls", "Presets"]
 
     @rx.var
     def all_weapon_slugs(self) -> list[str]:
@@ -1196,6 +1296,112 @@ class State(rx.State):
         self.utility_score = round(contrib.utility_score, 2)
         self.team_score = round(contrib.team_score, 2)
         self.weighted_score = round(contrib.weighted_score, 2)
+
+        # Pool stats — "N of M effects apply to <character>". Pulls from the
+        # same character_candidates() the solver uses, so the number reflects
+        # whatever filters are active (weapon-class override, build-goal
+        # weights, party composition).
+        from src.effects_db import _raw_ce_rows
+        pool_now = character_candidates(
+            self.character_id,
+            weapon_types=(list(self.weapon_types_override) or None),
+            playstyle_tags=(list(self.playstyle_tags_override) or None),
+            build_goal_weights=(
+                dict(self.build_goal_weights_override)
+                if self.build_goal_weights_override else None
+            ),
+            party_members=list(self.effective_party) or None,
+        )
+        total_effects = len(_raw_ce_rows())
+        self.pool_stats_text = (
+            f"{len(pool_now)} of {total_effects} relic effects apply"
+        )
+
+        # Effective uptimes after relic uptime_boosts fold in, and gated-
+        # effect counts per slider — drive the "baseline → effective" readout
+        # and the "×N" badge in the Buff / Affliction / Combat sliders.
+        from src.damage_model import _effective_uptimes
+        effs_flat = [a for b in build for a in b.attrs]
+        eff_up = _effective_uptimes(effs_flat, self._ctx())
+        # Slider field name → underlying uptime mapping key
+        slider_to_key = {
+            "grease_uptime": "grease_used",
+            "trance_uptime": "trance_active",
+            "ult_uptime": "ult_active",
+            "incant_uptime": "incant_buff_active",
+            "took_damage_uptime": "took_damage_recently",
+            "enemy_poisoned_uptime": "enemy_poisoned",
+            "enemy_scarlet_rot_uptime": "enemy_scarlet_rot",
+            "enemy_frostbite_uptime": "enemy_frostbite",
+            "enemy_bleed_uptime": "enemy_bleed",
+            "enemy_asleep_uptime": "enemy_asleep",
+            "enemy_madness_uptime": "enemy_madness",
+            "enemy_deathblight_uptime": "enemy_deathblight",
+            "first_combo_hit": "first_combo_hit",
+            "chain_last_hit": "chain_last_hit",
+        }
+        self.effective_uptimes = {
+            slider: round(eff_up.get(key, 0.0), 2)
+            for slider, key in slider_to_key.items()
+        }
+        # "No source" capability check for afflictions: does this character
+        # actually have a way to apply this status in-game? Raises a warning
+        # if the user sets the slider > 0 with no plausible in-game source.
+        current_weapons = set(self.effective_weapon_types)
+        current_playstyle = set(self.effective_playstyle_tags)
+        has_caster = bool(current_playstyle & _CASTER_TAGS)
+        aff_src: dict[str, bool] = {}
+        for slider, coat_weapons in _STATUS_COAT_WEAPONS.items():
+            by_weapon = bool(current_weapons & coat_weapons)
+            # Every status is reachable via sorcery/incant for a caster,
+            # even the "spell-only" ones with empty coat sets.
+            aff_src[slider] = by_weapon or has_caster
+        self.affliction_has_source = aff_src
+        gated: dict[str, int] = {s: 0 for s in slider_to_key}
+        key_to_slider = {k: s for s, k in slider_to_key.items()}
+        for e in effs_flat:
+            req = e.requires
+            slider = key_to_slider.get(req) if req else None
+            if slider:
+                gated[slider] += 1
+        self.slider_gated_count = gated
+
+        # Marginal impact per slider — "if I pushed this to 1.0 in-game, how
+        # much weighted_score would I gain?". Costs 14 extra compute() calls
+        # per recompute; compute() is ~1ms so the overhead is negligible, and
+        # this runs only when the build actually changes.
+        from dataclasses import replace as _dc_replace
+        ctx_base = self._ctx()
+        base_w = contrib.weighted_score
+        debuffs = [b.debuff for b in build if b.debuff is not None]
+        ctx_field_map = {
+            "grease_uptime": "grease_uptime",
+            "trance_uptime": "trance_uptime_baseline",
+            "ult_uptime": "ult_active_uptime",
+            "incant_uptime": "incant_buff_uptime",
+            "took_damage_uptime": "took_damage_uptime",
+            "enemy_poisoned_uptime": "enemy_poisoned_uptime",
+            "enemy_scarlet_rot_uptime": "enemy_scarlet_rot_uptime",
+            "enemy_frostbite_uptime": "enemy_frostbite_uptime",
+            "enemy_bleed_uptime": "enemy_bleed_uptime",
+            "enemy_asleep_uptime": "enemy_asleep_uptime",
+            "enemy_madness_uptime": "enemy_madness_uptime",
+            "enemy_deathblight_uptime": "enemy_deathblight_uptime",
+            "first_combo_hit": "first_combo_hit_fraction",
+            "chain_last_hit": "chain_last_hit_fraction",
+        }
+        deltas: dict[str, float] = {}
+        for slider, ctx_field in ctx_field_map.items():
+            if getattr(ctx_base, ctx_field) >= 0.999:
+                deltas[slider] = 0.0
+                continue
+            boosted = _dc_replace(ctx_base, **{ctx_field: 1.0})
+            wo = _compute_contrib(
+                effs_flat, debuffs=debuffs, ctx=boosted,
+                character_id=self.character_id, detailed=True,
+            )
+            deltas[slider] = round(max(0.0, wo.weighted_score - base_w), 1)
+        self.slider_full_delta = deltas
 
     def _named_relic_for_slot(self, slot_idx: int) -> str:
         """Return the named-relic id currently pinned in slot_idx (empty if none)."""
@@ -2010,7 +2216,14 @@ class State(rx.State):
         included — legacy code skipped it when slot 0 was a truly-fixed
         Remembrance slot, but now it's a regular slot and skipping it
         caused named relics (Glass Necklace) to display as 'Common Grand'
-        after load because the solver re-picked different attrs."""
+        after load because the solver re-picked different attrs.
+
+        Also restores the slider context (all uptime baselines, afflictions,
+        combat patterns) and the build-goal weights saved with the preset so
+        the loaded build is evaluated under the same conditions it was saved
+        under — otherwise a preset tuned for a Guardian tank profile would
+        score wildly differently under an Undertaker DPS slider set.
+        """
         p = presets_mod.get(name, self.character_id)
         if p is None:
             return rx.toast.error(f"Preset '{name}' not found")
@@ -2021,6 +2234,12 @@ class State(rx.State):
             for a_i, eid in enumerate(ps.attr_ids):
                 new_locks[_k(s_i, a_i)] = int(eid)
         self.locked_picks = new_locks
+        ctx = p.ctx or {}
+        for ctx_key, state_field in _CTX_TO_STATE.items():
+            if ctx_key in ctx:
+                setattr(self, state_field, ctx[ctx_key])
+        if p.build_goal_weights:
+            self.build_goal_weights_override = dict(p.build_goal_weights)
         self.recompute()
         return rx.toast.success(f"Loaded '{name}' ({p.total_boss_window:.2f} dmg)")
 

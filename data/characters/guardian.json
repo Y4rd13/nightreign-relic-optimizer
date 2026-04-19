@@ -61,7 +61,17 @@
       "survival": 1.0,
       "utility": 0.4,
       "team": 0.2
-    }
+    },
+    "sidebar_open_sections": [
+      "Character",
+      "Mode",
+      "Vessel",
+      "Boss routing",
+      "Build goal",
+      "Playstyle & weapons",
+      "Controls",
+      "Presets"
+    ]
   },
   "effects": {}
 }

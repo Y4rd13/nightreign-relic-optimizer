@@ -68,13 +68,24 @@ def _section(icon_name: str, title: str, *children, start_open: bool = True) -> 
 def _slider(label: str, value, on_change, on_commit=None,
             min_=0.0, max_=1.0, step=0.05,
             help_text: str = "", is_int: bool = False,
-            field_name: str = "") -> rx.Component:
+            field_name: str = "",
+            effective_value=None, gated_count=None,
+            has_source=None, full_delta=None) -> rx.Component:
     """Playstyle slider.
 
     `on_change` fires continuously while dragging — we use it to keep the
     displayed value synced without doing expensive work.
     `on_commit` (optional) fires once on mouse-release — use it to trigger
     recompute. If omitted, falls back to `on_change` (legacy behaviour).
+
+    `effective_value` (rx.Var or None): the uptime AFTER folding in relic
+    uptime_boosts from the current build. When different from `value`, the
+    slider shows a "→ Y" arrow next to the number so the user sees what
+    their build stacks on top of their playstyle floor.
+
+    `gated_count` (rx.Var or None): how many effects in the current build
+    depend on this slider being > 0. Renders a small "×N" pill that
+    previews how much the slider influences scoring.
     """
     default = PLAYSTYLE_DEFAULTS.get(field_name)
     default_str = _fmt_default(default) if default is not None else ""
@@ -93,6 +104,101 @@ def _slider(label: str, value, on_change, on_commit=None,
     }
     if on_commit is not None:
         slider_kwargs["on_value_commit"] = on_commit
+    effective_pill = rx.box()
+    if effective_value is not None:
+        effective_pill = rx.cond(
+            effective_value > value,
+            rx.tooltip(
+                rx.hstack(
+                    rx.text("→", color=PAL["green"],
+                            font_size="0.7rem", font_weight="700",
+                            font_family="ui-monospace, SFMono-Regular, Menlo, monospace"),
+                    rx.text(effective_value, color=PAL["green"],
+                            font_size="0.78rem", font_weight="700",
+                            font_family="ui-monospace, SFMono-Regular, Menlo, monospace"),
+                    spacing="1", align="center",
+                ),
+                content=(
+                    "Effective uptime — relics in your current build add boosts "
+                    "on top of your baseline. The solver scores against this "
+                    "higher value."
+                ),
+            ),
+            rx.box(),
+        )
+    full_delta_pill = rx.box()
+    if full_delta is not None:
+        # Only render the pill when there's meaningful potential gain — a
+        # delta of 0 means either the slider is already at 1.0 or no effect
+        # in the build is gated by it (so nothing would change).
+        full_delta_pill = rx.cond(
+            full_delta > 0.0,
+            rx.tooltip(
+                rx.text(
+                    "+" + full_delta.to_string() + " at full",
+                    color=PAL["overlay1"],
+                    font_size="0.64rem",
+                    font_weight="600",
+                    font_family="ui-monospace, SFMono-Regular, Menlo, monospace",
+                    font_style="italic",
+                    margin_top="2px",
+                ),
+                content=(
+                    "Weighted-score increase if you pushed this slider to "
+                    "1.0 (everything else fixed). Low number → the slider "
+                    "doesn't meaningfully gate your current build; high "
+                    "number → cycling this buff better in-game is worth "
+                    "effort."
+                ),
+            ),
+            rx.box(),
+        )
+    no_source_pill = rx.box()
+    if has_source is not None:
+        # Render the ⚠ only when the user has actually raised the slider above
+        # zero — a 0 slider can't mislead the solver, so the warning would be
+        # pure noise.
+        no_source_pill = rx.cond(
+            (value > 0.0) & ~has_source,
+            rx.tooltip(
+                rx.icon(
+                    tag="triangle_alert",
+                    size=12,
+                    color=PAL["yellow"],
+                    style={"cursor": "help"},
+                ),
+                content=(
+                    "No plausible in-game source for this status on your "
+                    "current weapon loadout / playstyle. The solver will "
+                    "credit damage bonuses you can't trigger. Override "
+                    "your weapons or playstyle tags if this is wrong."
+                ),
+            ),
+            rx.box(),
+        )
+    gated_pill = rx.box()
+    if gated_count is not None:
+        gated_pill = rx.cond(
+            gated_count > 0,
+            rx.tooltip(
+                rx.text(
+                    "×" + gated_count.to_string(),
+                    background=PAL["surface0"],
+                    color=PAL["overlay1"],
+                    border=f"1px solid {PAL['surface1']}",
+                    padding="1px 6px",
+                    border_radius="3px",
+                    font_size="0.64rem",
+                    font_weight="700",
+                    font_family="ui-monospace, SFMono-Regular, Menlo, monospace",
+                ),
+                content=(
+                    "Effects in your current build gated by this slider. "
+                    "Raising it above zero unlocks their scoring contribution."
+                ),
+            ),
+            rx.box(),
+        )
     return rx.box(
         rx.hstack(
             rx.tooltip(
@@ -100,10 +206,13 @@ def _slider(label: str, value, on_change, on_commit=None,
                         cursor="help"),
                 content=tooltip_txt,
             ),
+            no_source_pill,
+            gated_pill,
             rx.spacer(),
             rx.text(value, color=PAL["text"],
                     font_size="0.78rem", font_weight="700",
                     font_family="ui-monospace, SFMono-Regular, Menlo, monospace"),
+            effective_pill,
             rx.cond(
                 (default is not None) & (value != default),
                 rx.tooltip(
@@ -131,6 +240,7 @@ def _slider(label: str, value, on_change, on_commit=None,
             spacing="1",
         ),
         rx.slider(**slider_kwargs),
+        full_delta_pill,
         width="100%",
         spacing="1",
     )
@@ -215,6 +325,24 @@ def _character_card() -> rx.Component:
                     line_height="1.4"),
             spacing="1",
             align="start",
+        ),
+        rx.tooltip(
+            rx.hstack(
+                rx.icon(tag="filter", size=11, color=PAL["overlay0"]),
+                rx.text(State.pool_stats_text,
+                        color=PAL["overlay1"], font_size="0.7rem",
+                        font_family="ui-monospace, SFMono-Regular, Menlo, monospace",
+                        cursor="help"),
+                spacing="1",
+                align="center",
+                margin_top="6px",
+            ),
+            content=(
+                "The solver already filters out effects that can't apply to "
+                "your character (wrong weapon class, foreign character tag, "
+                "non-rollable tier, etc.). Changing weapons, playstyle tags, "
+                "party composition, or build-goal weights updates this count."
+            ),
         ),
         rx.cond(
             ~State.character_is_full,
@@ -629,31 +757,59 @@ def sidebar() -> rx.Component:
             _section(
                 "zap",
                 "Buff uptime",
-                _slider("Grease uptime", State.grease_uptime,
+                rx.hstack(
+                    rx.icon(tag="info", size=11, color=PAL["overlay1"]),
+                    rx.text(
+                        "Baseline = how often you naturally hold each buff without "
+                        "relic help (your skill / playstyle). Relics with "
+                        "uptime_boosts stack on top — the green '→ X' shows the "
+                        "effective total in your current build.",
+                        color=PAL["overlay1"], font_size="0.7rem",
+                        line_height="1.4",
+                    ),
+                    spacing="1", align="start",
+                    margin_bottom="6px",
+                ),
+                _slider("Grease baseline", State.grease_uptime,
                         lambda v: State.drag_slider("grease_uptime", v),
                         lambda v: State.commit_slider("grease_uptime", v),
-                        help_text="Fraction of fight with grease buff active.",
-                        field_name="grease_uptime"),
-                _slider("Skill baseline", State.trance_uptime,
+                        help_text="Fraction of fight you keep grease applied (L50 buff bucket).",
+                        field_name="grease_uptime",
+                        effective_value=State.effective_uptimes["grease_uptime"],
+                        gated_count=State.slider_gated_count["grease_uptime"],
+                        full_delta=State.slider_full_delta["grease_uptime"]),
+                _slider("Trance (skill) baseline", State.trance_uptime,
                         lambda v: State.drag_slider("trance_uptime", v),
                         lambda v: State.commit_slider("trance_uptime", v),
-                        help_text="Auto-jumps to 99% if a skill-loop effect is in build.",
-                        field_name="trance_uptime"),
-                _slider("Ult uptime", State.ult_uptime,
+                        help_text="Time you keep Trance active by cycling skill. L525 Trance-Loop relic pushes this toward 99%.",
+                        field_name="trance_uptime",
+                        effective_value=State.effective_uptimes["trance_uptime"],
+                        gated_count=State.slider_gated_count["trance_uptime"],
+                        full_delta=State.slider_full_delta["trance_uptime"]),
+                _slider("Ult baseline", State.ult_uptime,
                         lambda v: State.drag_slider("ult_uptime", v),
                         lambda v: State.commit_slider("ult_uptime", v),
-                        help_text="Fraction of fight where Ultimate Art is active.",
-                        field_name="ult_uptime"),
-                _slider("Incant buff", State.incant_uptime,
+                        help_text="Time Ultimate Art is active — depends on how fast you charge the gauge.",
+                        field_name="ult_uptime",
+                        effective_value=State.effective_uptimes["ult_uptime"],
+                        gated_count=State.slider_gated_count["ult_uptime"],
+                        full_delta=State.slider_full_delta["ult_uptime"]),
+                _slider("Incant buff baseline", State.incant_uptime,
                         lambda v: State.drag_slider("incant_uptime", v),
                         lambda v: State.commit_slider("incant_uptime", v),
-                        help_text="Incantation buff uptime — L522-like effects only apply when > 0.",
-                        field_name="incant_uptime"),
-                _slider("Taking attacks", State.took_damage_uptime,
+                        help_text="Golden Vow / Flame Grant Me Strength / similar self-buff uptime. L522 effects only score when > 0.",
+                        field_name="incant_uptime",
+                        effective_value=State.effective_uptimes["incant_uptime"],
+                        gated_count=State.slider_gated_count["incant_uptime"],
+                        full_delta=State.slider_full_delta["incant_uptime"]),
+                _slider("Taking-attacks baseline", State.took_damage_uptime,
                         lambda v: State.drag_slider("took_damage_uptime", v),
                         lambda v: State.commit_slider("took_damage_uptime", v),
-                        help_text="Fraction of fight spent with the L49 'took damage' buff up.",
-                        field_name="took_damage_uptime"),
+                        help_text="Fraction of boss window you've been hit recently — gates L49 'recently took damage' buffs.",
+                        field_name="took_damage_uptime",
+                        effective_value=State.effective_uptimes["took_damage_uptime"],
+                        gated_count=State.slider_gated_count["took_damage_uptime"],
+                        full_delta=State.slider_full_delta["took_damage_uptime"]),
                 start_open=False,
             ),
 
@@ -663,66 +819,106 @@ def sidebar() -> rx.Component:
                 rx.hstack(
                     rx.icon(tag="info", size=11, color=PAL["overlay1"]),
                     rx.text(
-                        "Set uptime > 0 only if your weapon coats / incants "
-                        "actually inflict the status. Otherwise \"damage vs "
-                        "X-afflicted enemy\" relics score 0 and are ignored.",
+                        "How reliably your weapon/incantations actually apply "
+                        "each status. Leave at 0 if you don't inflict it — "
+                        "\"damage vs X-afflicted\" relics will score 0 and be "
+                        "ignored. The ×N badge shows effects in your current "
+                        "build gated by each status.",
                         color=PAL["overlay1"], font_size="0.7rem",
                         line_height="1.4",
                     ),
                     spacing="1", align="start",
                     margin_bottom="4px",
                 ),
-                _slider("Poison uptime", State.enemy_poisoned_uptime,
+                _slider("Poison", State.enemy_poisoned_uptime,
                         lambda v: State.drag_slider("enemy_poisoned_uptime", v),
                         lambda v: State.commit_slider("enemy_poisoned_uptime", v),
                         help_text="Fraction of fight the enemy is poisoned (weapon coat / poison incant).",
-                        field_name="enemy_poisoned_uptime"),
+                        field_name="enemy_poisoned_uptime",
+                        gated_count=State.slider_gated_count["enemy_poisoned_uptime"],
+                        has_source=State.affliction_has_source["enemy_poisoned_uptime"],
+                        full_delta=State.slider_full_delta["enemy_poisoned_uptime"]),
                 _slider("Scarlet rot", State.enemy_scarlet_rot_uptime,
                         lambda v: State.drag_slider("enemy_scarlet_rot_uptime", v),
                         lambda v: State.commit_slider("enemy_scarlet_rot_uptime", v),
                         help_text="Fraction of fight enemy has scarlet rot applied.",
-                        field_name="enemy_scarlet_rot_uptime"),
+                        field_name="enemy_scarlet_rot_uptime",
+                        gated_count=State.slider_gated_count["enemy_scarlet_rot_uptime"],
+                        has_source=State.affliction_has_source["enemy_scarlet_rot_uptime"],
+                        full_delta=State.slider_full_delta["enemy_scarlet_rot_uptime"]),
                 _slider("Frostbite", State.enemy_frostbite_uptime,
                         lambda v: State.drag_slider("enemy_frostbite_uptime", v),
                         lambda v: State.commit_slider("enemy_frostbite_uptime", v),
                         help_text="Fraction of fight enemy is frostbitten (cold weapon / frost incant).",
-                        field_name="enemy_frostbite_uptime"),
+                        field_name="enemy_frostbite_uptime",
+                        gated_count=State.slider_gated_count["enemy_frostbite_uptime"],
+                        has_source=State.affliction_has_source["enemy_frostbite_uptime"],
+                        full_delta=State.slider_full_delta["enemy_frostbite_uptime"]),
                 _slider("Bleed", State.enemy_bleed_uptime,
                         lambda v: State.drag_slider("enemy_bleed_uptime", v),
                         lambda v: State.commit_slider("enemy_bleed_uptime", v),
                         help_text="Fraction of fight enemy is bleeding (hemorrhage).",
-                        field_name="enemy_bleed_uptime"),
+                        field_name="enemy_bleed_uptime",
+                        gated_count=State.slider_gated_count["enemy_bleed_uptime"],
+                        has_source=State.affliction_has_source["enemy_bleed_uptime"],
+                        full_delta=State.slider_full_delta["enemy_bleed_uptime"]),
                 _slider("Asleep", State.enemy_asleep_uptime,
                         lambda v: State.drag_slider("enemy_asleep_uptime", v),
                         lambda v: State.commit_slider("enemy_asleep_uptime", v),
                         help_text="Fraction of fight enemy is asleep.",
-                        field_name="enemy_asleep_uptime"),
+                        field_name="enemy_asleep_uptime",
+                        gated_count=State.slider_gated_count["enemy_asleep_uptime"],
+                        has_source=State.affliction_has_source["enemy_asleep_uptime"],
+                        full_delta=State.slider_full_delta["enemy_asleep_uptime"]),
                 _slider("Madness", State.enemy_madness_uptime,
                         lambda v: State.drag_slider("enemy_madness_uptime", v),
                         lambda v: State.commit_slider("enemy_madness_uptime", v),
                         help_text="Fraction of fight enemy has madness.",
-                        field_name="enemy_madness_uptime"),
+                        field_name="enemy_madness_uptime",
+                        gated_count=State.slider_gated_count["enemy_madness_uptime"],
+                        has_source=State.affliction_has_source["enemy_madness_uptime"],
+                        full_delta=State.slider_full_delta["enemy_madness_uptime"]),
                 _slider("Death Blight", State.enemy_deathblight_uptime,
                         lambda v: State.drag_slider("enemy_deathblight_uptime", v),
                         lambda v: State.commit_slider("enemy_deathblight_uptime", v),
                         help_text="Fraction of fight enemy is afflicted by death blight.",
-                        field_name="enemy_deathblight_uptime"),
+                        field_name="enemy_deathblight_uptime",
+                        gated_count=State.slider_gated_count["enemy_deathblight_uptime"],
+                        has_source=State.affliction_has_source["enemy_deathblight_uptime"],
+                        full_delta=State.slider_full_delta["enemy_deathblight_uptime"]),
                 start_open=False,
             ),
 
             _section(
                 "sword",
                 "Combat patterns",
+                rx.hstack(
+                    rx.icon(tag="info", size=11, color=PAL["overlay1"]),
+                    rx.text(
+                        "Fraction of your attacks that match each pattern — "
+                        "reflects your playstyle (long combos vs R1 spam). "
+                        "Gates effects keyed on combo position. The ×N badge "
+                        "shows effects in your build that use each.",
+                        color=PAL["overlay1"], font_size="0.7rem",
+                        line_height="1.4",
+                    ),
+                    spacing="1", align="start",
+                    margin_bottom="4px",
+                ),
                 _slider("Chain last-hit", State.chain_last_hit,
                         lambda v: State.drag_slider("chain_last_hit", v),
                         lambda v: State.commit_slider("chain_last_hit", v),
-                        help_text="Fraction of hits that are final-blow-of-chain (L521).",
-                        field_name="chain_last_hit"),
+                        help_text="Fraction of hits that are the final blow of a chain / combo (L521 Chain-Final-Blow).",
+                        field_name="chain_last_hit",
+                        gated_count=State.slider_gated_count["chain_last_hit"],
+                        full_delta=State.slider_full_delta["chain_last_hit"]),
                 _slider("First-hit", State.first_combo_hit,
                         lambda v: State.drag_slider("first_combo_hit", v),
                         lambda v: State.commit_slider("first_combo_hit", v),
-                        help_text="Fraction of hits that are combo starters.",
-                        field_name="first_combo_hit"),
+                        help_text="Fraction of hits that are combo starters (first attack of a string).",
+                        field_name="first_combo_hit",
+                        gated_count=State.slider_gated_count["first_combo_hit"],
+                        full_delta=State.slider_full_delta["first_combo_hit"]),
                 rx.hstack(
                     rx.hstack(
                         rx.checkbox(checked=State.three_hammers, on_change=State.toggle_hammers),
@@ -1162,7 +1358,7 @@ def sidebar() -> rx.Component:
             ),
 
             type="multiple",
-            default_value=["Character", "Mode", "Vessel", "Boss routing", "Controls", "Presets"],
+            default_value=State.sidebar_open_sections,
             variant="ghost",
             width="100%",
         ),

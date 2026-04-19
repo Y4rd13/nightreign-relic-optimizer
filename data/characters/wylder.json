@@ -62,7 +62,17 @@
       "survival": 0.4,
       "utility": 0.3,
       "team": 0.0
-    }
+    },
+    "sidebar_open_sections": [
+      "Character",
+      "Mode",
+      "Vessel",
+      "Boss routing",
+      "Buff uptime",
+      "Combat patterns",
+      "Controls",
+      "Presets"
+    ]
   },
   "effects": {}
 }

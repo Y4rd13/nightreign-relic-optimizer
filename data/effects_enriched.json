@@ -4131,14 +4131,19 @@
     },
     "7032200": {
       "category": "Offensive",
-      "effect_text": "",
+      "effect_text": "Increases damage by 15% for 10 seconds after taking damage.",
       "stack_self": false,
       "stack_other": null,
       "unobtainable": false,
       "is_dn": false,
-      "roll": "",
-      "notes": "",
-      "parsed": {}
+      "roll": "attack",
+      "notes": "In-game measured 120 \u2192 137 dmg (+14%, within variance of the 15% internal value). Duration 10s confirmed in-game on 2026-04-19.",
+      "parsed": {
+        "damage_mult_pct": 15,
+        "damage_scope": "all",
+        "duration_s": 10,
+        "trigger": "took_damage_recently"
+      }
     },
     "7032300": {
       "category": "Character Specific",

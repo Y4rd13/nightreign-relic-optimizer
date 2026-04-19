@@ -341,10 +341,25 @@ _GOAL_SCALE = {
 }
 
 
+import re as _re
+_EFFECT_TEXT_PCT_RE = _re.compile(r"by\s*(\d+(?:\.\d+)?)\s*%")
+_EFFECT_TEXT_FLAT_RE = _re.compile(r"(?:by|restores?|raises?|increases?)\s*(\d+(?:\.\d+)?)\b")
+
+
 def _effect_value_proxy(eff: Effect) -> float:
     """Picks a single scalar representing 'how much value this effect
     provides'. Memoized by effect_id — the solver calls this millions of
-    times in hot paths."""
+    times in hot paths.
+
+    Source of truth, in order:
+      1. Declared numeric fields (utility_value / additive / mult-1)
+      2. Effect name for "+N%" style suffixes
+      3. effect_text for "by N%" / "restores N" patterns (many in-game
+         effects carry their value only in the descriptive text, e.g.
+         'Improved Flask HP Restoration' → "Increases HP gained from
+         flasks by 10%")
+      4. Name keyword fallbacks (negation, resistance, ally, etc.)
+    """
     cached = _VALUE_CACHE.get(eff.effect_id)
     if cached is not None:
         return cached
@@ -360,6 +375,28 @@ def _effect_value_proxy(eff: Effect) -> float:
     for token in ("+5%", "+4%", "+3%", "+2%", "+1%"):
         if token in name_lower:
             v = int(token[1]) / 100.0
+            _VALUE_CACHE[eff.effect_id] = v
+            return v
+    # Parse effect_text for numeric values so defense/utility effects that
+    # carry their value only in the description (Flask HP Restoration,
+    # Magic Damage Negation+1, etc.) score non-zero. Heavily scaled down —
+    # a "15% magic negation" is a narrow defensive buff, NOT comparable in
+    # value to a "15% damage mult" on offense. Using /500 puts text-parsed
+    # pcts in the 0.02-0.05 range — same magnitude as the keyword fallbacks
+    # below — so they don't let the solver prefer defense over damage for
+    # a DPS character with survival weight 0.2.
+    text = (getattr(eff, "effect_text", "") or "").lower()
+    if text:
+        m = _EFFECT_TEXT_PCT_RE.search(text)
+        if m:
+            pct = float(m.group(1))
+            v = min(pct / 500.0, 0.10)
+            _VALUE_CACHE[eff.effect_id] = v
+            return v
+        m = _EFFECT_TEXT_FLAT_RE.search(text)
+        if m:
+            flat = float(m.group(1))
+            v = min(flat / 5000.0, 0.05)
             _VALUE_CACHE[eff.effect_id] = v
             return v
     if "maximum hp" in name_lower:

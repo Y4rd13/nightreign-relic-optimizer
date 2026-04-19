@@ -44,6 +44,12 @@ audit/
 *.log
 *.tmp
 
+# ── Migration backups (*.bak, *.bak.YYYYMMDD-HHMMSS) ──
+# Created by scripts/import_xlsx.py + sync_remembrance.py when they
+# rewrite data/*.json. Keep locally for rollback, never commit.
+*.bak
+*.bak.*
+
 # ── Generated screenshots / stray media at repo root ───
 /*.png
 /*.jpg

@@ -475,6 +475,27 @@ _PLAYSTYLE_NAME_PATTERNS: tuple[tuple[str, str], ...] = (
 )
 
 
+# Character-kit synergy — effects that reference another character's
+# ability by name (Totem Stela = Raider ult, Kindred = Revenant skill
+# target, etc.) are only useful if that character is in the party.
+# `[Character]`-tagged effects (like `[Raider] Improved ...`) are already
+# handled by character_compatible; THIS list catches the untagged ones
+# whose dependency hides in the descriptive name.
+_PARTY_SYNERGY_PATTERNS: tuple[tuple[re.Pattern, str], ...] = (
+    (re.compile(r"totem stela|totem statue", re.I), "raider"),
+)
+
+
+def _detect_party_synergy(name: str) -> Optional[str]:
+    """Returns the character_id whose kit this effect depends on, or None
+    if the effect is party-neutral. Used to gate synergy picks when that
+    character isn't in the current party."""
+    for pat, char in _PARTY_SYNERGY_PATTERNS:
+        if pat.search(name or ""):
+            return char
+    return None
+
+
 def _detect_playstyle_tag(name: str) -> Optional[str]:
     """Return the playstyle this effect requires, or None if universal.
     Used to skip guard-based / crit-based / stance-based effects for
@@ -702,6 +723,7 @@ def character_candidates(
     include_character_specific: bool = True,
     include_wrong_weapon: bool = False,
     build_goal_weights: Optional[dict] = None,
+    party_members: Optional[list[str]] = None,
 ) -> list[Effect]:
     """Effects the solver may consider for this character.
 
@@ -756,6 +778,8 @@ def character_candidates(
                 goal_w[k] = float(build_goal_weights[k])
     allow_survival = goal_w.get("survival", 0.0) > 0.05
     allow_team = goal_w.get("team", 0.0) > 0.05
+    # Default party = just the current character (solo).
+    party = set(party_members) if party_members else {character_id}
     out = []
     for e in pool:
         if not character_compatible(e, character_id):
@@ -783,6 +807,13 @@ def character_candidates(
             e.name, char_playstyle, char_weapons
         ):
             continue
+        # Party-synergy gate: effects that reference another character's
+        # ability (e.g. "near Totem Stela" = Raider ult) are only useful
+        # when that character is in the party.
+        if not include_wrong_weapon:
+            required = _detect_party_synergy(e.name)
+            if required and required not in party:
+                continue
         out.append(e)
     return out
 

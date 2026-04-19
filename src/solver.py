@@ -141,6 +141,10 @@ class OptimizerConfig:
     # instead of hammers) or a guard-focused build for any character, etc.
     weapon_types_override: Optional[tuple[str, ...]] = None
     playstyle_tags_override: Optional[tuple[str, ...]] = None
+    # Party composition (character ids including the current one). Default
+    # None = solo play (character_id only). Used to gate effects that
+    # reference another character's kit (e.g. "near Totem Stela" → Raider).
+    party_members: Optional[tuple[str, ...]] = None
 
     # SA / multi-restart knobs.  Defaults picked so a full solve finishes in
     # ~1-2 s on the reference build.
@@ -256,6 +260,7 @@ def _candidate_pool(cfg: OptimizerConfig, interest_only: bool = True) -> list[Ef
         weapon_types=list(cfg.weapon_types_override) if cfg.weapon_types_override is not None else None,
         playstyle_tags=list(cfg.playstyle_tags_override) if cfg.playstyle_tags_override is not None else None,
         build_goal_weights=goal_weights,
+        party_members=list(cfg.party_members) if cfg.party_members else None,
     )
     out = []
     for e in pool:

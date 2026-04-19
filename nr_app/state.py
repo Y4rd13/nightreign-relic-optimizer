@@ -352,6 +352,12 @@ class State(rx.State):
     # user steer the solver toward tank/support/utility even for characters
     # that default to pure damage.
     build_goal_weights_override: dict[str, float] = {}
+    # Team composition — character ids of OTHER members (not the active
+    # character). Drives the party-synergy filter: effects that reference
+    # another character's kit (e.g. "near Totem Stela" = Raider ult) are
+    # only shown to the solver when that character is in the team.
+    # Empty = solo play. Up to 2 entries (3-player team including self).
+    party_members_override: list[str] = []
 
     # ── playstyle context ─────────────────────────────────────────
     evergaol_clears: int = 6
@@ -541,6 +547,28 @@ class State(rx.State):
             "team": self.team_score * w["team"],
         }
         return max(contribs.items(), key=lambda kv: kv[1])[0]
+
+    @rx.var
+    def effective_party(self) -> list[str]:
+        """Self + other party members, de-duped + cleaned. Drives the
+        solver's party-synergy gate and the sidebar's team section."""
+        out = [self.character_id]
+        for m in self.party_members_override:
+            if m and m != self.character_id and m not in out:
+                out.append(m)
+        return out[:3]   # max 3-player party
+
+    @rx.var
+    def party_size(self) -> int:
+        return len(self.effective_party)
+
+    @rx.var
+    def party_slot_ids(self) -> list[str]:
+        """Up to 2 optional team-mate slots (indices 0 and 1)."""
+        raw = list(self.party_members_override)
+        while len(raw) < 2:
+            raw.append("")
+        return raw[:2]
 
     @rx.var
     def dominant_goal_label(self) -> str:
@@ -990,6 +1018,7 @@ class State(rx.State):
             playstyle_tags_override=(
                 tuple(self.playstyle_tags_override) if self.playstyle_tags_override else None
             ),
+            party_members=tuple(self.effective_party),
             seed_offset=self.explore_seed,
         )
 
@@ -1298,6 +1327,41 @@ class State(rx.State):
 
     def reset_build_goals(self):
         self.build_goal_weights_override = {}
+        self.recompute()
+
+    # ── team composition ──────────────────────────────────────────
+    def set_party_size(self, size: int):
+        """Radio buttons (1 / 2 / 3) — trims or extends the party list.
+        Solo = just self (no filtering change). Duo = self + 1 teammate
+        (one picker visible). Trio = self + 2 (two pickers)."""
+        size = max(1, min(3, int(size)))
+        current = list(self.party_members_override)
+        needed = size - 1   # minus self
+        if len(current) > needed:
+            current = current[:needed]
+        while len(current) < needed:
+            current.append("")   # empty slot — user picks via dropdown
+        self.party_members_override = current
+        self.recompute()
+
+    def set_party_member(self, slot_idx: int, cid: str):
+        """Pick a character for the Nth team-mate slot (0 or 1)."""
+        current = list(self.party_members_override)
+        while len(current) <= slot_idx:
+            current.append("")
+        # Guard against picking self (would be a no-op synergy-wise).
+        if cid == self.character_id:
+            cid = ""
+        # Guard against picking the same character twice.
+        if cid and cid in current and current.index(cid) != slot_idx:
+            current[slot_idx] = ""
+        else:
+            current[slot_idx] = cid
+        self.party_members_override = current
+        self.recompute()
+
+    def reset_party(self):
+        self.party_members_override = []
         self.recompute()
 
     # ═════════════════════════════════════════════════════════════

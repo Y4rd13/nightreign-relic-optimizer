@@ -910,6 +910,147 @@ def sidebar() -> rx.Component:
             ),
 
             _section(
+                "users",
+                "Team composition",
+                rx.hstack(
+                    rx.icon(tag="info", size=11, color=PAL["overlay1"]),
+                    rx.text(
+                        "Expedition size + team-mates. Unlocks synergy effects "
+                        "tied to another character's kit (e.g. 'near Totem "
+                        "Stela' needs Raider in the party).",
+                        color=PAL["overlay1"], font_size="0.7rem",
+                        line_height="1.4",
+                    ),
+                    spacing="1", align="start",
+                    margin_bottom="6px",
+                ),
+                rx.text("Party size", color=PAL["subtext"],
+                        font_size="0.72rem", font_weight="700",
+                        letter_spacing="0.04em", margin_bottom="4px"),
+                rx.hstack(
+                    rx.foreach(
+                        ["1", "2", "3"],
+                        lambda n: rx.el.button(
+                            rx.cond(n == "1", "Solo",
+                                    rx.cond(n == "2", "Duo", "Trio")),
+                            on_click=State.set_party_size(n.to(int)),
+                            style={
+                                "background": rx.cond(
+                                    State.party_size == n.to(int),
+                                    "rgba(203,166,247,0.20)",
+                                    "transparent",
+                                ),
+                                "border": rx.cond(
+                                    State.party_size == n.to(int),
+                                    f"1px solid {PAL['mauve']}",
+                                    f"1px solid {PAL['surface0']}",
+                                ),
+                                "color": rx.cond(
+                                    State.party_size == n.to(int),
+                                    PAL["mauve"], PAL["overlay1"],
+                                ),
+                                "padding": "5px 14px",
+                                "border_radius": "6px",
+                                "font_size": "0.78rem",
+                                "font_weight": "600",
+                                "cursor": "pointer",
+                                "flex": "1",
+                            },
+                        ),
+                    ),
+                    spacing="2", width="100%", margin_bottom="8px",
+                ),
+                rx.cond(
+                    State.party_size > 1,
+                    rx.vstack(
+                        rx.text("Team-mate 2", color=PAL["subtext"],
+                                font_size="0.72rem", font_weight="700",
+                                letter_spacing="0.04em", margin_bottom="2px"),
+                        rx.select.root(
+                            rx.select.trigger(
+                                placeholder="Select a character",
+                                width="100%"),
+                            rx.select.content(
+                                rx.foreach(
+                                    State.character_option_ids,
+                                    lambda cid, i: rx.cond(
+                                        cid != State.character_id,
+                                        rx.select.item(
+                                            State.character_option_labels[i],
+                                            value=cid,
+                                        ),
+                                        rx.fragment(),
+                                    ),
+                                ),
+                            ),
+                            value=State.party_slot_ids[0],
+                            on_change=lambda v: State.set_party_member(0, v),
+                            size="1",
+                        ),
+                        spacing="1", width="100%",
+                    ),
+                    rx.box(),
+                ),
+                rx.cond(
+                    State.party_size > 2,
+                    rx.vstack(
+                        rx.text("Team-mate 3", color=PAL["subtext"],
+                                font_size="0.72rem", font_weight="700",
+                                letter_spacing="0.04em",
+                                margin_top="6px", margin_bottom="2px"),
+                        rx.select.root(
+                            rx.select.trigger(
+                                placeholder="Select a character",
+                                width="100%"),
+                            rx.select.content(
+                                rx.foreach(
+                                    State.character_option_ids,
+                                    lambda cid, i: rx.cond(
+                                        cid != State.character_id,
+                                        rx.select.item(
+                                            State.character_option_labels[i],
+                                            value=cid,
+                                        ),
+                                        rx.fragment(),
+                                    ),
+                                ),
+                            ),
+                            value=State.party_slot_ids[1],
+                            on_change=lambda v: State.set_party_member(1, v),
+                            size="1",
+                        ),
+                        spacing="1", width="100%",
+                    ),
+                    rx.box(),
+                ),
+                rx.cond(
+                    State.party_members_override.length() > 0,
+                    rx.el.button(
+                        rx.hstack(
+                            rx.icon(tag="rotate_ccw", size=11),
+                            rx.text("Reset to solo", font_weight="600"),
+                            spacing="1", align="center",
+                        ),
+                        on_click=State.reset_party,
+                        style={
+                            "background": "transparent",
+                            "border": f"1px solid {PAL['surface1']}",
+                            "color": PAL["overlay1"],
+                            "padding": "5px 10px",
+                            "border_radius": "5px",
+                            "font_size": "0.72rem",
+                            "cursor": "pointer",
+                            "width": "100%",
+                            "margin_top": "8px",
+                        },
+                        _hover={"border_color": PAL["mauve"], "color": PAL["mauve"]},
+                    ),
+                    rx.box(),
+                ),
+                start_open=False,
+            ),
+
+            _section(
                 "target",
                 "Build goal",
                 rx.hstack(

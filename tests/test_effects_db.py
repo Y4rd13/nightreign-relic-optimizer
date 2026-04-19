@@ -50,6 +50,30 @@ def test_family_key_strips_plus_numeric_suffix():
     assert _family_key("Unrelated Effect") == "Unrelated Effect"
 
 
+def test_party_synergy_filter_solo():
+    """Raider-synergy effects (e.g. 'near Totem Stela') must NOT appear
+    for a non-Raider character playing solo — Totem Stela is Raider's
+    ultimate, so it's not on the field."""
+    pool = {e.effect_id for e in character_candidates("wylder", party_members=["wylder"])}
+    assert 7030000 not in pool, "'Improved Poise Near Totem Stela' leaked to solo Wylder"
+    assert 7090300 not in pool
+
+
+def test_party_synergy_filter_duo():
+    """Once Raider joins the party, those same effects become legit picks
+    for the other character — they can stack around Raider's Totem Stela."""
+    pool = {e.effect_id for e in character_candidates("wylder", party_members=["wylder", "raider"])}
+    assert 7030000 in pool, "Totem Stela synergy should unlock when Raider is in party"
+    assert 7090300 in pool
+
+
+def test_party_synergy_filter_raider_self():
+    """Raider's own synergy effects must always be available to them,
+    regardless of party size."""
+    pool = {e.effect_id for e in character_candidates("raider", party_members=["raider"])}
+    assert 7030000 in pool
+
+
 def test_family_key_memoized():
     """Calling twice with the same input shouldn't re-run the regex (cache hit)."""
     from src.effects_db import _FAMILY_CACHE

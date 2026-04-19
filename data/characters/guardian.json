@@ -1,0 +1,67 @@
+{
+  "id": "guardian",
+  "name": "Guardian",
+  "dlc": "base",
+  "tag": "Guardian",
+  "icon": "🛡️",
+  "tagline": "Heavy tank · halberd · guard counters",
+  "stats": {
+    "vigor": "S",
+    "mind": "C",
+    "endurance": "A",
+    "strength": "B",
+    "dexterity": "C",
+    "intelligence": "D",
+    "faith": "C",
+    "arcane": "C"
+  },
+  "weapon_types": [
+    "halberd",
+    "great_shield"
+  ],
+  "dual_wield": false,
+  "skill": {
+    "name": "Whirlwind",
+    "description": "Spinning halberd attack, AoE."
+  },
+  "ultimate": {
+    "name": "Wings of Salvation",
+    "description": "Shockwave + heal/buff allies."
+  },
+  "passive": {
+    "name": "Beast Regent",
+    "description": "HP regen + damage reduction for allies nearby."
+  },
+  "data_quality": "skeleton",
+  "remembrance_slots": [
+    {
+      "name": "Witch's Brooch",
+      "source": "xlsx_item_12002",
+      "fixed_effects": [
+        7012000,
+        7033400,
+        7000002
+      ],
+      "locked_labels": [],
+      "color_hint": "blue"
+    }
+  ],
+  "global": {
+    "trance_multiplier": 1.0,
+    "hammer_hits_per_boss_window_s": 0.8,
+    "hex_casts_per_boss_window_s": 0.0,
+    "loathsome_hex_per_cast_coef": 0.0,
+    "playstyle_tags": [
+      "melee",
+      "guard",
+      "stance"
+    ],
+    "build_goal_weights": {
+      "damage": 0.4,
+      "survival": 1.0,
+      "utility": 0.4,
+      "team": 0.2
+    }
+  },
+  "effects": {}
+}

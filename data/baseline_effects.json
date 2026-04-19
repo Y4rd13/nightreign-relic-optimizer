@@ -1,0 +1,342 @@
+{
+  "_schema": "Character-agnostic effect metadata. Characters can override individual entries in their own JSON; unspecified effects fall back to the baseline shown here.",
+  "global": {
+    "trance_uptime_with_skill_loop_default": 0.99,
+    "hammer_hits_per_boss_window_s": 0.8,
+    "hex_casts_per_boss_window_s": 0.22,
+    "loathsome_hex_per_cast_coef": 0.3,
+    "successive_attack_additive": 0.08,
+    "successive_attack_uptime": 0.7
+  },
+  "effects": {
+    "7001400": {
+      "label": "Physical Attack Up",
+      "additive": 0.02,
+      "additive_scope": "phys"
+    },
+    "7001401": {
+      "label": "Physical Attack Up +1",
+      "additive": 0.025,
+      "additive_scope": "phys"
+    },
+    "7001402": {
+      "label": "Physical Attack Up +2 (BTH)",
+      "additive": 0.035,
+      "additive_scope": "phys"
+    },
+    "6001400": {
+      "label": "Physical Attack Up +3 (DoN)",
+      "additive": 0.05,
+      "additive_scope": "phys"
+    },
+    "6001401": {
+      "label": "Physical Attack Up +4 (DoN)",
+      "additive": 0.065,
+      "additive_scope": "phys"
+    },
+    "7000302": {
+      "label": "Strength +3",
+      "stat": "str"
+    },
+    "7000301": {
+      "label": "Strength +2",
+      "stat": "str"
+    },
+    "7000300": {
+      "label": "Strength +1",
+      "stat": "str"
+    },
+    "7000402": {
+      "label": "Dexterity +3",
+      "stat": "dex"
+    },
+    "7000502": {
+      "label": "Intelligence +3",
+      "stat": "int"
+    },
+    "7000602": {
+      "label": "Faith +3",
+      "stat": "fai"
+    },
+    "7000601": {
+      "label": "Faith +2",
+      "stat": "fai"
+    },
+    "7000600": {
+      "label": "Faith +1",
+      "stat": "fai"
+    },
+    "7000702": {
+      "label": "Arcane +3",
+      "stat": "arc"
+    },
+    "7000102": {
+      "label": "Mind +3 (STD)",
+      "utility_value": 0.0
+    },
+    "7000202": {
+      "label": "Endurance +3 (STD)",
+      "utility_value": 0.0
+    },
+    "7000000": {
+      "label": "Vigor +3",
+      "utility_value": 0.0,
+      "notes": "+60 HP survival"
+    },
+    "7060000": {
+      "label": "Evergaol Prisoner Stack",
+      "additive": 0.05,
+      "additive_scope": "all",
+      "scaling_stat": "evergaol_clears",
+      "notes": "+5% per evergaol cleared"
+    },
+    "7060200": {
+      "label": "Night Invader Kill",
+      "additive": 0.07,
+      "additive_scope": "all",
+      "scaling_stat": "invader_kills"
+    },
+    "7060100": {
+      "label": "Attack Power Up after Destroying Nest Mimic",
+      "additive": 0.05,
+      "additive_scope": "all",
+      "uptime_default": 0.2
+    },
+    "7001002": {
+      "label": "Poise +3",
+      "utility_value": 0.0,
+      "notes": "fewer interrupts"
+    },
+    "7100100": {
+      "label": "Stamina Recovery upon Landing Attacks",
+      "utility_value": 0.0
+    },
+    "7100000": {
+      "label": "Improved Stamina Recovery Speed",
+      "utility_value": 0.0
+    },
+    "7005600": {
+      "label": "Partial HP Restoration upon Post-Damage Atks",
+      "utility_value": 0.015
+    },
+    "6005600": {
+      "label": "Partial HP Restoration +1 (DoN)",
+      "utility_value": 0.02
+    },
+    "6005601": {
+      "label": "Partial HP Restoration +2 (DoN)",
+      "utility_value": 0.025
+    },
+    "6090000": {
+      "label": "Defeating Enemies Fills Art Gauge +1 (DoN)",
+      "utility_value": 0.025
+    },
+    "6611400": {
+      "label": "Improved Flask HP Restoration (DoN)",
+      "utility_value": 0.0
+    },
+    "7012300": {
+      "label": "Improved Dmg Negation at Low HP",
+      "utility_value": 0.0
+    },
+    "7032100": {
+      "label": "Taking Attacks Reduces Damage",
+      "utility_value": 0.0
+    },
+    "7150000": {
+      "label": "HP Boost on Guard Counter",
+      "utility_value": 0.0
+    },
+    "7040200": {
+      "label": "Improved Critical Hits",
+      "bucket": "B_CRIT",
+      "mult": 1.15,
+      "mult_scope": "crit",
+      "uptime_default": 0.0
+    },
+    "7040100": {
+      "label": "Improved Guard Counters (BTH)",
+      "bucket": "B_COUNTER",
+      "mult": 1.15,
+      "mult_scope": "counter",
+      "uptime_default": 0.0
+    },
+    "6040100": {
+      "label": "Improved Guard Counters +1 (DoN)",
+      "bucket": "B_COUNTER",
+      "mult": 1.2,
+      "mult_scope": "counter",
+      "uptime_default": 0.0
+    },
+    "6040101": {
+      "label": "Improved Guard Counters +2 (DoN)",
+      "bucket": "B_COUNTER",
+      "mult": 1.25,
+      "mult_scope": "counter",
+      "uptime_default": 0.0
+    },
+    "6611001": {
+      "label": "Improved Phys Dmg Negation +1 (DoN)",
+      "utility_value": 0.0
+    },
+    "6611002": {
+      "label": "Improved Phys Dmg Negation +2 (DoN)",
+      "utility_value": 0.0
+    },
+    "6610400": {
+      "label": "Increased Maximum HP (DoN)",
+      "utility_value": 0.0
+    },
+    "6610500": {
+      "label": "Increased Maximum FP (DoN)",
+      "utility_value": 0.0
+    },
+    "6610600": {
+      "label": "Increased Maximum Stamina (DoN)",
+      "utility_value": 0.0
+    },
+    "6035100": {
+      "label": "Critical Hit Stamina Recovery +1 (DoN)",
+      "utility_value": 0.0
+    },
+    "6600000": {
+      "label": "Sleep in Vicinity Improves Atk",
+      "bucket": "B_AILMENT",
+      "mult": 1.1,
+      "mult_scope": "all",
+      "requires": "enemy_asleep",
+      "uptime_default": 0.0
+    },
+    "6600001": {
+      "label": "Sleep Vicinity +1",
+      "bucket": "B_AILMENT",
+      "mult": 1.13,
+      "mult_scope": "all",
+      "requires": "enemy_asleep",
+      "uptime_default": 0.0
+    },
+    "6600100": {
+      "label": "Madness in Vicinity Improves Atk",
+      "bucket": "B_AILMENT",
+      "mult": 1.1,
+      "mult_scope": "all",
+      "requires": "enemy_madness",
+      "uptime_default": 0.0
+    },
+    "6600101": {
+      "label": "Madness Vicinity +1",
+      "bucket": "B_AILMENT",
+      "mult": 1.13,
+      "mult_scope": "all",
+      "requires": "enemy_madness",
+      "uptime_default": 0.0
+    },
+    "6610800": {
+      "label": "Improved Affinity Atk",
+      "bucket": "B_AFFINITY",
+      "mult": 1.05,
+      "mult_scope": "affinity_only",
+      "uptime_default": 0.5
+    },
+    "6610801": {
+      "label": "Improved Affinity Atk +1",
+      "bucket": "B_AFFINITY",
+      "mult": 1.08,
+      "mult_scope": "affinity_only",
+      "uptime_default": 0.5
+    },
+    "6610802": {
+      "label": "Improved Affinity Atk +2",
+      "bucket": "B_AFFINITY",
+      "mult": 1.1,
+      "mult_scope": "affinity_only",
+      "uptime_default": 0.5
+    },
+    "7006000": {
+      "label": "Stance Breaking Two-Handing",
+      "utility_value": 0.0,
+      "notes": "stance gauge only, no HP dmg"
+    },
+    "7006100": {
+      "label": "Stance Breaking Two Armaments",
+      "utility_value": 0.0,
+      "notes": "stance gauge; minor DPS"
+    },
+    "7032200": {
+      "label": "L49 Taking Attacks Improves Atk",
+      "bucket": "B_L49",
+      "mult": 1.15,
+      "mult_scope": "all",
+      "requires": "took_damage_recently"
+    },
+    "7030900": {
+      "label": "Grease Buff base (+10%)",
+      "bucket": "B_GREASE",
+      "mult": 1.1,
+      "mult_scope": "all",
+      "requires": "grease_used"
+    },
+    "6030900": {
+      "label": "Grease Buff +1 (DoN)",
+      "bucket": "B_GREASE",
+      "mult": 1.13,
+      "mult_scope": "all",
+      "requires": "grease_used"
+    },
+    "6030901": {
+      "label": "Grease Buff +2 (DoN)",
+      "bucket": "B_GREASE",
+      "mult": 1.16,
+      "mult_scope": "all",
+      "requires": "grease_used"
+    },
+    "7040000": {
+      "label": "Initial Standard Attack Up",
+      "additive": 0.15,
+      "additive_scope": "phys",
+      "requires": "first_combo_hit"
+    },
+    "7000802": {
+      "label": "Character Skill CD Reduction +3",
+      "utility_value": 0.02,
+      "notes": "~10% CD reduction"
+    },
+    "7000902": {
+      "label": "Ultimate Art Gauge +3",
+      "utility_value": 0.03
+    },
+    "6830200": {
+      "label": "Reduced Intelligence and Dexterity (CURSE)",
+      "debuff_cost": 0.0
+    },
+    "6840000": {
+      "label": "Reduced Rune Acquisition (CURSE)",
+      "debuff_cost": 0.0
+    },
+    "6830400": {
+      "label": "Reduced Vigor and Arcane (CURSE)",
+      "debuff_cost": 0.01
+    },
+    "6851300": {
+      "label": "Poison Buildup when below max HP (CURSE)",
+      "debuff_cost": 0.02
+    },
+    "6830300": {
+      "label": "Reduced Faith and Strength (CURSE)",
+      "debuff_cost": 0.2,
+      "notes": "DO NOT USE on STR/FAI builds"
+    },
+    "6820000": {
+      "label": "Taking Damage Causes Poison Buildup (CURSE)",
+      "debuff_cost": 0.02
+    },
+    "6820600": {
+      "label": "Death Buildup on Damage (CURSE)",
+      "debuff_cost": 0.5
+    },
+    "6851200": {
+      "label": "Lower Atk when below max HP (CURSE)",
+      "debuff_cost": 0.1
+    }
+  }
+}

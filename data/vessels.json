@@ -1,0 +1,78 @@
+{
+  "_schema": "Vessels (chalices/urns/goblets/grails). Each has 3 standard slot colors; Deep-of-Night mode unlocks 3 additional slots per vessel (colors may differ). 'character' matches a character json id or 'any' for universal.",
+  "_colors_legend": {
+    "R": "Red (Burning Scene)",
+    "G": "Green (Tranquil Scene)",
+    "B": "Blue (Drizzly Scene)",
+    "Y": "Yellow (Luminous Scene)",
+    "U": "Universal / White (accepts any relic)"
+  },
+  "_source": "Fextralife Nightreign wiki, patch 1.03.5 / April 2026. Deep-slot data is known for some vessels but omitted here — defaults to [U,U,U] when not specified.",
+  "vessels": [
+    {"id": "wylder_urn",      "name": "Wylder's Urn",     "character": "wylder",  "slots": ["R","Y","Y"], "source": "Small Jar Bazaar"},
+    {"id": "wylder_goblet",   "name": "Wylder's Goblet",  "character": "wylder",  "slots": ["R","B","Y"], "source": "Remembrance"},
+    {"id": "wylder_chalice",  "name": "Wylder's Chalice", "character": "wylder",  "slots": ["R","G","U"], "source": "Remembrance"},
+    {"id": "soot_wylder_urn", "name": "Soot-Covered Wylder's Urn", "character": "wylder", "slots": ["B","B","Y"], "dlc": "Forsaken Hollows", "source": "DLC"},
+    {"id": "seal_wylder_urn", "name": "Sealed Wylder's Urn",       "character": "wylder", "slots": ["B","R","R"], "dlc": "Forsaken Hollows", "source": "DLC"},
+
+    {"id": "guardian_urn",     "name": "Guardian's Urn",     "character": "guardian", "slots": ["R","Y","Y"], "source": "Small Jar Bazaar"},
+    {"id": "guardian_goblet",  "name": "Guardian's Goblet",  "character": "guardian", "slots": ["B","B","G"], "source": "Remembrance"},
+    {"id": "guardian_chalice", "name": "Guardian's Chalice", "character": "guardian", "slots": ["B","Y","U"], "source": "Remembrance"},
+    {"id": "soot_guardian_urn","name": "Soot-Covered Guardian's Urn", "character": "guardian", "slots": ["R","G","G"], "dlc": "Forsaken Hollows", "source": "DLC"},
+    {"id": "seal_guardian_urn","name": "Sealed Guardian's Urn",       "character": "guardian", "slots": ["Y","Y","R"], "dlc": "Forsaken Hollows", "source": "DLC"},
+
+    {"id": "ironeye_urn",     "name": "Ironeye's Urn",     "character": "ironeye", "slots": ["Y","G","G"], "source": "Small Jar Bazaar"},
+    {"id": "ironeye_goblet",  "name": "Ironeye's Goblet",  "character": "ironeye", "slots": ["R","B","Y"], "source": "Remembrance"},
+    {"id": "ironeye_chalice", "name": "Ironeye's Chalice", "character": "ironeye", "slots": ["R","G","U"], "source": "Remembrance"},
+    {"id": "soot_ironeye_urn","name": "Soot-Covered Ironeye's Urn", "character": "ironeye", "slots": ["B","Y","Y"], "dlc": "Forsaken Hollows", "source": "DLC"},
+    {"id": "seal_ironeye_urn","name": "Sealed Ironeye's Urn",       "character": "ironeye", "slots": ["G","G","Y"], "dlc": "Forsaken Hollows", "source": "DLC"},
+
+    {"id": "duchess_urn",     "name": "Duchess's Urn",     "character": "duchess", "slots": ["R","B","B"], "source": "Small Jar Bazaar"},
+    {"id": "duchess_goblet",  "name": "Duchess's Goblet",  "character": "duchess", "slots": ["Y","Y","G"], "source": "Remembrance"},
+    {"id": "duchess_chalice", "name": "Duchess's Chalice", "character": "duchess", "slots": ["B","Y","U"], "source": "Remembrance"},
+    {"id": "soot_duchess_urn","name": "Soot-Covered Duchess's Urn", "character": "duchess", "slots": ["R","R","G"], "dlc": "Forsaken Hollows", "source": "DLC"},
+    {"id": "seal_duchess_urn","name": "Sealed Duchess's Urn",       "character": "duchess", "slots": ["B","B","R"], "dlc": "Forsaken Hollows", "source": "DLC"},
+
+    {"id": "raider_urn",     "name": "Raider's Urn",     "character": "raider", "slots": ["R","G","G"], "source": "Small Jar Bazaar"},
+    {"id": "raider_goblet",  "name": "Raider's Goblet",  "character": "raider", "slots": ["R","B","Y"], "source": "Remembrance"},
+    {"id": "raider_chalice", "name": "Raider's Chalice", "character": "raider", "slots": ["R","R","U"], "source": "Remembrance"},
+    {"id": "soot_raider_urn","name": "Soot-Covered Raider's Urn", "character": "raider", "slots": ["B","B","G"], "dlc": "Forsaken Hollows", "source": "DLC"},
+    {"id": "seal_raider_urn","name": "Sealed Raider's Urn",       "character": "raider", "slots": ["G","G","R"], "dlc": "Forsaken Hollows", "source": "DLC"},
+
+    {"id": "revenant_urn",     "name": "Revenant's Urn",     "character": "revenant", "slots": ["R","Y","Y"], "source": "Small Jar Bazaar"},
+    {"id": "revenant_goblet",  "name": "Revenant's Goblet",  "character": "revenant", "slots": ["R","B","Y"], "source": "Remembrance"},
+    {"id": "revenant_chalice", "name": "Revenant's Chalice", "character": "revenant", "slots": ["B","G","U"], "source": "Remembrance"},
+    {"id": "soot_revenant_urn","name": "Soot-Covered Revenant's Urn", "character": "revenant", "slots": ["R","Y","Y"], "dlc": "Forsaken Hollows", "source": "DLC"},
+    {"id": "seal_revenant_urn","name": "Sealed Revenant's Urn",       "character": "revenant", "slots": ["Y","B","B"], "dlc": "Forsaken Hollows", "source": "DLC"},
+
+    {"id": "recluse_urn",     "name": "Recluse's Urn",     "character": "recluse", "slots": ["B","B","G"], "source": "Small Jar Bazaar"},
+    {"id": "recluse_goblet",  "name": "Recluse's Goblet",  "character": "recluse", "slots": ["R","B","Y"], "source": "Remembrance"},
+    {"id": "recluse_chalice", "name": "Recluse's Chalice", "character": "recluse", "slots": ["Y","G","U"], "source": "Remembrance"},
+    {"id": "soot_recluse_urn","name": "Soot-Covered Recluse's Urn", "character": "recluse", "slots": ["R","R","Y"], "dlc": "Forsaken Hollows", "source": "DLC"},
+    {"id": "seal_recluse_urn","name": "Sealed Recluse's Urn",       "character": "recluse", "slots": ["G","B","B"], "dlc": "Forsaken Hollows", "source": "DLC"},
+
+    {"id": "executor_urn",     "name": "Executor's Urn",     "character": "executor", "slots": ["R","Y","Y"], "source": "Small Jar Bazaar"},
+    {"id": "executor_goblet",  "name": "Executor's Goblet",  "character": "executor", "slots": ["R","B","G"], "source": "Remembrance"},
+    {"id": "executor_chalice", "name": "Executor's Chalice", "character": "executor", "slots": ["B","Y","U"], "source": "Remembrance"},
+    {"id": "soot_executor_urn","name": "Soot-Covered Executor's Urn", "character": "executor", "slots": ["R","R","B"], "dlc": "Forsaken Hollows", "source": "DLC"},
+    {"id": "seal_executor_urn","name": "Sealed Executor's Urn",       "character": "executor", "slots": ["Y","Y","R"], "dlc": "Forsaken Hollows", "source": "DLC"},
+
+    {"id": "scholar_urn",     "name": "Scholar's Urn",     "character": "scholar", "slots": ["R","R","Y"], "dlc": "Forsaken Hollows", "source": "DLC"},
+    {"id": "scholar_goblet",  "name": "Scholar's Goblet",  "character": "scholar", "slots": ["B","G","Y"], "dlc": "Forsaken Hollows", "source": "DLC"},
+    {"id": "scholar_chalice", "name": "Scholar's Chalice", "character": "scholar", "slots": ["R","B","U"], "dlc": "Forsaken Hollows", "source": "DLC Remembrance"},
+    {"id": "soot_scholar_urn","name": "Soot-Covered Scholar's Urn",   "character": "scholar", "slots": ["B","G","G"], "dlc": "Forsaken Hollows", "source": "DLC"},
+    {"id": "seal_scholar_urn","name": "Sealed Scholar's Urn",         "character": "scholar", "slots": ["Y","R","R"], "dlc": "Forsaken Hollows", "source": "DLC"},
+
+    {"id": "undertaker_urn",     "name": "Undertaker's Urn",     "character": "undertaker", "slots": ["B","G","G"], "dlc": "Forsaken Hollows", "source": "DLC"},
+    {"id": "undertaker_goblet",  "name": "Undertaker's Goblet",  "character": "undertaker", "slots": ["R","Y","Y"], "dlc": "Forsaken Hollows", "source": "DLC"},
+    {"id": "undertaker_chalice", "name": "Undertaker's Chalice", "character": "undertaker", "slots": ["G","Y","U"], "dlc": "Forsaken Hollows", "source": "DLC Remembrance"},
+    {"id": "soot_undertaker_urn","name": "Soot-Covered Undertaker's Urn", "character": "undertaker", "slots": ["R","R","B"], "dlc": "Forsaken Hollows", "source": "DLC"},
+    {"id": "seal_undertaker_urn","name": "Sealed Undertaker's Urn",       "character": "undertaker", "slots": ["G","B","R"], "dlc": "Forsaken Hollows", "source": "DLC"},
+
+    {"id": "jar_bazaar_goblet", "name": "Jar Bazaar Goblet (universal)", "character": "any", "slots": ["U","U","U"], "source": "Small Jar Bazaar"}
+  ],
+  "_known_missing": [
+    "Decrepit / Forgotten goblet variants for each character (DLC) — 16 vessels, slot colours not fully documented in available sources.",
+    "Grail-type universal vessels (Giant's Cradle, Sacred Erdtree, Spirit Shelter, Scadutree) — colours unknown."
+  ]
+}

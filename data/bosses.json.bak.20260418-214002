@@ -1,0 +1,851 @@
+{
+  "_source": "relics.pro compendium · bosses sheet",
+  "bosses": [
+    {
+      "id": 902500300,
+      "npc_id": 25000030,
+      "raw_npc_id": null,
+      "name": "Crucible Knight",
+      "type": "Evergoal",
+      "threat": "Large",
+      "notes": ""
+    },
+    {
+      "id": 903010000,
+      "npc_id": 30100190,
+      "raw_npc_id": null,
+      "name": "Banished Knights",
+      "type": "Evergoal",
+      "threat": "Medium",
+      "notes": "There are too many different Banished Knights"
+    },
+    {
+      "id": null,
+      "npc_id": 30100270,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Location",
+      "threat": "Medium",
+      "notes": ""
+    },
+    {
+      "id": 903050600,
+      "npc_id": 30500110,
+      "raw_npc_id": null,
+      "name": "Battlefield Commander",
+      "type": "Night",
+      "threat": "Night",
+      "notes": ""
+    },
+    {
+      "id": 903181300,
+      "npc_id": 31810010,
+      "raw_npc_id": null,
+      "name": "Red Wolf of the King Consort",
+      "type": "Field",
+      "threat": "Small",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 31810020,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Field",
+      "threat": "Medium",
+      "notes": "In the castle"
+    },
+    {
+      "id": 903250600,
+      "npc_id": 32500090,
+      "raw_npc_id": null,
+      "name": "Draconic Tree Sentinel",
+      "type": "Field",
+      "threat": "Large",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 32500110,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Night",
+      "threat": "Night",
+      "notes": ""
+    },
+    {
+      "id": 903251600,
+      "npc_id": 32510020,
+      "raw_npc_id": null,
+      "name": "Tree Sentinel",
+      "type": "Field",
+      "threat": "Medium",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 32510110,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Night",
+      "threat": "Night",
+      "notes": ""
+    },
+    {
+      "id": 903253500,
+      "npc_id": 32520010,
+      "raw_npc_id": null,
+      "name": "Royal Carian Knight",
+      "type": "Field",
+      "threat": "Large",
+      "notes": ""
+    },
+    {
+      "id": 903300562,
+      "npc_id": 33001020,
+      "raw_npc_id": null,
+      "name": "Nox Warriors",
+      "type": "Evergoal",
+      "threat": "Small",
+      "notes": "There are multiple not listed here"
+    },
+    {
+      "id": 903350323,
+      "npc_id": 33500020,
+      "raw_npc_id": null,
+      "name": "Crystalian Alliance",
+      "type": "Location",
+      "threat": "Small",
+      "notes": "There are multiple not listed here"
+    },
+    {
+      "id": null,
+      "npc_id": 33500010,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Evergoal",
+      "threat": "Small",
+      "notes": ""
+    },
+    {
+      "id": 903350330,
+      "npc_id": 33501010,
+      "raw_npc_id": null,
+      "name": "Crystalian",
+      "type": "Evergoal",
+      "threat": "Small",
+      "notes": "There are multiple not listed here"
+    },
+    {
+      "id": 903550541,
+      "npc_id": 35500010,
+      "raw_npc_id": null,
+      "name": "Sanguine Noble",
+      "type": "Location",
+      "threat": "Small",
+      "notes": ""
+    },
+    {
+      "id": 903560000,
+      "npc_id": 35600020,
+      "raw_npc_id": null,
+      "name": "Godskin Apostle",
+      "type": "Evergoal",
+      "threat": "Large",
+      "notes": ""
+    },
+    {
+      "id": 903570000,
+      "npc_id": 35700020,
+      "raw_npc_id": null,
+      "name": "Godskin Noble",
+      "type": "Evergoal",
+      "threat": "Large",
+      "notes": ""
+    },
+    {
+      "id": 903575000,
+      "npc_id": 35600010,
+      "raw_npc_id": null,
+      "name": "Godskin Duo",
+      "type": "Night",
+      "threat": "Night",
+      "notes": "Godskin Apostle"
+    },
+    {
+      "id": null,
+      "npc_id": 35700010,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Night",
+      "threat": "Night",
+      "notes": "Godskin Noble"
+    },
+    {
+      "id": null,
+      "npc_id": 35600020,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Evergoal",
+      "threat": "Large",
+      "notes": "Godskin Apostle"
+    },
+    {
+      "id": null,
+      "npc_id": 35700020,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Evergoal",
+      "threat": "Large",
+      "notes": "Godskin Noble"
+    },
+    {
+      "id": 903600530,
+      "npc_id": 36000020,
+      "raw_npc_id": null,
+      "name": "Stoneskin Lords",
+      "type": "Evergoal",
+      "threat": "Small",
+      "notes": "Alabaster Lord"
+    },
+    {
+      "id": null,
+      "npc_id": 36001020,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Evergoal",
+      "threat": "Small",
+      "notes": "Onyx Lord"
+    },
+    {
+      "id": 903620000,
+      "npc_id": 36200010,
+      "raw_npc_id": null,
+      "name": "Oracle Envoys",
+      "type": "Location",
+      "threat": "Small",
+      "notes": "There are multple of these"
+    },
+    {
+      "id": 903700301,
+      "npc_id": 37000010,
+      "raw_npc_id": null,
+      "name": "Depraved Perfumer",
+      "type": "Location",
+      "threat": "Small",
+      "notes": ""
+    },
+    {
+      "id": 903701000,
+      "npc_id": 37010030,
+      "raw_npc_id": null,
+      "name": "Perfumer",
+      "type": "Location",
+      "threat": "Small",
+      "notes": ""
+    },
+    {
+      "id": 903704522,
+      "npc_id": 37040025,
+      "raw_npc_id": null,
+      "name": "Battlemages",
+      "type": "Location",
+      "threat": "Small",
+      "notes": ""
+    },
+    {
+      "id": 903900000,
+      "npc_id": 39000020,
+      "raw_npc_id": null,
+      "name": "Fire Monk",
+      "type": "Location",
+      "threat": "Small",
+      "notes": ""
+    },
+    {
+      "id": 903970313,
+      "npc_id": 39701120,
+      "raw_npc_id": null,
+      "name": "Beastmen of Farum Azula",
+      "type": "Location",
+      "threat": "Medium",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 39701110,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Evergoal",
+      "threat": "Small",
+      "notes": "There are multiple not listed here"
+    },
+    {
+      "id": 904311000,
+      "npc_id": 43510020,
+      "raw_npc_id": null,
+      "name": "Lordsworn Captain",
+      "type": "Location",
+      "threat": "Small",
+      "notes": ""
+    },
+    {
+      "id": 904353000,
+      "npc_id": 43530035,
+      "raw_npc_id": null,
+      "name": "Royal Army Knights",
+      "type": "Location",
+      "threat": "Small",
+      "notes": ""
+    },
+    {
+      "id": 904354000,
+      "npc_id": 43540015,
+      "raw_npc_id": null,
+      "name": "Redmane Knights",
+      "type": "Location",
+      "threat": "Small",
+      "notes": ""
+    },
+    {
+      "id": 904355000,
+      "npc_id": 43550020,
+      "raw_npc_id": null,
+      "name": "Mausoleum Knight",
+      "type": "Location",
+      "threat": "Small",
+      "notes": ""
+    },
+    {
+      "id": 904470002,
+      "npc_id": 44700010,
+      "raw_npc_id": null,
+      "name": "Abductor Virgin",
+      "type": "Location",
+      "threat": "Small",
+      "notes": "Fort"
+    },
+    {
+      "id": 904500600,
+      "npc_id": null,
+      "raw_npc_id": "x",
+      "name": "Flying Dragon of the Hills",
+      "type": null,
+      "threat": null,
+      "notes": ""
+    },
+    {
+      "id": 904501600,
+      "npc_id": null,
+      "raw_npc_id": "x",
+      "name": "Decaying Rancor Dragon",
+      "type": null,
+      "threat": null,
+      "notes": ""
+    },
+    {
+      "id": 904502600,
+      "npc_id": null,
+      "raw_npc_id": "x",
+      "name": "Lake Glintstone Dragon",
+      "type": null,
+      "threat": null,
+      "notes": ""
+    },
+    {
+      "id": 904503600,
+      "npc_id": 45030010,
+      "raw_npc_id": null,
+      "name": "Mountaintop Ice Dragon",
+      "type": "Field",
+      "threat": "Medium",
+      "notes": ""
+    },
+    {
+      "id": 904503601,
+      "npc_id": null,
+      "raw_npc_id": "x",
+      "name": "Borealis the Freezing Fog",
+      "type": null,
+      "threat": null,
+      "notes": ""
+    },
+    {
+      "id": 904505000,
+      "npc_id": 45000010,
+      "raw_npc_id": null,
+      "name": "Flying Dragon",
+      "type": "Field",
+      "threat": "Medium",
+      "notes": ""
+    },
+    {
+      "id": 904510601,
+      "npc_id": 45101110,
+      "raw_npc_id": null,
+      "name": "Ancient Dragon",
+      "type": "Night",
+      "threat": "Night",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 45102010,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Evergoal",
+      "threat": "Large",
+      "notes": ""
+    },
+    {
+      "id": 904560000,
+      "npc_id": 45601020,
+      "raw_npc_id": null,
+      "name": "Giant Crows",
+      "type": "Field",
+      "threat": "Medium",
+      "notes": ""
+    },
+    {
+      "id": 904600200,
+      "npc_id": 46000230,
+      "raw_npc_id": null,
+      "name": "Headless Troll",
+      "type": "Field",
+      "threat": "Medium",
+      "notes": ""
+    },
+    {
+      "id": 904600600,
+      "npc_id": 46004010,
+      "raw_npc_id": null,
+      "name": "Frenzied Flame Troll",
+      "type": "Location",
+      "threat": "Medium",
+      "notes": ""
+    },
+    {
+      "id": 904601001,
+      "npc_id": 46020050,
+      "raw_npc_id": null,
+      "name": "Snowfield Troll",
+      "type": "Field",
+      "threat": "Medium",
+      "notes": ""
+    },
+    {
+      "id": 904601000,
+      "npc_id": null,
+      "raw_npc_id": "x",
+      "name": "Troll Knight",
+      "type": null,
+      "threat": null,
+      "notes": ""
+    },
+    {
+      "id": 904620320,
+      "npc_id": 46200020,
+      "raw_npc_id": null,
+      "name": "Naturalborn of the Void",
+      "type": "Field",
+      "threat": "Large",
+      "notes": ""
+    },
+    {
+      "id": 904630310,
+      "npc_id": 46300210,
+      "raw_npc_id": null,
+      "name": "Runebear",
+      "type": "Location",
+      "threat": "Medium",
+      "notes": ""
+    },
+    {
+      "id": 904660310,
+      "npc_id": 46600030,
+      "raw_npc_id": null,
+      "name": "Guardian Golem",
+      "type": "Location",
+      "threat": "Small",
+      "notes": ""
+    },
+    {
+      "id": 904680603,
+      "npc_id": 46809010,
+      "raw_npc_id": null,
+      "name": "Full-Grown Fallingstar Beast",
+      "type": "Night",
+      "threat": "Night",
+      "notes": ""
+    },
+    {
+      "id": 904770000,
+      "npc_id": 47700020,
+      "raw_npc_id": null,
+      "name": "Valiant Gargoyle",
+      "type": "Night",
+      "threat": "Night",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 47701030,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Field",
+      "threat": "Large",
+      "notes": ""
+    },
+    {
+      "id": 904770001,
+      "npc_id": 47701210,
+      "raw_npc_id": null,
+      "name": "Black Blade Kindred",
+      "type": "Field",
+      "threat": "Large",
+      "notes": ""
+    },
+    {
+      "id": 904800003,
+      "npc_id": 21400210,
+      "raw_npc_id": null,
+      "name": "Omen",
+      "type": "Evergoal",
+      "threat": "Small",
+      "notes": ""
+    },
+    {
+      "id": 904800600,
+      "npc_id": 48000010,
+      "raw_npc_id": null,
+      "name": "Lord of Blood",
+      "type": "Night",
+      "threat": "Night",
+      "notes": ""
+    },
+    {
+      "id": 904910320,
+      "npc_id": 49100190,
+      "raw_npc_id": null,
+      "name": "Magma Wyrm",
+      "type": "Field",
+      "threat": "Medium",
+      "notes": "Crater and field boss are little different"
+    },
+    {
+      "id": 904911320,
+      "npc_id": 49110010,
+      "raw_npc_id": null,
+      "name": "Great Wyrm",
+      "type": "Night",
+      "threat": "Night",
+      "notes": ""
+    },
+    {
+      "id": 905070000,
+      "npc_id": 50700010,
+      "raw_npc_id": null,
+      "name": "Death Knight",
+      "type": "Night",
+      "threat": "Night",
+      "notes": "There are two variants"
+    },
+    {
+      "id": 905210600,
+      "npc_id": 52100010,
+      "raw_npc_id": null,
+      "name": "Divine Beast Dancing Lion",
+      "type": "Night",
+      "threat": "Night",
+      "notes": ""
+    },
+    {
+      "id": 905250600,
+      "npc_id": 52501220,
+      "raw_npc_id": null,
+      "name": "Divine Beast Warrior",
+      "type": "Night",
+      "threat": "Night",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 50400120,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Night",
+      "threat": "Night",
+      "notes": "Curseblade"
+    },
+    {
+      "id": 905820600,
+      "npc_id": 58200010,
+      "raw_npc_id": null,
+      "name": "Great Red Bear",
+      "type": "Night",
+      "threat": "Night",
+      "notes": ""
+    },
+    {
+      "id": 907100300,
+      "npc_id": 71000110,
+      "raw_npc_id": null,
+      "name": "Ancient Hero of Zamor",
+      "type": "Location",
+      "threat": "Medium",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 71000010,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Field",
+      "threat": "Medium",
+      "notes": ""
+    },
+    {
+      "id": 907500000,
+      "npc_id": 75000020,
+      "raw_npc_id": null,
+      "name": "Gladius, Beast of Night",
+      "type": "Final",
+      "threat": "Final",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 75000210,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Everdark",
+      "threat": "Final",
+      "notes": ""
+    },
+    {
+      "id": 907510000,
+      "npc_id": 75100020,
+      "raw_npc_id": null,
+      "name": "Adel, Baron of Night",
+      "type": "Final",
+      "threat": "Final",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 75110010,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Everdark",
+      "threat": "Final",
+      "notes": ""
+    },
+    {
+      "id": 907520000,
+      "npc_id": 75200020,
+      "raw_npc_id": null,
+      "name": "Gnoster, Wisdom of Night",
+      "type": "Final",
+      "threat": "Final",
+      "notes": "Gnoster"
+    },
+    {
+      "id": null,
+      "npc_id": 75300010,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Final",
+      "threat": "Final",
+      "notes": "Faurtis Stoneshield"
+    },
+    {
+      "id": null,
+      "npc_id": 75200120,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Everdark",
+      "threat": "Final",
+      "notes": "Gnoster"
+    },
+    {
+      "id": null,
+      "npc_id": 75300120,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Everdark",
+      "threat": "Final",
+      "notes": "Faurtis Stoneshield"
+    },
+    {
+      "id": null,
+      "npc_id": 75210010,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Everdark",
+      "threat": "Final",
+      "notes": "Animus - Ascendant Light"
+    },
+    {
+      "id": 907540000,
+      "npc_id": 75400000,
+      "raw_npc_id": null,
+      "name": "Maris, Fathom of Night",
+      "type": "Final",
+      "threat": "Final",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 75400100,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Everdark",
+      "threat": "Final",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 75410000,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Everdark",
+      "threat": "Final",
+      "notes": ""
+    },
+    {
+      "id": 907550000,
+      "npc_id": 75600020,
+      "raw_npc_id": null,
+      "name": "Libra, Creature of Night",
+      "type": "Final",
+      "threat": "Final",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 75610010,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Everdark",
+      "threat": "Final",
+      "notes": ""
+    },
+    {
+      "id": 907610000,
+      "npc_id": 76000010,
+      "raw_npc_id": null,
+      "name": "Fulghor, Champion of Nightglow",
+      "type": "Final",
+      "threat": "Final",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 76001010,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Everdark",
+      "threat": "Final",
+      "notes": ""
+    },
+    {
+      "id": 907620000,
+      "npc_id": 49000010,
+      "raw_npc_id": null,
+      "name": "Caligo, Miasma of Night",
+      "type": "Final",
+      "threat": "Final",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 49010010,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Everdark",
+      "threat": "Final",
+      "notes": ""
+    },
+    {
+      "id": 907580000,
+      "npc_id": 75800000,
+      "raw_npc_id": null,
+      "name": "The Shape of Night",
+      "type": "Final",
+      "threat": "Final",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 75802000,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Final",
+      "threat": "Final",
+      "notes": "Heolstor the Nightlord"
+    },
+    {
+      "id": 907640000,
+      "npc_id": 76200000,
+      "raw_npc_id": null,
+      "name": "Weapon-Bequeathed Harmonia",
+      "type": "Final",
+      "threat": "Final",
+      "notes": "Balancers"
+    },
+    {
+      "id": 907630000,
+      "npc_id": 76100000,
+      "raw_npc_id": null,
+      "name": "Traitorous Straghess",
+      "type": "Final",
+      "threat": "Final",
+      "notes": "Dreglord"
+    },
+    {
+      "id": 907720600,
+      "npc_id": 77200010,
+      "raw_npc_id": null,
+      "name": "Knight Artorias",
+      "type": "Night",
+      "threat": "Night",
+      "notes": ""
+    },
+    {
+      "id": 907930600,
+      "npc_id": 79300110,
+      "raw_npc_id": null,
+      "name": "Demon in Pain",
+      "type": "Night",
+      "threat": "Night",
+      "notes": ""
+    },
+    {
+      "id": null,
+      "npc_id": 79300010,
+      "raw_npc_id": null,
+      "name": null,
+      "type": "Night",
+      "threat": "Night",
+      "notes": "Demon from Below"
+    },
+    {
+      "id": 907930610,
+      "npc_id": 79301010,
+      "raw_npc_id": null,
+      "name": "Demon Prince",
+      "type": "Night",
+      "threat": "Night",
+      "notes": "There are two variants"
+    },
+    {
+      "id": 909850000,
+      "npc_id": 33610010,
+      "raw_npc_id": null,
+      "name": "Ancestral Follower Warriors",
+      "type": "Location",
+      "threat": "Small",
+      "notes": ""
+    }
+  ]
+}

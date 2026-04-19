@@ -1,0 +1,65 @@
+{
+  "id": "revenant",
+  "name": "Revenant",
+  "dlc": "base",
+  "tag": "Revenant",
+  "icon": "👻",
+  "tagline": "Summoner · S-tier Faith · staff caster",
+  "stats": {
+    "vigor": "D",
+    "mind": "A",
+    "endurance": "D",
+    "strength": "C",
+    "dexterity": "C",
+    "intelligence": "B",
+    "faith": "S",
+    "arcane": "B"
+  },
+  "weapon_types": [
+    "staff",
+    "sacred_seal"
+  ],
+  "dual_wield": false,
+  "skill": {
+    "name": "Revenant's Retinue",
+    "description": "Summons spectral allies to fight alongside."
+  },
+  "ultimate": {
+    "name": "Kindred Rescue",
+    "description": "Restore/revive allies; area ghostflame burst."
+  },
+  "passive": {
+    "name": "Spectral Kinship",
+    "description": "Bonus damage while retinue is active."
+  },
+  "data_quality": "skeleton",
+  "remembrance_slots": [
+    {
+      "name": "Old Portrait",
+      "source": "xlsx_item_16002",
+      "fixed_effects": [
+        7011200,
+        7010900,
+        7090000
+      ],
+      "locked_labels": [],
+      "color_hint": "blue"
+    }
+  ],
+  "global": {
+    "trance_multiplier": 1.0,
+    "hammer_hits_per_boss_window_s": 0.3,
+    "hex_casts_per_boss_window_s": 0.5,
+    "loathsome_hex_per_cast_coef": 0.25,
+    "playstyle_tags": [
+      "cast"
+    ],
+    "build_goal_weights": {
+      "damage": 0.5,
+      "survival": 0.3,
+      "utility": 0.6,
+      "team": 0.8
+    }
+  },
+  "effects": {}
+}

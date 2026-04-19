@@ -1,0 +1,67 @@
+{
+  "id": "duchess",
+  "name": "Duchess",
+  "dlc": "base",
+  "tag": "Duchess",
+  "icon": "🗡️",
+  "tagline": "Stealth assassin · dagger · high DEX",
+  "stats": {
+    "vigor": "C",
+    "mind": "B",
+    "endurance": "D",
+    "strength": "D",
+    "dexterity": "B",
+    "intelligence": "A",
+    "faith": "B",
+    "arcane": "C"
+  },
+  "weapon_types": [
+    "dagger",
+    "straight_sword"
+  ],
+  "dual_wield": true,
+  "skill": {
+    "name": "Restage",
+    "description": "Reprises previous attack effects on nearby enemies."
+  },
+  "ultimate": {
+    "name": "Finale",
+    "description": "Temporary invisibility + silence; devastating critical opener."
+  },
+  "passive": {
+    "name": "Aristocratic Grace",
+    "description": "Speed + evasion bonus after successful dodge."
+  },
+  "data_quality": "skeleton",
+  "remembrance_slots": [
+    {
+      "name": "Blessed Iron Coin",
+      "source": "xlsx_item_14002",
+      "fixed_effects": [
+        7032700,
+        7001100,
+        7000002
+      ],
+      "locked_labels": [],
+      "color_hint": "green"
+    }
+  ],
+  "global": {
+    "trance_multiplier": 1.0,
+    "hammer_hits_per_boss_window_s": 1.4,
+    "hex_casts_per_boss_window_s": 0.0,
+    "loathsome_hex_per_cast_coef": 0.0,
+    "playstyle_tags": [
+      "melee",
+      "crit",
+      "successive"
+    ],
+    "build_goal_weights": {
+      "damage": 1.0,
+      "survival": 0.3,
+      "utility": 0.4,
+      "team": 0.0
+    }
+  },
+  "effects": {}
+}

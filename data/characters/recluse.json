@@ -1,0 +1,64 @@
+{
+  "id": "recluse",
+  "name": "Recluse",
+  "dlc": "base",
+  "tag": "Recluse",
+  "icon": "📜",
+  "tagline": "Sorceress · INT primary · affinity residue",
+  "stats": {
+    "vigor": "D",
+    "mind": "A",
+    "endurance": "C",
+    "strength": "D",
+    "dexterity": "C",
+    "intelligence": "S",
+    "faith": "S",
+    "arcane": "C"
+  },
+  "weapon_types": [
+    "staff"
+  ],
+  "dual_wield": false,
+  "skill": {
+    "name": "Magic Cocktail",
+    "description": "Mix affinity residues for custom spell effects."
+  },
+  "ultimate": {
+    "name": "Soulblood Song",
+    "description": "Self-sacrifice AoE; buffs allies via own HP."
+  },
+  "passive": {
+    "name": "Affinity Draw",
+    "description": "Auto-collects affinity residues from defeated enemies."
+  },
+  "data_quality": "skeleton",
+  "remembrance_slots": [
+    {
+      "name": "Bone-Like Stone",
+      "source": "xlsx_item_17002",
+      "fixed_effects": [
+        7034100,
+        7032900,
+        7000502
+      ],
+      "locked_labels": [],
+      "color_hint": "green"
+    }
+  ],
+  "global": {
+    "trance_multiplier": 1.0,
+    "hammer_hits_per_boss_window_s": 0.2,
+    "hex_casts_per_boss_window_s": 0.6,
+    "loathsome_hex_per_cast_coef": 0.3,
+    "playstyle_tags": [
+      "cast"
+    ],
+    "build_goal_weights": {
+      "damage": 0.9,
+      "survival": 0.2,
+      "utility": 0.7,
+      "team": 0.2
+    }
+  },
+  "effects": {}
+}

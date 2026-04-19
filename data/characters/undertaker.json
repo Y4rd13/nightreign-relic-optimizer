@@ -1,0 +1,156 @@
+{
+  "id": "undertaker",
+  "name": "Undertaker",
+  "dlc": "Forsaken Hollows",
+  "tag": "Undertaker",
+  "icon": "⚰️",
+  "tagline": "Dual-hammer STR/FAI specialist",
+  "stats": {
+    "vigor": "B",
+    "mind": "C",
+    "endurance": "C",
+    "strength": "A",
+    "dexterity": "D",
+    "intelligence": "D",
+    "faith": "A",
+    "arcane": "C"
+  },
+  "weapon_types": [
+    "hammer"
+  ],
+  "dual_wield": true,
+  "skill": {
+    "name": "Trance",
+    "description": "Melee damage + self buff while active (×1.15 damage)."
+  },
+  "ultimate": {
+    "name": "Loathsome Hex",
+    "description": "Channelled holy damage projection; scales with character level."
+  },
+  "passive": {
+    "name": "Confluence",
+    "description": "Free Loathsome Hex casts when channels synergise."
+  },
+  "data_quality": "full",
+  "remembrance_slots": [
+    {
+      "name": "Glass Necklace",
+      "source": "xlsx_item_19051",
+      "fixed_effects": [
+        7036800,
+        7000902,
+        7037600
+      ],
+      "locked_labels": [],
+      "color_hint": "green"
+    }
+  ],
+  "global": {
+    "trance_multiplier": 1.15,
+    "trance_uptime_baseline": 0.5,
+    "trance_uptime_with_L525": 0.99,
+    "hammer_hits_per_boss_window_s": 0.8,
+    "hex_casts_per_boss_window_s": 0.22,
+    "loathsome_hex_per_cast_coef": 0.3,
+    "damage_scaling": {
+      "strength": 0.4,
+      "faith": 0.4
+    },
+    "hex_damage_type": "holy",
+    "affinity_damage_fraction": 0.045,
+    "playstyle_tags": ["melee", "successive", "trance_loop"],
+    "build_goal_weights": {
+      "damage": 1.0,
+      "survival": 0.2,
+      "utility": 0.3,
+      "team": 0.0
+    }
+  },
+  "effects": {
+    "7036800": {
+      "label": "L519 Activating Ult",
+      "bucket": "B_L519",
+      "mult": 1.13,
+      "mult_scope": "all",
+      "requires": "ult_active",
+      "uptime_boosts": {"ult_active": 0.05},
+      "notes": "Also extends Ult-active slightly (longer burst window after activation)"
+    },
+    "7000902": {
+      "label": "Ultimate Art Gauge +3",
+      "utility_value": 0.05,
+      "uptime_boosts": {"ult_active": 0.10},
+      "notes": "+10% gauge gain → Ult fires ~10% more often → ult_active uptime rises accordingly"
+    },
+    "7000800": {
+      "label": "Character Skill Cooldown Reduction",
+      "utility_value": 0.02,
+      "uptime_boosts": {"trance_active": 0.05},
+      "notes": "5% skill cooldown reduction"
+    },
+    "7000801": {
+      "label": "Character Skill Cooldown Reduction +1",
+      "utility_value": 0.03,
+      "uptime_boosts": {"trance_active": 0.075},
+      "notes": "7.5% skill cooldown reduction"
+    },
+    "7000802": {
+      "label": "Character Skill Cooldown Reduction +3",
+      "utility_value": 0.04,
+      "uptime_boosts": {"trance_active": 0.10},
+      "notes": "10% skill cooldown reduction → Trance fires 10% more often"
+    },
+    "7037600": {
+      "label": "Successive Attacks Boost Attack Power +3",
+      "bucket": "B_SUCCESSIVE",
+      "mult": 1.09,
+      "mult_scope": "all",
+      "uptime_default": 0.9,
+      "notes": "+9% mult on melee damage during continuous attacks (most of boss window)"
+    },
+    "7036900": {
+      "label": "L521 Final Blow of Chain",
+      "additive": 0.15,
+      "additive_scope": "phys",
+      "requires": "chain_last_hit"
+    },
+    "7037000": {
+      "label": "L522 Phys Boost while Incant Buff",
+      "additive": 0.15,
+      "additive_scope": "phys",
+      "requires": "incant_buff_active"
+    },
+    "7037300": {
+      "label": "L520 Contact Ally Heal",
+      "utility_value": 0.0,
+      "notes": "team heal utility"
+    },
+    "6500900": {
+      "label": "L525 Executing Art readies Skill (Trance loop)",
+      "utility_value": 0.12,
+      "uptime_boosts": {"trance_active": 0.45, "ult_active": 0.20},
+      "notes": "Trance re-readies after each Ult cast → Trance uptime ~0.95, Ult uptime ~0.55-0.70 with this effect in build"
+    },
+    "6647400": {
+      "label": "[Undertaker] Improved Dex, Reduced Vigor/Faith",
+      "notes": "Net contribution = damage_scaling delta from DEX+ minus FAI-. Good for DEX-scaling variant, bad for STR/FAI default."
+    },
+    "6647500": {
+      "label": "[Undertaker] Improved Mind/Faith, Reduced Strength",
+      "notes": "Net contribution = damage_scaling delta from FAI+ minus STR-. Good for FAI-heavy variant."
+    },
+    "7081200": {
+      "label": "L18 3+ Hammers Equipped",
+      "bucket": "B_L18",
+      "mult": 1.1,
+      "mult_scope": "all",
+      "requires": "three_hammers_equipped"
+    },
+    "7331200": {
+      "label": "L21 Improved Hammer Atk",
+      "bucket": "B_L21",
+      "mult": 1.06,
+      "mult_scope": "hammer"
+    }
+  }
+}

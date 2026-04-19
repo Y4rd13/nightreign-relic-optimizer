@@ -1,0 +1,1761 @@
+{
+  "_source": "relics.pro compendium · items sheet (auto-imported)",
+  "_schema": "Named/unique relics with explicit effect IDs. E1/E2/E3 columns from xlsx are mapped to attrs[]. source_type ∈ {remembrance, shop, boss_standard, boss_everdark, boss_dlc, other}.",
+  "_colors_legend": {
+    "R": "Red (Burning Scene)",
+    "G": "Green (Tranquil Scene)",
+    "B": "Blue (Drizzly Scene)",
+    "Y": "Yellow (Luminous Scene)",
+    "U": "Universal"
+  },
+  "_source_types": {
+    "remembrance": "Character-specific Remembrance quest reward",
+    "shop": "Small Jar Bazaar (Murk) or Collector Signboard",
+    "boss_standard": "First-kill drop from a base Nightlord",
+    "boss_everdark": "Collector Signboard · 12 Sovereign Sigils",
+    "boss_dlc": "Forsaken Hollows DLC boss drop",
+    "other": "Tutorial / random expedition reward / special event"
+  },
+  "relics": [
+    {
+      "id": "delicate_burning_scene_1000",
+      "name": "Delicate Burning Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 500 murk.",
+      "character": "any",
+      "color": "R",
+      "is_dn": false,
+      "description": "Fire Pots in possession at start of expedition",
+      "attrs": [
+        7121100
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1000
+    },
+    {
+      "id": "delicate_drizzly_scene_1010",
+      "name": "Delicate Drizzly Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 500 murk.",
+      "character": "any",
+      "color": "B",
+      "is_dn": false,
+      "description": "Starting armament deals magic damage",
+      "attrs": [
+        7120000
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1010
+    },
+    {
+      "id": "delicate_luminous_scene_1020",
+      "name": "Delicate Luminous Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 500 murk.",
+      "character": "any",
+      "color": "Y",
+      "is_dn": false,
+      "description": "Lightning Grease in possession at start of expedition",
+      "attrs": [
+        7122400
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1020
+    },
+    {
+      "id": "delicate_tranquil_scene_1030",
+      "name": "Delicate Tranquil Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 500 murk.",
+      "character": "any",
+      "color": "G",
+      "is_dn": false,
+      "description": "Changes compatible armament's skill to Sacred Blade at start of expedition",
+      "attrs": [
+        7123300
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1030
+    },
+    {
+      "id": "polished_burning_scene_1040",
+      "name": "Polished Burning Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 500 murk.",
+      "character": "any",
+      "color": "R",
+      "is_dn": false,
+      "description": "Improved Throwing Pot Damage · Improved Throwing Knife Damage",
+      "attrs": [
+        7040300,
+        7040400
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1040
+    },
+    {
+      "id": "delicate_luminous_scene_1050",
+      "name": "Delicate Luminous Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 500 murk.",
+      "character": "any",
+      "color": "Y",
+      "is_dn": false,
+      "description": "Improved Critical Hits",
+      "attrs": [
+        7040200
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1050
+    },
+    {
+      "id": "polished_tranquil_scene_1060",
+      "name": "Polished Tranquil Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 700 murk.",
+      "character": "any",
+      "color": "G",
+      "is_dn": false,
+      "description": "Physical attack power increases after using grease items · Endurance +3",
+      "attrs": [
+        7030900,
+        7000202
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1060
+    },
+    {
+      "id": "polished_drizzly_scene_1070",
+      "name": "Polished Drizzly Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 700 murk.",
+      "character": "any",
+      "color": "B",
+      "is_dn": false,
+      "description": "Draw enemy attention while guarding · Vigor +3",
+      "attrs": [
+        7030700,
+        7000002
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1070
+    },
+    {
+      "id": "polished_burning_scene_1080",
+      "name": "Polished Burning Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 700 murk.",
+      "character": "any",
+      "color": "R",
+      "is_dn": false,
+      "description": "Ultimate Art Auto Charge +2 · Magic Damage Negation Up",
+      "attrs": [
+        7000901,
+        7002600
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1080
+    },
+    {
+      "id": "polished_tranquil_scene_1090",
+      "name": "Polished Tranquil Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 700 murk.",
+      "character": "any",
+      "color": "G",
+      "is_dn": false,
+      "description": "Character Skill Cooldown Reduction +2 · Fire Damage Negation Up",
+      "attrs": [
+        7000801,
+        7002700
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1090
+    },
+    {
+      "id": "polished_tranquil_scene_1100",
+      "name": "Polished Tranquil Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 700 murk.",
+      "character": "any",
+      "color": "G",
+      "is_dn": false,
+      "description": "Character Skill Cooldown Reduction +2 · Lightning Damage Negation Up",
+      "attrs": [
+        7000801,
+        7002800
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1100
+    },
+    {
+      "id": "polished_burning_scene_1110",
+      "name": "Polished Burning Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 700 murk.",
+      "character": "any",
+      "color": "R",
+      "is_dn": false,
+      "description": "Ultimate Art Auto Charge +2 · Holy Damage Negation Up",
+      "attrs": [
+        7000901,
+        7002900
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1110
+    },
+    {
+      "id": "polished_burning_scene_1120",
+      "name": "Polished Burning Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 700 murk.",
+      "character": "any",
+      "color": "R",
+      "is_dn": false,
+      "description": "Improved Glintstone and Gravity Stone Damage · Small Pouch in possession at start of expedition",
+      "attrs": [
+        7040500,
+        7121000
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1120
+    },
+    {
+      "id": "polished_tranquil_scene_1130",
+      "name": "Polished Tranquil Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 700 murk.",
+      "character": "any",
+      "color": "G",
+      "is_dn": false,
+      "description": "Flask Also Heals Allies · Defeating enemies restores HP for allies but not for self",
+      "attrs": [
+        7010200,
+        7090100
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1130
+    },
+    {
+      "id": "polished_luminous_scene_1140",
+      "name": "Polished Luminous Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 700 murk.",
+      "character": "any",
+      "color": "Y",
+      "is_dn": false,
+      "description": "Improved Poison Resistance · Improved Rot Resistance",
+      "attrs": [
+        7003000,
+        7003400
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1140
+    },
+    {
+      "id": "polished_luminous_scene_1150",
+      "name": "Polished Luminous Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 700 murk.",
+      "character": "any",
+      "color": "Y",
+      "is_dn": false,
+      "description": "Improved Blood Loss Resistance · Improved Frost Resistance",
+      "attrs": [
+        7003100,
+        7003500
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1150
+    },
+    {
+      "id": "polished_drizzly_scene_1160",
+      "name": "Polished Drizzly Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 700 murk.",
+      "character": "any",
+      "color": "B",
+      "is_dn": false,
+      "description": "Improved Sleep Resistance · Improved Madness Resistance",
+      "attrs": [
+        7003200,
+        7003600
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1160
+    },
+    {
+      "id": "polished_drizzly_scene_1170",
+      "name": "Polished Drizzly Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 700 murk.",
+      "character": "any",
+      "color": "B",
+      "is_dn": false,
+      "description": "Mind +3 · Improved Death Blight Resistance",
+      "attrs": [
+        7000102,
+        7003300
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1170
+    },
+    {
+      "id": "grand_burning_scene_1180",
+      "name": "Grand Burning Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 1000 murk.",
+      "character": "wylder",
+      "color": "R",
+      "is_dn": false,
+      "description": "[Wylder] Art activation spreads fire in area · Strength +2 · Dexterity +2",
+      "attrs": [
+        7010500,
+        7000301,
+        7000401
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1180
+    },
+    {
+      "id": "grand_drizzly_scene_1190",
+      "name": "Grand Drizzly Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 1000 murk.",
+      "character": "guardian",
+      "color": "B",
+      "is_dn": false,
+      "description": "[Guardian] Successful guards send out shockwaves while ability is active · Vigor +2 · Endurance +2",
+      "attrs": [
+        7033400,
+        7000001,
+        7000201
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1190
+    },
+    {
+      "id": "grand_tranquil_scene_1200",
+      "name": "Grand Tranquil Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 1000 murk.",
+      "character": "duchess",
+      "color": "G",
+      "is_dn": false,
+      "description": "[Duchess] Improved Character Skill Attack Power · Dexterity +2 · Intelligence +2",
+      "attrs": [
+        7290000,
+        7000401,
+        7000501
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1200
+    },
+    {
+      "id": "grand_tranquil_scene_1210",
+      "name": "Grand Tranquil Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 1000 murk.",
+      "character": "recluse",
+      "color": "Y",
+      "is_dn": false,
+      "description": "[Recluse] Suffer blood loss and increase attack power upon Art activation · Mind +2 · Intelligence +2",
+      "attrs": [
+        7032900,
+        7000101,
+        7000501
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "According to the old data and its name it should be Green. Probably was changed to yellow later.",
+      "xlsx_item_id": 1210
+    },
+    {
+      "id": "grand_luminous_scene_1220",
+      "name": "Grand Luminous Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 1000 murk.",
+      "character": "ironeye",
+      "color": "Y",
+      "is_dn": false,
+      "description": "[Ironeye] Extends duration of weak point · Endurance +2 · Dexterity +2",
+      "attrs": [
+        7280000,
+        7000201,
+        7000401
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1220
+    },
+    {
+      "id": "grand_drizzly_scene_1230",
+      "name": "Grand Drizzly Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 1000 murk.",
+      "character": "any",
+      "color": "B",
+      "is_dn": false,
+      "description": "Improved Poise Near Totem Stela · Vigor +2 · Strength +2",
+      "attrs": [
+        7030000,
+        7000001,
+        7000301
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1230
+    },
+    {
+      "id": "grand_drizzly_scene_1240",
+      "name": "Grand Drizzly Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 1000 murk.",
+      "character": "revenant",
+      "color": "B",
+      "is_dn": false,
+      "description": "[Revenant] Trigger ghostflame explosion during Ultimate Art activation · Faith +2 · Arcane +2",
+      "attrs": [
+        7011200,
+        7000601,
+        7000701
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1240
+    },
+    {
+      "id": "grand_burning_scene_1250",
+      "name": "Grand Burning Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 1000 murk.",
+      "character": "executor",
+      "color": "R",
+      "is_dn": false,
+      "description": "[Executor] Roaring restores HP while Art is active · Dexterity +2 · Arcane +2",
+      "attrs": [
+        7011700,
+        7000401,
+        7000701
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1250
+    },
+    {
+      "id": "grand_burning_scene_1260",
+      "name": "Grand Burning Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 1000 murk.",
+      "character": "any",
+      "color": "R",
+      "is_dn": false,
+      "description": "Increased rune acquisition for self and allies · Stonesword Key in possession at start of expedition · Rune discount for shop purchases while on expedition",
+      "attrs": [
+        7110000,
+        7120900,
+        7230000
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1260
+    },
+    {
+      "id": "grand_tranquil_scene_1270",
+      "name": "Grand Tranquil Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Can be purchased from the Small Jar Bazaar for 1000 murk.",
+      "character": "any",
+      "color": "G",
+      "is_dn": false,
+      "description": "Partial HP Restoration upon Post-Damage Attacks · Vigor +2 · Poise +2",
+      "attrs": [
+        7005600,
+        7000001,
+        7001001
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1270
+    },
+    {
+      "id": "grand_drizzly_scene_1400",
+      "name": "Grand Drizzly Scene",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Can be purchased at the Collector Signboard for 3 sovereign sigil.",
+      "character": "wylder",
+      "color": "B",
+      "is_dn": false,
+      "description": "[Wylder] Art activation spreads fire in area · Changes compatible armament's skill to Flaming Strike at start of expedition · Fire Attack Power Up +2",
+      "attrs": [
+        7010500,
+        7122900,
+        7001602
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1400
+    },
+    {
+      "id": "grand_burning_scene_1410",
+      "name": "Grand Burning Scene",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Can be purchased at the Collector Signboard for 3 sovereign sigil.",
+      "character": "guardian",
+      "color": "R",
+      "is_dn": false,
+      "description": "[Guardian] Successful guards send out shockwaves while ability is active · Successful guarding fills more of the Art gauge · Endurance +3",
+      "attrs": [
+        7033400,
+        7030600,
+        7000202
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1410
+    },
+    {
+      "id": "grand_tranquil_scene_1420",
+      "name": "Grand Tranquil Scene",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Can be purchased at the Collector Signboard for 3 sovereign sigil.",
+      "character": "duchess",
+      "color": "G",
+      "is_dn": false,
+      "description": "[Duchess] Become difficult to spot and silence footsteps after landing critical from behind · Improved Critical Hits · Character Skill Cooldown Reduction +2",
+      "attrs": [
+        7031800,
+        7040200,
+        7000801
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1420
+    },
+    {
+      "id": "grand_tranquil_scene_1430",
+      "name": "Grand Tranquil Scene",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Can be purchased at the Collector Signboard for 3 sovereign sigil.",
+      "character": "any",
+      "color": "G",
+      "is_dn": false,
+      "description": "Max FP Up with 3+ Staves Equipped · Max FP increased for each Sorcerer's Rise unlocked · Magic Attack Power Up",
+      "attrs": [
+        7082500,
+        7060100,
+        7001500
+      ],
+      "locked_labels": [],
+      "attrs_verified": false,
+      "notes": "",
+      "xlsx_item_id": 1430,
+      "_audit_notes": [
+        "attrs_verified disabled 2026-04-19: references missing effect_ids [7082500]"
+      ]
+    },
+    {
+      "id": "grand_burning_scene_1440",
+      "name": "Grand Burning Scene",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Can be purchased at the Collector Signboard for 3 sovereign sigil.",
+      "character": "ironeye",
+      "color": "R",
+      "is_dn": false,
+      "description": "[Ironeye] Art Charge Activation Adds Poison Effect · Attack power up when facing poison-afflicted enemy · Ultimate Art Auto Charge +3",
+      "attrs": [
+        7034600,
+        7260000,
+        7000902
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1440
+    },
+    {
+      "id": "grand_luminous_scene_1450",
+      "name": "Grand Luminous Scene",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Can be purchased at the Collector Signboard for 3 sovereign sigil.",
+      "character": "raider",
+      "color": "Y",
+      "is_dn": false,
+      "description": "[Raider] Duration of Ultimate Art extended · Improved Colossal Weapon Attack Power · Endurance +3",
+      "attrs": [
+        7310000,
+        7332300,
+        7000202
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1450
+    },
+    {
+      "id": "grand_drizzly_scene_1460",
+      "name": "Grand Drizzly Scene",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Can be purchased at the Collector Signboard for 3 sovereign sigil.",
+      "character": "revenant",
+      "color": "B",
+      "is_dn": false,
+      "description": "[Revenant] Strengthens family and allies when Ultimate Art is activated · Items confer effect to all nearby allies · Starlight Shards in possession at start of expedition",
+      "attrs": [
+        7031200,
+        7050100,
+        7126000
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1460
+    },
+    {
+      "id": "grand_luminous_scene_1470",
+      "name": "Grand Luminous Scene",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Can be purchased at the Collector Signboard for 3 sovereign sigil.",
+      "character": "executor",
+      "color": "Y",
+      "is_dn": false,
+      "description": "[Executor] Character Skill Boosts Attack but Lowers Damage Negation While Attacking · HP Recovery From Successful Guarding · Successful guarding fills more of the Art gauge",
+      "attrs": [
+        7034400,
+        7036100,
+        7030600
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1470
+    },
+    {
+      "id": "grand_burning_scene_1480",
+      "name": "Grand Burning Scene",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Can be purchased at the Collector Signboard for 3 sovereign sigil.",
+      "character": "any",
+      "color": "R",
+      "is_dn": false,
+      "description": "Slowly restore HP for self and nearby allies when HP is low · Improved Damage Negation at Low HP · Vigor +3",
+      "attrs": [
+        7012200,
+        7012300,
+        7000002
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1480
+    },
+    {
+      "id": "grand_tranquil_scene_1490",
+      "name": "Grand Tranquil Scene",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Can be purchased at the Collector Signboard for 3 sovereign sigil.",
+      "character": "any",
+      "color": "G",
+      "is_dn": false,
+      "description": "Improved Stance-Breaking when Two-Handing · Improved Initial Standard Attack · Poise +3",
+      "attrs": [
+        7006000,
+        7040000,
+        7001002
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1490
+    },
+    {
+      "id": "grand_burning_scene_1500",
+      "name": "Grand Burning Scene",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Can be purchased at the Collector Signboard for 3 sovereign sigil.",
+      "character": "any",
+      "color": "R",
+      "is_dn": false,
+      "description": "Improved Stance-Breaking when Wielding Two Armaments · Stamina Recovery upon Landing Attacks · Endurance +3",
+      "attrs": [
+        7006100,
+        7100100,
+        7000202
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1500
+    },
+    {
+      "id": "grand_luminous_scene_1510",
+      "name": "Grand Luminous Scene",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Can be purchased at the Collector Signboard for 3 sovereign sigil.",
+      "character": "any",
+      "color": "Y",
+      "is_dn": false,
+      "description": "Attack power increased for each evergaol prisoner defeated · Treasure marked upon map · Stonesword Key in possession at start of expedition",
+      "attrs": [
+        7060000,
+        7070000,
+        7120900
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1510
+    },
+    {
+      "id": "grand_drizzly_scene_1520",
+      "name": "Grand Drizzly Scene",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Can be purchased at the Collector Signboard for 3 sovereign sigil.",
+      "character": "any",
+      "color": "B",
+      "is_dn": false,
+      "description": "Starlight Shards in possession at start of expedition · Starlight Shards in possession at start of expedition · Starlight Shards in possession at start of expedition",
+      "attrs": [
+        7126000,
+        7126000,
+        7126000
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 1520
+    },
+    {
+      "id": "night_of_the_beast_2000",
+      "name": "Night of the Beast",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for defeating the Tricephalos Night Lord for the first time",
+      "character": "any",
+      "color": "G",
+      "is_dn": false,
+      "description": "Stamina Recovery upon Landing Attacks +1 · Starting armament deals fire damage",
+      "attrs": [
+        7100110,
+        7120100
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2000
+    },
+    {
+      "id": "dark_night_of_the_beast_2001",
+      "name": "Dark Night of the Beast",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Defeat Everdark Sovereign Gladius and purchase from the Collector Signboard",
+      "character": "any",
+      "color": "Y",
+      "is_dn": false,
+      "description": "Stamina Recovery upon Landing Attacks +1 · Taking attacks improves attack power · Fire Attack Power Up +2",
+      "attrs": [
+        7100110,
+        10001,
+        7001602
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2001
+    },
+    {
+      "id": "night_of_the_baron_2010",
+      "name": "Night of the Baron",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired by defeating the Gaping Jaw Night Lord for the first time",
+      "character": "any",
+      "color": "B",
+      "is_dn": false,
+      "description": "Improved Critical Hits +1 · Critical hits fill more of the Art gauge · Critical Hit Boosts Stamina Recovery Speed",
+      "attrs": [
+        7040201,
+        7030800,
+        7035100
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2010
+    },
+    {
+      "id": "dark_night_of_the_baron_2011",
+      "name": "Dark Night of the Baron",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Defeat Everdark Sovereign Gaping Jaw and purchase from the Collector Signboard",
+      "character": "any",
+      "color": "R",
+      "is_dn": false,
+      "description": "Improved Critical Hits +1 · Improved Critical Hits · Critical Hits Earn Runes",
+      "attrs": [
+        7040201,
+        7040200,
+        7031900
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2011
+    },
+    {
+      "id": "night_of_the_wise_2020",
+      "name": "Night of the Wise",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for defeating the Sentient Pest Night Lord for the first time",
+      "character": "any",
+      "color": "Y",
+      "is_dn": false,
+      "description": "Increased Maximum FP · Starting armament inflicts poison · Poison & Rot in Vicinity Increases Attack Power",
+      "attrs": [
+        7000190,
+        7120500,
+        7260710
+      ],
+      "locked_labels": [],
+      "attrs_verified": false,
+      "notes": "",
+      "xlsx_item_id": 2020,
+      "_audit_notes": [
+        "attrs_verified disabled 2026-04-19: references missing effect_ids [7260710]"
+      ]
+    },
+    {
+      "id": "dark_night_of_the_wise_2021",
+      "name": "Dark Night of the Wise",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Defeat Everdark Sovereign Gaping Jaw and purchase from the Collector Signboard",
+      "character": "any",
+      "color": "G",
+      "is_dn": false,
+      "description": "Increased Maximum FP · FP Restoration upon Successive Attacks · Max FP increased for each Sorcerer's Rise unlocked",
+      "attrs": [
+        7000190,
+        10000,
+        7060100
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2021
+    },
+    {
+      "id": "night_of_the_fathom_2030",
+      "name": "Night of the Fathom",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for defeating the Augur Night Lord for the first time",
+      "character": "any",
+      "color": "R",
+      "is_dn": false,
+      "description": "Increased Maximum HP · Flask Also Heals Allies · Items confer effect to all nearby allies",
+      "attrs": [
+        7000090,
+        7010200,
+        7050100
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2030
+    },
+    {
+      "id": "dark_night_of_the_fathom_2031",
+      "name": "Dark Night of the Fathom",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Defeat Everdark Sovereign Augur and purchase from the Collector Signboard",
+      "character": "any",
+      "color": "B",
+      "is_dn": false,
+      "description": "Increased Maximum HP · Continuous HP Recovery · Slowly restore HP for self and nearby allies when HP is low",
+      "attrs": [
+        7000090,
+        7001100,
+        7012200
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2031
+    },
+    {
+      "id": "night_of_the_demon_2040",
+      "name": "Night of the Demon",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for defeating the Equilibrious Beast Night Lord for the first time",
+      "character": "any",
+      "color": "R",
+      "is_dn": false,
+      "description": "Huge rune discount for shop purchases while on expedition · Gesture \"Crossed Legs\" Builds Up Madness · Madness Continually Recovers FP",
+      "attrs": [
+        7230001,
+        7035400,
+        7035500
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2040
+    },
+    {
+      "id": "dark_night_of_the_demon_2041",
+      "name": "Dark Night of the Demon",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Defeat Everdark Sovereign Libra Creature of Night and purchase from the Collector Signboard",
+      "character": "any",
+      "color": "B",
+      "is_dn": false,
+      "description": "Taking attacks improves attack power · Gesture \"Crossed Legs\" Builds Up Madness · Madness Continually Recovers FP",
+      "attrs": [
+        10001,
+        7035400,
+        7035500
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2041
+    },
+    {
+      "id": "night_of_the_champion_2050",
+      "name": "Night of the Champion",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for defeating the Darkdrift Knight Night Lord for the first time",
+      "character": "any",
+      "color": "G",
+      "is_dn": false,
+      "description": "Increased Maximum Stamina · Guard counter is given a boost based on current HP · HP Restoration upon Thrusting Counterattack",
+      "attrs": [
+        7000290,
+        7150000,
+        7160000
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2050
+    },
+    {
+      "id": "dark_night_of_the_champion_2051",
+      "name": "Dark Night of the Champion",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Defeat Everdark Sovereign Darkdrift Knight and purchase from the Collector Signboard",
+      "character": "any",
+      "color": "Y",
+      "is_dn": false,
+      "description": "Increased Maximum Stamina · Boosts Attack Power of Added Affinity Attacks · Defeating enemies fills more of the Art gauge",
+      "attrs": [
+        7000290,
+        7035800,
+        7090000
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2051
+    },
+    {
+      "id": "night_of_the_miasma_2060",
+      "name": "Night of the Miasma",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for defeating the Fissure in the Fog Night Lord for the first time",
+      "character": "any",
+      "color": "Y",
+      "is_dn": false,
+      "description": "Frostbite in Vicinity Conceals Self · Changes compatible armament's skill to Chilling Mist at start of expedition · Attack power up when facing frostbite-afflicted enemy",
+      "attrs": [
+        7260700,
+        7123900,
+        7260400
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2060
+    },
+    {
+      "id": "dark_night_of_the_miasma_2061",
+      "name": "Dark Night of the Miasma",
+      "source": "boss_everdark",
+      "source_type": "boss_everdark",
+      "source_detail": "Defeat Everdark Sovereign Caligo and purchase from the Collector Signboard",
+      "character": "any",
+      "color": "G",
+      "is_dn": false,
+      "description": "Frostbite in Vicinity Conceals Self · Starting armament inflicts frost · Improved Physical Damage Negation",
+      "attrs": [
+        7260700,
+        7120400,
+        7006200
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2061
+    },
+    {
+      "id": "the_will_of_the_balancers_2070",
+      "name": "The Will of the Balancers",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for defeating the Balancers for the first time.",
+      "character": "any",
+      "color": "B",
+      "is_dn": false,
+      "description": "Improved Melee Attack Power · Improved Skill Attack Power · Continuous FP Recovery",
+      "attrs": [
+        7006600,
+        7006700,
+        7006500
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2070
+    },
+    {
+      "id": "the_will_of_balance_2071",
+      "name": "The Will of Balance",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "",
+      "character": "any",
+      "color": "R",
+      "is_dn": false,
+      "description": "Improved Melee Attack Power · Improved Skill Attack Power · Occasionally Nullify Attacks When Damage Negation is Lowered",
+      "attrs": [
+        7006600,
+        7006700,
+        7037800
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2071
+    },
+    {
+      "id": "the_night_of_dregs_2080",
+      "name": "The Night of Dregs",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for defeating the Dreglord for the first time.",
+      "character": "any",
+      "color": "R",
+      "is_dn": false,
+      "description": "HP Restoration upon Thrusting Counterattack · Rot in Vicinity Causes Continuous HP Recovery · Status Ailment Gauges Slowly Increase Attack Power",
+      "attrs": [
+        7170100,
+        7260900,
+        7037700
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2080
+    },
+    {
+      "id": "night_of_the_lord_2100",
+      "name": "Night of the Lord",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for defeating the Night Aspect Night Lord for the first time",
+      "character": "any",
+      "color": "B",
+      "is_dn": false,
+      "description": "Switching Weapons Adds an Affinity Attack · Boosts Attack Power of Added Affinity Attacks · Switching Weapons Boosts Attack Power",
+      "attrs": [
+        7035700,
+        7035800,
+        7035900
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 2100
+    },
+    {
+      "id": "old_pocketwatch_10000",
+      "name": "Old Pocketwatch",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for defeating the Gladius Night Lord for the first time, or as random drop",
+      "character": "any",
+      "color": "G",
+      "is_dn": false,
+      "description": "FP Restoration upon Successive Attacks · Dexterity +3",
+      "attrs": [
+        10000,
+        7000402
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 10000
+    },
+    {
+      "id": "besmirched_frame_10001",
+      "name": "Besmirched Frame",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "Purchased from the Small Jar Bazaar at the Roundtable Hold for 1500 murk, after unlocking Duchess",
+      "character": "duchess",
+      "color": "B",
+      "is_dn": false,
+      "description": "Taking attacks improves attack power · Faith +3",
+      "attrs": [
+        10001,
+        7000602
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 10001
+    },
+    {
+      "id": "fell_omen_fetish_10002",
+      "name": "Fell Omen Fetish",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for defeating Fell Omen boss encountered in the tutorial section of the game",
+      "character": "any",
+      "color": "B",
+      "is_dn": false,
+      "description": "Switching Weapons Boosts Attack Power · Improved Throwing Knife Damage · Vigor +1",
+      "attrs": [
+        7035900,
+        7040400,
+        7000000
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 10002
+    },
+    {
+      "id": "slate_whetstone_11000",
+      "name": "Slate Whetstone",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Wylder's Remembrance Quest",
+      "character": "wylder",
+      "color": "R",
+      "is_dn": false,
+      "description": "[Wylder] Standard attacks enhanced with fiery follow-ups when using Character Skill (greatsword only) · Physical Attack Up",
+      "attrs": [
+        7020000,
+        7001400
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 11000
+    },
+    {
+      "id": "the_wylder_s_earring_11001",
+      "name": "The Wylder's Earring",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Complete Wylders's Remembrance quests and kill Heolstor the Nightlord while you have the Silver Tear relic equipped",
+      "character": "wylder",
+      "color": "R",
+      "is_dn": false,
+      "description": "[Wylder] Art activation spreads fire in area · [Wylder] +1 additional Character Skill use · Stamina Recovery upon Landing Attacks",
+      "attrs": [
+        7010500,
+        7033200,
+        7100100
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 11001
+    },
+    {
+      "id": "silver_tear_11002",
+      "name": "Silver Tear",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Wylder's Remembrance Quest",
+      "character": "wylder",
+      "color": "R",
+      "is_dn": false,
+      "description": "[Wylder] Art gauge greatly filled when ability is activated · Ultimate Art Auto Charge +3 · Arcane +3",
+      "attrs": [
+        7032400,
+        7000902,
+        7000702
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 11002
+    },
+    {
+      "id": "delicate_burning_scene_11004",
+      "name": "Delicate Burning Scene",
+      "source": "shop",
+      "source_type": "shop",
+      "source_detail": "",
+      "character": "any",
+      "color": "R",
+      "is_dn": false,
+      "description": "Dexterity +1",
+      "attrs": [
+        7000400
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 11004
+    },
+    {
+      "id": "third_volume_12000",
+      "name": "Third Volume",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Guardian's Remembrance Quest",
+      "character": "guardian",
+      "color": "R",
+      "is_dn": false,
+      "description": "[Guardian] Creates whirlwind when charging halberd attacks · HP Restoration upon Halberd Attacks",
+      "attrs": [
+        7011600,
+        7341800
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 12000
+    },
+    {
+      "id": "stone_stake_12001",
+      "name": "Stone Stake",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Guardian's Remembrance Quest",
+      "character": "guardian",
+      "color": "R",
+      "is_dn": false,
+      "description": "[Guardian] Increased duration for Character Skill · Character Skill Cooldown Reduction +3",
+      "attrs": [
+        7011000,
+        7000802
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 12001
+    },
+    {
+      "id": "witch_s_brooch_12002",
+      "name": "Witch's Brooch",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Guardian's Remembrance Quest",
+      "character": "guardian",
+      "color": "B",
+      "is_dn": false,
+      "description": "[Guardian] Slowly restores nearby allies' HP while Art is active · [Guardian] Successful guards send out shockwaves while ability is active · Vigor +3",
+      "attrs": [
+        7012000,
+        7033400,
+        7000002
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 12002
+    },
+    {
+      "id": "cracked_witch_s_brooch_12003",
+      "name": "Cracked Witch's Brooch",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Guardian's Remembrance Quest",
+      "character": "guardian",
+      "color": "B",
+      "is_dn": false,
+      "description": "[Guardian] Slowly restores nearby allies' HP while Art is active · [Guardian] Successful guards send out shockwaves while ability is active · Vigor +3",
+      "attrs": [
+        7012000,
+        7033400,
+        7000002
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 12003
+    },
+    {
+      "id": "cracked_sealing_wax_13001",
+      "name": "Cracked Sealing Wax",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Ironeye's Remembrance Quest",
+      "character": "ironeye",
+      "color": "Y",
+      "is_dn": false,
+      "description": "[Ironeye] Extends duration of weak point · Critical Hits Earn Runes",
+      "attrs": [
+        7280000,
+        7031900
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 13001
+    },
+    {
+      "id": "edge_of_order_13002",
+      "name": "Edge of Order",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Ironeye's Remembrance Quest",
+      "character": "ironeye",
+      "color": "Y",
+      "is_dn": false,
+      "description": "[Ironeye] Boosts thrusting counterattacks after executing Art · Improved Bow Attack Power · Starting armament deals holy damage",
+      "attrs": [
+        7034700,
+        7332400,
+        7120300
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 13002
+    },
+    {
+      "id": "golden_dew_14000",
+      "name": "Golden Dew",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Duchess' Remembrance Quest",
+      "character": "duchess",
+      "color": "Y",
+      "is_dn": false,
+      "description": "[Duchess] Improved Character Skill Attack Power · Boosts Attack Power of Added Affinity Attacks",
+      "attrs": [
+        7290000,
+        7035800
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 14000
+    },
+    {
+      "id": "crown_medal_14001",
+      "name": "Crown Medal",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Duchess' Remembrance Quest.",
+      "character": "duchess",
+      "color": "G",
+      "is_dn": false,
+      "description": "[Duchess] Reprise events upon nearby enemies by landing the final blow of a chain attack with dagger · Improved Dagger Attack Power",
+      "attrs": [
+        7010700,
+        7330000
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 14001
+    },
+    {
+      "id": "blessed_iron_coin_14002",
+      "name": "Blessed Iron Coin",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Duchess' Remembrance Quest",
+      "character": "duchess",
+      "color": "G",
+      "is_dn": false,
+      "description": "[Duchess] Defeating enemies while Art is active ups attack power · Continuous HP Recovery · Vigor +3",
+      "attrs": [
+        7032700,
+        7001100,
+        7000002
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 14002
+    },
+    {
+      "id": "torn_braided_cord_15000",
+      "name": "Torn Braided Cord",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Raider's Remembrance Quest",
+      "character": "raider",
+      "color": "B",
+      "is_dn": false,
+      "description": "[Raider] Damage taken while using Character Skill improves attack power and stamina · Strength +3",
+      "attrs": [
+        7031300,
+        7000302
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 15000
+    },
+    {
+      "id": "black_claw_necklace_15002",
+      "name": "Black Claw Necklace",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Raider's Remembrance Quest",
+      "character": "raider",
+      "color": "Y",
+      "is_dn": false,
+      "description": "Defeating enemies near Totem Stela restores HP · Defeating enemies fills more of the Art gauge · Poise +3",
+      "attrs": [
+        7090300,
+        7090000,
+        7001002
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 15002
+    },
+    {
+      "id": "small_makeup_brush_16001",
+      "name": "Small Makeup Brush",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Revenant's Remembrance Quest",
+      "character": "revenant",
+      "color": "B",
+      "is_dn": false,
+      "description": "[Revenant] Power up while fighting alongside family · Increased rune acquisition for self and allies",
+      "attrs": [
+        7220000,
+        7110000
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 16001
+    },
+    {
+      "id": "old_portrait_16002",
+      "name": "Old Portrait",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Revenant's Remembrance Quest",
+      "character": "revenant",
+      "color": "B",
+      "is_dn": false,
+      "description": "[Revenant] Trigger ghostflame explosion during Ultimate Art activation · [Revenant] Expend own HP to fully heal nearby allies when activating Art · Defeating enemies fills more of the Art gauge",
+      "attrs": [
+        7011200,
+        7010900,
+        7090000
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 16002
+    },
+    {
+      "id": "vestige_of_night_17001",
+      "name": "Vestige of Night",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Recluse's Remembrance Quest",
+      "character": "recluse",
+      "color": "G",
+      "is_dn": false,
+      "description": "[Recluse] Collecting affinity residue activates Terra Magica · Magic Attack Power Up +2",
+      "attrs": [
+        7032800,
+        7001502
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 17001
+    },
+    {
+      "id": "bone_like_stone_17002",
+      "name": "Bone-Like Stone",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Recluse's Remembrance Quest",
+      "character": "recluse",
+      "color": "G",
+      "is_dn": false,
+      "description": "[Recluse] Activating Ultimate Art raises Max HP · [Recluse] Suffer blood loss and increase attack power upon Art activation · Intelligence +3",
+      "attrs": [
+        7034100,
+        7032900,
+        7000502
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 17002
+    },
+    {
+      "id": "blessed_flowers_18000",
+      "name": "Blessed Flowers",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Recluse's Remembrance Quest",
+      "character": "executor",
+      "color": "G",
+      "is_dn": false,
+      "description": "[Executor] While Character Skill is active, unlocking use of cursed sword restores HP · Dexterity +3",
+      "attrs": [
+        7034500,
+        7000402
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 18000
+    },
+    {
+      "id": "golden_sprout_18002",
+      "name": "Golden Sprout",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Executor's Remembrance Quest",
+      "character": "executor",
+      "color": "R",
+      "is_dn": false,
+      "description": "[Executor] Roaring restores HP while Art is active · HP Recovery From Successful Guarding · Slowly restore HP for self and nearby allies when HP is low",
+      "attrs": [
+        7011700,
+        7036100,
+        7012200
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 18002
+    },
+    {
+      "id": "cleansing_tear_19000",
+      "name": "Cleansing Tear",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Scholar's Remembrance Quest",
+      "character": "scholar",
+      "color": "R",
+      "is_dn": false,
+      "description": "[Scholar] Continuous damage inflicted on targets threaded by Ultimate Art · Defeating enemies fills more of the Art gauge · Improved Affinity Damage Negation",
+      "attrs": [
+        7036400,
+        7090000,
+        7006300
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 19000
+    },
+    {
+      "id": "note_my_dear_successor_19001",
+      "name": "Note \"My Dear Successor\"",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Scholar's Remembrance Quest",
+      "character": "scholar",
+      "color": "Y",
+      "is_dn": false,
+      "description": "[Scholar] Prevent slowing of Character Skill progress · [Scholar] Allies targeted by Character Skill gain boosted attack · Character Skill Cooldown Reduction +3",
+      "attrs": [
+        7036200,
+        7036300,
+        7000802
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 19001
+    },
+    {
+      "id": "leather_monocle_case_19050",
+      "name": "Leather Monocle Case",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Undertakers's Remembrance Quest",
+      "character": "undertaker",
+      "color": "B",
+      "is_dn": false,
+      "description": "[Undertaker] Physical attacks boosted while assist effect from incantation is active for self · Physical Attack Up +2 · Extended Spell Duration",
+      "attrs": [
+        7037000,
+        7001402,
+        7006400
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 19050
+    },
+    {
+      "id": "glass_necklace_19051",
+      "name": "Glass Necklace",
+      "source": "remembrance",
+      "source_type": "remembrance",
+      "source_detail": "Acquired as a reward for completing the Undertakers's Remembrance Quest",
+      "character": "undertaker",
+      "color": "G",
+      "is_dn": false,
+      "description": "[Undertaker] Activating Ultimate Art increases attack power · Ultimate Art Auto Charge +3 · Successive Attacks Boost Attack Power",
+      "attrs": [
+        7036800,
+        7000902,
+        7037600
+      ],
+      "locked_labels": [],
+      "attrs_verified": true,
+      "notes": "",
+      "xlsx_item_id": 19051
+    },
+    {
+      "id": "todo_item_name_vins_1000232",
+      "name": "TODO Item Name (VINS)",
+      "source": "other",
+      "source_type": "other",
+      "source_detail": "",
+      "character": "any",
+      "color": "U",
+      "is_dn": false,
+      "description": "",
+      "attrs": [],
+      "locked_labels": [],
+      "attrs_verified": false,
+      "notes": "",
+      "xlsx_item_id": 1000232
+    },
+    {
+      "id": "todo_item_name_vins_2003350",
+      "name": "TODO Item Name (VINS)",
+      "source": "other",
+      "source_type": "other",
+      "source_detail": "",
+      "character": "any",
+      "color": "U",
+      "is_dn": false,
+      "description": "",
+      "attrs": [],
+      "locked_labels": [],
+      "attrs_verified": false,
+      "notes": "",
+      "xlsx_item_id": 2003350
+    }
+  ]
+}

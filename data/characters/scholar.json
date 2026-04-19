@@ -1,0 +1,65 @@
+{
+  "id": "scholar",
+  "name": "Scholar",
+  "dlc": "Forsaken Hollows",
+  "tag": "Scholar",
+  "icon": "📖",
+  "tagline": "Support caster · Mind/INT · team buffs",
+  "stats": {
+    "vigor": "B",
+    "mind": "B",
+    "endurance": "B",
+    "strength": "D",
+    "dexterity": "C",
+    "intelligence": "C",
+    "faith": "C",
+    "arcane": "S"
+  },
+  "weapon_types": [
+    "staff",
+    "sacred_seal"
+  ],
+  "dual_wield": false,
+  "skill": {
+    "name": "Specimen Thread",
+    "description": "Threads targets; allies attacking threaded enemies gain boost."
+  },
+  "ultimate": {
+    "name": "Archive Open",
+    "description": "Continuous damage + buff AoE."
+  },
+  "passive": {
+    "name": "Annotative Scholarship",
+    "description": "Extra runes on specimen capture; buff retention."
+  },
+  "data_quality": "skeleton",
+  "remembrance_slots": [
+    {
+      "name": "Note \"My Dear Successor\"",
+      "source": "xlsx_item_19001",
+      "fixed_effects": [
+        7036200,
+        7036300,
+        7000802
+      ],
+      "locked_labels": [],
+      "color_hint": "yellow"
+    }
+  ],
+  "global": {
+    "trance_multiplier": 1.0,
+    "hammer_hits_per_boss_window_s": 0.3,
+    "hex_casts_per_boss_window_s": 0.5,
+    "loathsome_hex_per_cast_coef": 0.25,
+    "playstyle_tags": [
+      "cast"
+    ],
+    "build_goal_weights": {
+      "damage": 0.6,
+      "survival": 0.3,
+      "utility": 0.8,
+      "team": 0.5
+    }
+  },
+  "effects": {}
+}

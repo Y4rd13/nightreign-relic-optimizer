@@ -1,0 +1,67 @@
+{
+  "id": "executor",
+  "name": "Executor",
+  "dlc": "base",
+  "tag": "Executor",
+  "icon": "🗡️",
+  "tagline": "Parry specialist · dual katana · counter-hit",
+  "stats": {
+    "vigor": "B",
+    "mind": "D",
+    "endurance": "B",
+    "strength": "C",
+    "dexterity": "S",
+    "intelligence": "D",
+    "faith": "D",
+    "arcane": "S"
+  },
+  "weapon_types": [
+    "katana",
+    "curved_sword"
+  ],
+  "dual_wield": true,
+  "skill": {
+    "name": "Cragblade Stance",
+    "description": "Perfect parry stance; counter-hits with buffed damage."
+  },
+  "ultimate": {
+    "name": "Crimson Slaughter",
+    "description": "Unlocks cursed sword with massive damage during channel."
+  },
+  "passive": {
+    "name": "Aspects of the Crucible: Beast",
+    "description": "HP regen + attack boost after successful parry/skill."
+  },
+  "data_quality": "skeleton",
+  "remembrance_slots": [
+    {
+      "name": "Golden Sprout",
+      "source": "xlsx_item_18002",
+      "fixed_effects": [
+        7011700,
+        7036100,
+        7012200
+      ],
+      "locked_labels": [],
+      "color_hint": "red"
+    }
+  ],
+  "global": {
+    "trance_multiplier": 1.0,
+    "hammer_hits_per_boss_window_s": 1.2,
+    "hex_casts_per_boss_window_s": 0.0,
+    "loathsome_hex_per_cast_coef": 0.0,
+    "playstyle_tags": [
+      "melee",
+      "crit",
+      "stance"
+    ],
+    "build_goal_weights": {
+      "damage": 1.0,
+      "survival": 0.2,
+      "utility": 0.4,
+      "team": 0.0
+    }
+  },
+  "effects": {}
+}

@@ -1,0 +1,69 @@
+{
+  "id": "raider",
+  "name": "Raider",
+  "dlc": "base",
+  "tag": "Raider",
+  "icon": "🪓",
+  "tagline": "Barbarian bruiser · highest STR",
+  "stats": {
+    "vigor": "A",
+    "mind": "D",
+    "endurance": "A",
+    "strength": "S",
+    "dexterity": "C",
+    "intelligence": "D",
+    "faith": "D",
+    "arcane": "C"
+  },
+  "weapon_types": [
+    "greatsword",
+    "colossal_weapon",
+    "hammer",
+    "greathammer"
+  ],
+  "dual_wield": false,
+  "skill": {
+    "name": "Retaliate",
+    "description": "Counter-attack when struck."
+  },
+  "ultimate": {
+    "name": "Totem Stela",
+    "description": "Summons damage-boosting totem for team."
+  },
+  "passive": {
+    "name": "Untamable",
+    "description": "Attack power grows as HP drops."
+  },
+  "data_quality": "skeleton",
+  "remembrance_slots": [
+    {
+      "name": "Black Claw Necklace",
+      "source": "xlsx_item_15002",
+      "fixed_effects": [
+        7090300,
+        7090000,
+        7001002
+      ],
+      "locked_labels": [],
+      "color_hint": "yellow"
+    }
+  ],
+  "global": {
+    "trance_multiplier": 1.0,
+    "hammer_hits_per_boss_window_s": 0.7,
+    "hex_casts_per_boss_window_s": 0.0,
+    "loathsome_hex_per_cast_coef": 0.0,
+    "playstyle_tags": [
+      "melee",
+      "charged",
+      "stance"
+    ],
+    "build_goal_weights": {
+      "damage": 1.0,
+      "survival": 0.3,
+      "utility": 0.2,
+      "team": 0.0
+    }
+  },
+  "effects": {}
+}

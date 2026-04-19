@@ -1,0 +1,68 @@
+{
+  "id": "wylder",
+  "name": "Wylder",
+  "dlc": "base",
+  "tag": "Wylder",
+  "icon": "🗡️",
+  "tagline": "Balanced all-rounder · greatsword",
+  "stats": {
+    "vigor": "A",
+    "mind": "C",
+    "endurance": "B",
+    "strength": "A",
+    "dexterity": "B",
+    "intelligence": "C",
+    "faith": "C",
+    "arcane": "C"
+  },
+  "weapon_types": [
+    "greatsword",
+    "straight_sword"
+  ],
+  "dual_wield": false,
+  "skill": {
+    "name": "Claw Shot",
+    "description": "Grappling hook attack for closing gaps."
+  },
+  "ultimate": {
+    "name": "Onslaught Stake",
+    "description": "Pillar of fire impact damage."
+  },
+  "passive": {
+    "name": "Sturdy Build",
+    "description": "Slight HP and damage negation boost."
+  },
+  "data_quality": "skeleton",
+  "remembrance_slots": [
+    {
+      "name": "The Wylder's Earring",
+      "source": "xlsx_item_11001",
+      "fixed_effects": [
+        7010500,
+        7033200,
+        7100100
+      ],
+      "locked_labels": [],
+      "color_hint": "red"
+    }
+  ],
+  "global": {
+    "trance_multiplier": 1.0,
+    "trance_uptime_baseline": 0.0,
+    "hammer_hits_per_boss_window_s": 0.9,
+    "hex_casts_per_boss_window_s": 0.0,
+    "loathsome_hex_per_cast_coef": 0.0,
+    "playstyle_tags": [
+      "melee",
+      "successive",
+      "stance"
+    ],
+    "build_goal_weights": {
+      "damage": 0.8,
+      "survival": 0.4,
+      "utility": 0.3,
+      "team": 0.0
+    }
+  },
+  "effects": {}
+}

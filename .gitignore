@@ -1,0 +1,56 @@
+# ── Python ─────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ── Virtualenv / package manager ───────────────────────
+.venv/
+venv/
+env/
+pip-log.txt
+
+# ── Reflex runtime + build artifacts ───────────────────
+.web/
+.states/
+reflex.db
+*.db
+.reflex_cache/
+assets/external/
+
+# ── User-generated data (persisted on host, never in repo) ──
+user_data/
+presets/*.json
+!presets/.gitkeep
+
+# ── Editors / IDE ──────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Dev tooling / scratch artifacts ────────────────────
+.playwright-mcp/
+audit/
+*.log
+*.tmp
+
+# ── Generated screenshots / stray media at repo root ───
+/*.png
+/*.jpg
+/*.jpeg
+/*.gif
+
+# ── Secrets / local env overrides ──────────────────────
+.env
+.env.*
+!.env.example

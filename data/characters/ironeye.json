@@ -1,0 +1,66 @@
+{
+  "id": "ironeye",
+  "name": "Ironeye",
+  "dlc": "base",
+  "tag": "Ironeye",
+  "icon": "🏹",
+  "tagline": "Ranged DEX specialist · bow + weak-point damage",
+  "stats": {
+    "vigor": "C",
+    "mind": "C",
+    "endurance": "B",
+    "strength": "C",
+    "dexterity": "A",
+    "intelligence": "D",
+    "faith": "D",
+    "arcane": "B"
+  },
+  "weapon_types": [
+    "bow",
+    "light_bow"
+  ],
+  "dual_wield": false,
+  "skill": {
+    "name": "Marking",
+    "description": "Exposes weak points on enemies for bonus damage."
+  },
+  "ultimate": {
+    "name": "Single Shot",
+    "description": "Long-range precision shot dealing massive damage."
+  },
+  "passive": {
+    "name": "Enhanced Senses",
+    "description": "Reveals treasure and enemy weak points."
+  },
+  "data_quality": "skeleton",
+  "remembrance_slots": [
+    {
+      "name": "Edge of Order",
+      "source": "xlsx_item_13002",
+      "fixed_effects": [
+        7034700,
+        7332400,
+        7120300
+      ],
+      "locked_labels": [],
+      "color_hint": "yellow"
+    }
+  ],
+  "global": {
+    "trance_multiplier": 1.0,
+    "hammer_hits_per_boss_window_s": 1.2,
+    "hex_casts_per_boss_window_s": 0.0,
+    "loathsome_hex_per_cast_coef": 0.0,
+    "playstyle_tags": [
+      "ranged",
+      "crit"
+    ],
+    "build_goal_weights": {
+      "damage": 1.0,
+      "survival": 0.2,
+      "utility": 0.3,
+      "team": 0.0
+    }
+  },
+  "effects": {}
+}

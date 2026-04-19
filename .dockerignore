@@ -1,0 +1,62 @@
+# Keep the build context lean: only source + data needs to go in.
+# Everything below either rebuilds from source or is runtime-only.
+
+# ── Version control + meta ─────────────────────────────
+.git/
+.github/
+.gitignore
+.gitattributes
+CLAUDE.md
+README.md
+LICENSE
+
+# ── Python caches ──────────────────────────────────────
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+
+# ── Virtualenv ─────────────────────────────────────────
+.venv/
+venv/
+env/
+
+# ── Reflex dev artifacts (rebuilt inside the image) ────
+.web/
+.states/
+reflex.db
+*.db
+.reflex_cache/
+
+# ── User data — mounted as a volume at runtime, never in the image ──
+user_data/
+presets/
+
+# ── Tests / dev tooling ────────────────────────────────
+tests/
+.playwright-mcp/
+audit/
+scripts/
+
+# ── Stray media / scratch artifacts ────────────────────
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.log
+*.tmp
+
+# ── Editor / OS ────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Secrets ────────────────────────────────────────────
+.env
+.env.*

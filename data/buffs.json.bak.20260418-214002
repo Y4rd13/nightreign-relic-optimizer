@@ -1,0 +1,925 @@
+{
+  "_source": "relics.pro compendium · buffs sheet",
+  "_schema": "Dormant Powers (permanent buffs earned per expedition). values[] holds the tier levels (typically tier 1 / tier 2).",
+  "buffs": [
+    {
+      "id": 8000000,
+      "description": "Increased Maximum HP",
+      "effect_template": "Maximum HP raised by {}",
+      "values": [
+        10.0,
+        15.0
+      ],
+      "format": "pct",
+      "category": "Attributes",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8010000,
+      "description": "Increased Maximum FP",
+      "effect_template": "Maximum FP raised by {}",
+      "values": [
+        10.0,
+        15.0
+      ],
+      "format": "pct",
+      "category": "Attributes",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8010100,
+      "description": "Reduced FP Consumption",
+      "effect_template": "Lowers FP consumption by {}",
+      "values": [
+        10.0,
+        15.0
+      ],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8020000,
+      "description": "Increased Maximum Stamina",
+      "effect_template": "Maximum stamina raised by {}",
+      "values": [
+        10.0,
+        15.0
+      ],
+      "format": "pct",
+      "category": "Attributes",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8020100,
+      "description": "Reduced Stamina Consumption",
+      "effect_template": "",
+      "values": [],
+      "format": "pct",
+      "category": "",
+      "stack_self": null,
+      "stack_other": null,
+      "unobtainable": true,
+      "notes": ""
+    },
+    {
+      "id": 8020200,
+      "description": "Improved Stamina Recovery",
+      "effect_template": "Raises stamina recovery speed by {} per second",
+      "values": [
+        4.0,
+        6.0
+      ],
+      "format": "pct",
+      "category": "Attributes",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8100000,
+      "description": "Improved Physical Attack Power",
+      "effect_template": "Raises Physical attack by {}",
+      "values": [
+        6.0,
+        9.0
+      ],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8100500,
+      "description": "Improved Affinity Attack Power",
+      "effect_template": "Raises attacks of magic, fire, lightning, holy affinities by {}.",
+      "values": [
+        5.0,
+        8.0
+      ],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8120000,
+      "description": "Improved Stance-Breaking",
+      "effect_template": "Attacks are {} more likely to break stance of enemies",
+      "values": [
+        10.0,
+        15.0
+      ],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8150000,
+      "description": "Attack Boost [Lifeforms Born of Falling Stars]",
+      "effect_template": "Enhances attacks against blockers lifeforms born of falling stars by {}",
+      "values": [
+        20.0
+      ],
+      "format": "pct",
+      "category": "",
+      "stack_self": null,
+      "stack_other": null,
+      "unobtainable": true,
+      "notes": ""
+    },
+    {
+      "id": 8150100,
+      "description": "Attack Boost [Those Who Live in Death]",
+      "effect_template": "Enhances attacks against Those Who Live in Death by {}",
+      "values": [
+        20.0
+      ],
+      "format": "pct",
+      "category": "",
+      "stack_self": null,
+      "stack_other": null,
+      "unobtainable": true,
+      "notes": ""
+    },
+    {
+      "id": 8150300,
+      "description": "Attack Boost [Dragons]",
+      "effect_template": "Enhances attacks against dragons by {}",
+      "values": [
+        20.0
+      ],
+      "format": "pct",
+      "category": "",
+      "stack_self": null,
+      "stack_other": null,
+      "unobtainable": true,
+      "notes": ""
+    },
+    {
+      "id": 8200000,
+      "description": "Improved Physical Damage Negation",
+      "effect_template": "Increases physical damage negation by {}",
+      "values": [
+        12.0,
+        15.0,
+        18.0
+      ],
+      "format": "pct",
+      "category": "Defensive",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8200500,
+      "description": "Improved Affinity Damage Negation",
+      "effect_template": "Increases affinity damage negation by {}",
+      "values": [
+        12.0,
+        15.0,
+        18.0
+      ],
+      "format": "pct",
+      "category": "Defensive",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8210700,
+      "description": "All Resistances Up",
+      "effect_template": "Raises resistance to all ailments by {}",
+      "values": [
+        57.0,
+        75.0
+      ],
+      "format": "pct",
+      "category": "Defensive",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8230000,
+      "description": "Improved Poise",
+      "effect_template": "Reduces incoming poise damage by {}",
+      "values": [
+        25.0,
+        38.0
+      ],
+      "format": "pct",
+      "category": "Defensive",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8330103,
+      "description": "Improved Sorceries & Incantations",
+      "effect_template": "Raises potency of sorceries and incantations by {}",
+      "values": [
+        7.0
+      ],
+      "format": "pct",
+      "category": "Sorceries",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8330500,
+      "description": "Increased Sorcery & Incantation Duration",
+      "effect_template": "Extends spell effect duration by {}",
+      "values": [
+        30.0
+      ],
+      "format": "pct",
+      "category": "Sorceries",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8330700,
+      "description": "Dragonwound upon Dragon Communion",
+      "effect_template": "Dragon Communion incantations add anti-dragon effect to armament",
+      "values": [],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": "TODO: How strong is this effect?"
+    },
+    {
+      "id": 8350400,
+      "description": "Successful Parries Activate Golden Retaliation",
+      "effect_template": "Parry to dispel incoming sorceries and incantations, retaliating with golden power",
+      "values": [],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8360000,
+      "description": "Improved Ultimate Art Gauge Charge Speed",
+      "effect_template": "Improves the charging speed of Ultimate Art gauge by {}",
+      "values": [
+        6.0
+      ],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8370000,
+      "description": "Character Skill Cooldown Reduction",
+      "effect_template": "Shortens Character Skill cooldown time by {}",
+      "values": [
+        10.0
+      ],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8380000,
+      "description": "Improved Roar & Breath Attacks",
+      "effect_template": "Enhances roars and breath attacks by {}",
+      "values": [
+        20.0
+      ],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8390000,
+      "description": "Improved Throwing Pots",
+      "effect_template": "Raises potency of throwing pots by {}",
+      "values": [
+        20.0
+      ],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8400000,
+      "description": "Improved Perfuming Arts",
+      "effect_template": "Raises potency of items employing perfume by {}",
+      "values": [
+        20.0
+      ],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8410000,
+      "description": "Improved Dodging",
+      "effect_template": "Longer invincibility windows during evasive maneuvers. Increase depends on character.",
+      "values": [],
+      "format": "pct",
+      "category": "Defensive",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8410100,
+      "description": "Lightning upon Dodging",
+      "effect_template": "Evasive maneuvers strike surroundings with lightning",
+      "values": [],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8420100,
+      "description": "Guard Counters Activate Holy Attacks",
+      "effect_template": "Guard counters trigger holy bursts",
+      "values": [],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8420200,
+      "description": "Guard Counters Activate Summoning Attack",
+      "effect_template": "Activation summons a group of Those Lost in Death that attack enemies",
+      "values": [],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8430000,
+      "description": "Improved Thrusting Counterattack",
+      "effect_template": "Enhances counterattacks unique to thrusting weapons by {}",
+      "values": [
+        20.0
+      ],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8440000,
+      "description": "Improved Flask HP Restoration",
+      "effect_template": "Boosts HP Restoration from flasks by {}",
+      "values": [
+        20.0,
+        30.0
+      ],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8440100,
+      "description": "Flask Also Heals Allies",
+      "effect_template": "Heals allies for 50% of flask HP in a radius.",
+      "values": [],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8440200,
+      "description": "Gradual Restoration by Flask",
+      "effect_template": "Flask slowly restores HP",
+      "values": [],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": "TODO: How much healing? Are there staking effects?"
+    },
+    {
+      "id": 8450100,
+      "description": "Ice Storm Surge Sprint",
+      "effect_template": "Produces ice storm at the starting point of surge sprint",
+      "values": [],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8460000,
+      "description": "Area of Darkness Conceals Caster While Walking",
+      "effect_template": "Become difficult to spot and silence footsteps",
+      "values": [],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8460200,
+      "description": "Flame of Frenzy While Walking",
+      "effect_template": "Causes the yellow flame of frenzy to violently burst forth while walking",
+      "values": [],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8460400,
+      "description": "Violent Deluge of Star Rain While Walking",
+      "effect_template": "Summons a dark cloud of stars overhead while walking. The cloud will release a violent deluge of star rain.",
+      "values": [],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8500000,
+      "description": "More Runes From Defeated Enemies",
+      "effect_template": "Increased number of runes obtained by {}",
+      "values": [
+        10.0
+      ],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8500100,
+      "description": "Rune of the Strong",
+      "effect_template": "Gain {} Runes",
+      "values": [
+        10000.0,
+        20000.0,
+        30000.0
+      ],
+      "format": "pct",
+      "category": "",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8500101,
+      "description": "Rune of the Strong",
+      "effect_template": "",
+      "values": [],
+      "format": "pct",
+      "category": "",
+      "stack_self": null,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8500102,
+      "description": "Rune of the Strong",
+      "effect_template": "",
+      "values": [],
+      "format": "pct",
+      "category": "",
+      "stack_self": null,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8530200,
+      "description": "Periodical Giant Glintblades",
+      "effect_template": "Creates a glintblade which automatically attack nearby foes at regular intervals",
+      "values": [],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": "TODO: Time and damage of the glintblade? Does it stack with these from weapons?"
+    },
+    {
+      "id": 8600300,
+      "description": "Sudden Enemy Death upon Attacks that Land",
+      "effect_template": "Attacked enemies die instantly on rare occasions",
+      "values": [],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": null,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8610000,
+      "description": "HP Restoration upon Successive Attacks",
+      "effect_template": "Successive attacks restore {} HP",
+      "values": [
+        10.0
+      ],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8610100,
+      "description": "FP Restoration upon Successive Attacks",
+      "effect_template": "Successive attacks restore {} FP",
+      "values": [
+        3.0
+      ],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8610200,
+      "description": "Successive Attacks Boost Attack Power",
+      "effect_template": "",
+      "values": [],
+      "format": "pct",
+      "category": "",
+      "stack_self": null,
+      "stack_other": null,
+      "unobtainable": true,
+      "notes": ""
+    },
+    {
+      "id": 8640000,
+      "description": "Critical Hit HP Restoration",
+      "effect_template": "Critical hits restore {} of Max HP",
+      "values": [
+        10.0
+      ],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8640100,
+      "description": "Critical Hit FP Restoration",
+      "effect_template": "Critical hits restore {} of Max FP",
+      "values": [
+        10.0
+      ],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8640200,
+      "description": "Increased Damage After Critical Hit",
+      "effect_template": "Critical hits increases damage inflicted upon enemies by {}",
+      "values": [
+        15.0
+      ],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": "TODO: For how long?"
+    },
+    {
+      "id": 8642000,
+      "description": "Increased Damage After Critical Hit",
+      "effect_template": "Critical hits increases damage inflicted upon enemies by {}",
+      "values": [
+        15.0
+      ],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": "Name and Buff Ids are different"
+    },
+    {
+      "id": 8650000,
+      "description": "HP Recovery From Successful Guarding",
+      "effect_template": "Restores {} HP upon guarding",
+      "values": [
+        10.0
+      ],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": true,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8650100,
+      "description": "FP Recovery From Successful Guarding",
+      "effect_template": "",
+      "values": [],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": null,
+      "stack_other": null,
+      "unobtainable": true,
+      "notes": ""
+    },
+    {
+      "id": 8660200,
+      "description": "Critical Hits Inflict Blood Loss",
+      "effect_template": "Armament inflicts blood loss after performing a critical hit",
+      "values": [],
+      "format": "pct",
+      "category": "Status Effect",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": "TODO: For how long and how much?"
+    },
+    {
+      "id": 8660300,
+      "description": "Create Holy Ground at Low HP",
+      "effect_template": "At low HP, create holy ground, slowly restore HP, and improve defense",
+      "values": [],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": "TODO: How long? How much healing etc?"
+    },
+    {
+      "id": 8700000,
+      "description": "Poison & Rot Trigger Continuous HP Recovery",
+      "effect_template": "Poisoning or Scarlet Rot in vicinity continuously restores {} HP/s.",
+      "values": [
+        7.0
+      ],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": "TODO: For how long?"
+    },
+    {
+      "id": 8710000,
+      "description": "Blood Loss in Vicinity Increases Attack Power",
+      "effect_template": "Nearby blood loss increases attack power by {}.",
+      "values": [
+        20.0
+      ],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": false,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": "TODO: For how long?"
+    },
+    {
+      "id": 8970000,
+      "description": "Traces of Grace-Given Lord",
+      "effect_template": "Newly found Sites of Grace raise attack power by ~{}% each, max 10 stacks. This effect is acquired by defeating the Fell Omen during the Morgott Invasion Event.",
+      "values": [
+        2.0
+      ],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8970010,
+      "description": "Integration of Intelligence",
+      "effect_template": "Attacks obtain a great amount of runes from enemies on rare occasions. This effect is acquired by defeating the Sentient Pest that will spawn during the Locusts Plague Event.",
+      "values": [],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8970020,
+      "description": "Unifying Fate",
+      "effect_template": "Using flask also restores FP. This effect is acquired by defeating the lesser Augur that will raid you during the Giant Bubbles Event.",
+      "values": [],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 8970030,
+      "description": "Demon's Plating",
+      "effect_template": "Enhances attack power depending on the runes in possession. This effect is acquired by paying the demon that places a curse on you. This is a random encounter with the lesser version of the Libra that can randomly raid your expedition. The fee costs 15,000 Runes on Day 1 and 35,000 on Day 2.",
+      "values": [],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 9990000,
+      "description": "Favor of the Night",
+      "effect_template": "Improves the charging speed of Ultimate Art gauge. Acquired by participating in the Night Horde Event.",
+      "values": [],
+      "format": "pct",
+      "category": "Attributes",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 9990010,
+      "description": "Favor of Noklateo, the Shrouded City",
+      "effect_template": "Rise from near-death, unaided, a single time, and become more powerful for a short time. This effect is acquired by interacting with the chest found during the Shifting Earth: Noklateo, the Shrouded City.",
+      "values": [],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 9990020,
+      "description": "Favor of the Rotted Woods",
+      "effect_template": "Nullifies scarlet rot and increases max HP. Attacks after receiving damage partially recover HP. Acquired by interacting with the Red Flower found during the Shifting Earth: Rotted Woods. ",
+      "values": [],
+      "format": "pct",
+      "category": "Utility",
+      "stack_self": false,
+      "stack_other": true,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 9990030,
+      "description": "Favor of the Mountaintop",
+      "effect_template": "Halves frostbite damage and frost buildup. Nearby frostbite boosts attack by {}. Acquired by interacting with the blue crystals at the top of the region.",
+      "values": [
+        15.0
+      ],
+      "format": "pct",
+      "category": "Offensive",
+      "stack_self": null,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 9990031,
+      "description": "Improved Frost Resistance",
+      "effect_template": "",
+      "values": [],
+      "format": "pct",
+      "category": "",
+      "stack_self": null,
+      "stack_other": null,
+      "unobtainable": true,
+      "notes": ""
+    },
+    {
+      "id": 9990032,
+      "description": "Attacks Possess Anti-Dragon Effect",
+      "effect_template": "",
+      "values": [],
+      "format": "pct",
+      "category": "",
+      "stack_self": null,
+      "stack_other": null,
+      "unobtainable": true,
+      "notes": ""
+    },
+    {
+      "id": 9990033,
+      "description": "Favor of the Mountaintop",
+      "effect_template": "",
+      "values": [],
+      "format": "pct",
+      "category": "",
+      "stack_self": null,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": ""
+    },
+    {
+      "id": 9990034,
+      "description": "Improves resistance to frost ailment",
+      "effect_template": "",
+      "values": [],
+      "format": "pct",
+      "category": "",
+      "stack_self": null,
+      "stack_other": null,
+      "unobtainable": true,
+      "notes": ""
+    },
+    {
+      "id": 9990040,
+      "description": "Unhealed Wound Carved by the Night",
+      "effect_template": "Increases damage taken by 20%. This effect is acquired when the targetted player die to the Fell Omen during the Morgott Invasion Event.",
+      "values": [],
+      "format": "pct",
+      "category": "Impairment",
+      "stack_self": null,
+      "stack_other": null,
+      "unobtainable": false,
+      "notes": "TODO: How much?"
+    }
+  ]
+}

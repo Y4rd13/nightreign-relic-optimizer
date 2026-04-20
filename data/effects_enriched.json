@@ -2954,7 +2954,7 @@
     },
     "7000300": {
       "category": "Attributes",
-      "effect_text": "",
+      "effect_text": "Raises Strength by 1. Damage gain flows through your weapon's Strength-scaling grade — small AR bump that diminishes past the Strength softcaps (~20, 55, 80). Stacks with other relic stat bonuses.",
       "stack_self": true,
       "stack_other": null,
       "unobtainable": false,
@@ -2965,7 +2965,7 @@
     },
     "7000301": {
       "category": "Attributes",
-      "effect_text": "",
+      "effect_text": "Raises Strength by 2. Damage gain flows through your weapon's Strength-scaling grade — small AR bump that diminishes past the Strength softcaps (~20, 55, 80). Stacks with other relic stat bonuses.",
       "stack_self": true,
       "stack_other": null,
       "unobtainable": false,
@@ -2976,7 +2976,7 @@
     },
     "7000302": {
       "category": "Attributes",
-      "effect_text": "",
+      "effect_text": "Raises Strength by 3. Damage gain flows through your weapon's Strength-scaling grade — small AR bump that diminishes past the Strength softcaps (~20, 55, 80). Stacks with other relic stat bonuses.",
       "stack_self": true,
       "stack_other": null,
       "unobtainable": false,
@@ -2987,7 +2987,7 @@
     },
     "7000400": {
       "category": "Attributes",
-      "effect_text": "",
+      "effect_text": "Raises Dexterity by 1. Damage gain flows through your weapon's Dexterity-scaling grade — small AR bump that diminishes past the Dexterity softcaps (~20, 55, 80). Stacks with other relic stat bonuses.",
       "stack_self": true,
       "stack_other": null,
       "unobtainable": false,
@@ -2998,7 +2998,7 @@
     },
     "7000401": {
       "category": "Attributes",
-      "effect_text": "",
+      "effect_text": "Raises Dexterity by 2. Damage gain flows through your weapon's Dexterity-scaling grade — small AR bump that diminishes past the Dexterity softcaps (~20, 55, 80). Stacks with other relic stat bonuses.",
       "stack_self": true,
       "stack_other": null,
       "unobtainable": false,
@@ -3009,7 +3009,7 @@
     },
     "7000402": {
       "category": "Attributes",
-      "effect_text": "",
+      "effect_text": "Raises Dexterity by 3. Damage gain flows through your weapon's Dexterity-scaling grade — small AR bump that diminishes past the Dexterity softcaps (~20, 55, 80). Stacks with other relic stat bonuses.",
       "stack_self": true,
       "stack_other": null,
       "unobtainable": false,
@@ -3020,7 +3020,7 @@
     },
     "7000500": {
       "category": "Attributes",
-      "effect_text": "",
+      "effect_text": "Raises Intelligence by 1. Damage gain flows through your weapon's Intelligence-scaling grade — small AR bump that diminishes past the Intelligence softcaps (~20, 55, 80). Stacks with other relic stat bonuses.",
       "stack_self": true,
       "stack_other": null,
       "unobtainable": false,
@@ -3031,7 +3031,7 @@
     },
     "7000501": {
       "category": "Attributes",
-      "effect_text": "",
+      "effect_text": "Raises Intelligence by 2. Damage gain flows through your weapon's Intelligence-scaling grade — small AR bump that diminishes past the Intelligence softcaps (~20, 55, 80). Stacks with other relic stat bonuses.",
       "stack_self": true,
       "stack_other": null,
       "unobtainable": false,
@@ -3042,7 +3042,7 @@
     },
     "7000502": {
       "category": "Attributes",
-      "effect_text": "",
+      "effect_text": "Raises Intelligence by 3. Damage gain flows through your weapon's Intelligence-scaling grade — small AR bump that diminishes past the Intelligence softcaps (~20, 55, 80). Stacks with other relic stat bonuses.",
       "stack_self": true,
       "stack_other": null,
       "unobtainable": false,
@@ -3053,7 +3053,7 @@
     },
     "7000600": {
       "category": "Attributes",
-      "effect_text": "",
+      "effect_text": "Raises Faith by 1. Damage gain flows through your weapon's Faith-scaling grade — small AR bump that diminishes past the Faith softcaps (~20, 55, 80). Stacks with other relic stat bonuses.",
       "stack_self": true,
       "stack_other": null,
       "unobtainable": false,
@@ -3064,7 +3064,7 @@
     },
     "7000601": {
       "category": "Attributes",
-      "effect_text": "",
+      "effect_text": "Raises Faith by 2. Damage gain flows through your weapon's Faith-scaling grade — small AR bump that diminishes past the Faith softcaps (~20, 55, 80). Stacks with other relic stat bonuses.",
       "stack_self": true,
       "stack_other": null,
       "unobtainable": false,
@@ -3075,7 +3075,7 @@
     },
     "7000602": {
       "category": "Attributes",
-      "effect_text": "",
+      "effect_text": "Raises Faith by 3. Damage gain flows through your weapon's Faith-scaling grade — small AR bump that diminishes past the Faith softcaps (~20, 55, 80). Stacks with other relic stat bonuses.",
       "stack_self": true,
       "stack_other": null,
       "unobtainable": false,
@@ -3086,7 +3086,7 @@
     },
     "7000700": {
       "category": "Attributes",
-      "effect_text": "",
+      "effect_text": "Raises Arcane by 1. Damage gain flows through your weapon's Arcane-scaling grade — small AR bump that diminishes past the Arcane softcaps (~20, 55, 80). Stacks with other relic stat bonuses.",
       "stack_self": true,
       "stack_other": null,
       "unobtainable": false,
@@ -3097,7 +3097,7 @@
     },
     "7000701": {
       "category": "Attributes",
-      "effect_text": "",
+      "effect_text": "Raises Arcane by 2. Damage gain flows through your weapon's Arcane-scaling grade — small AR bump that diminishes past the Arcane softcaps (~20, 55, 80). Stacks with other relic stat bonuses.",
       "stack_self": true,
       "stack_other": null,
       "unobtainable": false,
@@ -3108,7 +3108,7 @@
     },
     "7000702": {
       "category": "Attributes",
-      "effect_text": "",
+      "effect_text": "Raises Arcane by 3. Damage gain flows through your weapon's Arcane-scaling grade — small AR bump that diminishes past the Arcane softcaps (~20, 55, 80). Stacks with other relic stat bonuses.",
       "stack_self": true,
       "stack_other": null,
       "unobtainable": false,
@@ -4137,7 +4137,7 @@
       "unobtainable": false,
       "is_dn": false,
       "roll": "attack",
-      "notes": "In-game measured 120 \u2192 137 dmg (+14%, within variance of the 15% internal value). Duration 10s confirmed in-game on 2026-04-19.",
+      "notes": "In-game measured 120 → 137 dmg (+14%, within variance of the 15% internal value). Duration 10s confirmed in-game on 2026-04-19.",
       "parsed": {
         "damage_mult_pct": 15,
         "damage_scope": "all",

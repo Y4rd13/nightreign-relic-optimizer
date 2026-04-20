@@ -15,6 +15,36 @@ from ..widgets import (
 )
 
 
+def _save_button() -> rx.Component:
+    """Save-relic CTA. Visually affirmative when enabled, visibly greyed
+    when blocked — tooltip spells out what's missing so the user doesn't
+    have to hunt through the rule list."""
+    enabled = State.v_can_save
+    label = rx.cond(State.my_relic_editing_id != "", "Update relic", "Save relic")
+    return rx.el.button(
+        rx.hstack(
+            rx.icon(tag="save", size=14),
+            rx.text(label, font_weight="700"),
+            spacing="1", align="center",
+        ),
+        on_click=rx.cond(enabled, State.open_save_relic_dialog, rx.noop()),
+        title=rx.cond(enabled, "Save to My Relics", State.v_save_disabled_reason),
+        disabled=~enabled,
+        style={
+            "background": rx.cond(enabled, PAL["green"], PAL["surface0"]),
+            "border": "1px solid transparent",
+            "color": rx.cond(enabled, PAL["crust"], PAL["overlay0"]),
+            "padding": "8px 16px",
+            "border_radius": "8px",
+            "font_size": "0.84rem",
+            "cursor": rx.cond(enabled, "pointer", "not-allowed"),
+            "opacity": rx.cond(enabled, "1", "0.6"),
+            "transition": "all 0.12s",
+        },
+        _hover={"background": rx.cond(enabled, PAL["teal"], PAL["surface0"])},
+    )
+
+
 def _tier_radio() -> rx.Component:
     return rx.card(
         rx.hstack(
@@ -243,24 +273,51 @@ def validator_tab() -> rx.Component:
                 ),
                 spacing="1", align="start", flex="1",
             ),
-            rx.el.button(
-                rx.hstack(
-                    rx.icon(tag="arrow_up_down", size=14),
-                    rx.text("Auto-sort attrs", font_weight="600"),
-                    spacing="1", align="center",
+            rx.hstack(
+                rx.el.button(
+                    rx.hstack(
+                        rx.icon(tag="arrow_up_down", size=14),
+                        rx.text("Auto-sort attrs", font_weight="600"),
+                        spacing="1", align="center",
+                    ),
+                    on_click=State.v_auto_sort,
+                    title="Reorder attrs to ascending sort_index (game's display rule)",
+                    style={
+                        "background": "transparent",
+                        "border": f"1px solid {PAL['surface1']}",
+                        "color": PAL["mauve"],
+                        "padding": "8px 14px",
+                        "border_radius": "8px",
+                        "font_size": "0.84rem",
+                        "cursor": "pointer",
+                    },
+                    _hover={"background": "rgba(203,166,247,0.08)"},
                 ),
-                on_click=State.v_auto_sort,
-                title="Reorder attrs to ascending sort_index (game's display rule)",
-                style={
-                    "background": "transparent",
-                    "border": f"1px solid {PAL['surface1']}",
-                    "color": PAL["mauve"],
-                    "padding": "8px 14px",
-                    "border_radius": "8px",
-                    "font_size": "0.84rem",
-                    "cursor": "pointer",
-                },
-                _hover={"background": "rgba(203,166,247,0.08)"},
+                rx.cond(
+                    State.my_relic_editing_id != "",
+                    rx.el.button(
+                        rx.hstack(
+                            rx.icon(tag="x", size=14),
+                            rx.text("Cancel edit", font_weight="600"),
+                            spacing="1", align="center",
+                        ),
+                        on_click=State.cancel_edit_my_relic,
+                        title="Discard edits and clear validator",
+                        style={
+                            "background": "transparent",
+                            "border": f"1px solid {PAL['surface1']}",
+                            "color": PAL["subtext"],
+                            "padding": "8px 14px",
+                            "border_radius": "8px",
+                            "font_size": "0.84rem",
+                            "cursor": "pointer",
+                        },
+                    ),
+                    rx.box(),
+                ),
+                _save_button(),
+                spacing="2",
+                align="center",
             ),
             width="100%",
             align="center",

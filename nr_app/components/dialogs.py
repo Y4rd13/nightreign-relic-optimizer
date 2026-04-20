@@ -167,6 +167,7 @@ def edit_dialog() -> rx.Component:
 
 
 _SOURCE_COLORS = {
+    "my_relic": "green",
     "remembrance": "mauve",
     "shop": "peach",
     "boss_standard": "red",
@@ -180,6 +181,7 @@ def _source_badge(source_type) -> rx.Component:
     """Colored pill showing the relic's source category."""
     color = rx.match(
         source_type,
+        ("my_relic", PAL["green"]),
         ("remembrance", PAL["mauve"]),
         ("shop", PAL["peach"]),
         ("boss_standard", PAL["red"]),
@@ -190,6 +192,7 @@ def _source_badge(source_type) -> rx.Component:
     )
     label = rx.match(
         source_type,
+        ("my_relic", "My Relic"),
         ("remembrance", "Remembrance"),
         ("shop", "Shop"),
         ("boss_standard", "Boss · Std"),
@@ -297,6 +300,7 @@ def _named_row(r) -> rx.Component:
 
 _FILTER_LABELS = {
     "all": "All",
+    "my_relic": "My Relics",
     "remembrance": "Remembrance",
     "shop": "Shop",
     "boss_standard": "Boss · Std",
@@ -311,6 +315,7 @@ def _filter_chip(f) -> rx.Component:
     label = rx.match(
         f,
         ("all", "All"),
+        ("my_relic", "My Relics"),
         ("remembrance", "Remembrance"),
         ("shop", "Shop"),
         ("boss_standard", "Boss · Std"),
@@ -345,8 +350,9 @@ def named_dialog() -> rx.Component:
                 color=PAL["text"],
             ),
             rx.dialog.description(
-                "Pick a Remembrance quest reward, Jar Bazaar purchase, or Nightlord boss drop. "
-                "Verified relics auto-lock their fixed attributes into this slot.",
+                "Pick a Remembrance reward, Jar Bazaar purchase, Nightlord drop, "
+                "or one of your saved My Relics. Locks the relic's attrs (and "
+                "debuff, if any) into this slot.",
                 color=PAL["overlay1"],
                 font_size="0.82rem",
             ),
@@ -536,6 +542,120 @@ def debuff_dialog() -> rx.Component:
         ),
         open=State.debuff_dialog_open,
         on_open_change=State.on_debuff_open_change,
+    )
+
+
+_MY_RELIC_COLORS = ["R", "G", "B", "Y", "U"]
+
+
+def _color_chip(code: str) -> rx.Component:
+    """Segmented-button-style swatch for picking a MyRelic's vessel colour."""
+    label = COLOR_SLOT[code][0]
+    swatch = COLOR_SLOT[code][1]
+    active = State.my_relic_color_input == code
+    return rx.el.button(
+        rx.hstack(
+            rx.box(
+                width="10px", height="10px", border_radius="50%",
+                background=swatch, flex_shrink="0",
+                box_shadow=f"0 0 4px {swatch}",
+            ),
+            rx.text(label, font_size="0.76rem", font_weight="700"),
+            spacing="1", align="center",
+        ),
+        on_click=State.set_my_relic_color(code),
+        style={
+            "background": rx.cond(active, f"{swatch}22", PAL["crust"]),
+            "border": "1px solid",
+            "border_color": rx.cond(active, swatch, PAL["surface0"]),
+            "color": rx.cond(active, swatch, PAL["subtext"]),
+            "padding": "6px 12px",
+            "border_radius": "99px",
+            "cursor": "pointer",
+            "transition": "all 0.12s",
+        },
+    )
+
+
+def save_relic_dialog() -> rx.Component:
+    """Dialog fired from the Validator tab to name + colour-tag the current
+    relic before persisting it to user_data/my_relics.json. In edit mode
+    (editing_id non-empty) the same dialog updates the saved relic in place."""
+    title = rx.cond(
+        State.my_relic_editing_id != "",
+        "Update saved relic",
+        "Save relic to My Relics",
+    )
+    cta = rx.cond(
+        State.my_relic_editing_id != "", "Update", "Save",
+    )
+    return rx.dialog.root(
+        rx.dialog.content(
+            rx.dialog.title(title, color=PAL["text"]),
+            rx.dialog.description(
+                "Auto-sorts attributes by sort_index and re-runs the validator "
+                "before persisting. Only legal relics can be saved.",
+                color=PAL["overlay1"],
+                font_size="0.82rem",
+            ),
+            rx.box(
+                rx.text("name", color=PAL["overlay0"],
+                        font_size="0.68rem", font_weight="700",
+                        letter_spacing="0.08em", text_transform="uppercase",
+                        margin_bottom="4px"),
+                rx.input(
+                    placeholder="e.g. Green roll — Successive Attacks",
+                    value=State.my_relic_name_input,
+                    on_change=State.set_my_relic_name,
+                    width="100%",
+                ),
+                margin_top="14px",
+            ),
+            rx.box(
+                rx.text("vessel colour", color=PAL["overlay0"],
+                        font_size="0.68rem", font_weight="700",
+                        letter_spacing="0.08em", text_transform="uppercase",
+                        margin_bottom="6px"),
+                rx.flex(
+                    *[_color_chip(c) for c in _MY_RELIC_COLORS],
+                    direction="row", wrap="wrap", gap="6px",
+                ),
+                margin_top="12px",
+            ),
+            rx.hstack(
+                rx.dialog.close(
+                    rx.el.button(
+                        "Cancel",
+                        on_click=State.close_save_relic_dialog,
+                        style={"background": "transparent",
+                               "border": f"1px solid {PAL['surface1']}",
+                               "color": PAL["subtext"],
+                               "padding": "8px 16px",
+                               "border_radius": "6px",
+                               "cursor": "pointer"},
+                    ),
+                ),
+                rx.spacer(),
+                rx.el.button(
+                    cta,
+                    on_click=State.save_my_relic,
+                    style={"background": PAL["green"],
+                           "border": "1px solid transparent",
+                           "color": PAL["crust"],
+                           "padding": "8px 20px",
+                           "border_radius": "6px",
+                           "font_weight": "700",
+                           "cursor": "pointer"},
+                ),
+                margin_top="16px",
+                width="100%",
+            ),
+            max_width="480px",
+            background=PAL["mantle"],
+            color=PAL["text"],
+        ),
+        open=State.save_relic_dialog_open,
+        on_open_change=State.on_save_relic_open_change,
     )
 
 

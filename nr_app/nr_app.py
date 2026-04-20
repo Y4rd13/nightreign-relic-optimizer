@@ -5,9 +5,16 @@ from __future__ import annotations
 import reflex as rx
 
 from .components.compare_tab import compare_tab
-from .components.dialogs import debuff_dialog, edit_dialog, named_dialog, preset_dialog
+from .components.dialogs import (
+    debuff_dialog,
+    edit_dialog,
+    named_dialog,
+    preset_dialog,
+    save_relic_dialog,
+)
 from .components.hero import hero
 from .components.my_builds_tab import my_builds_tab
+from .components.my_relics_tab import my_relics_tab
 from .components.sidebar import sidebar
 from .components.slot_card import slot_card
 from .components.stats_chart import character_stats_panel
@@ -146,6 +153,7 @@ def _tabs() -> rx.Component:
         rx.tabs.list(
             _tab_trigger("optimizer", "wrench", "Optimizer"),
             _tab_trigger("validator", "check-circle", "Validator"),
+            _tab_trigger("my_relics", "package", "My relics"),
             _tab_trigger("builds", "bookmark", "My builds"),
             _tab_trigger("compare", "scale", "Compare presets"),
             style={
@@ -158,6 +166,8 @@ def _tabs() -> rx.Component:
         rx.tabs.content(_optimizer_content(), value="optimizer",
                         padding_top="4px"),
         rx.tabs.content(validator_tab(), value="validator",
+                        padding_top="4px"),
+        rx.tabs.content(my_relics_tab(), value="my_relics",
                         padding_top="4px"),
         rx.tabs.content(my_builds_tab(), value="builds",
                         padding_top="4px"),
@@ -184,6 +194,7 @@ def index() -> rx.Component:
         named_dialog(),
         debuff_dialog(),
         preset_dialog(),
+        save_relic_dialog(),
         rx.toast.provider(
             position="bottom-right",
             close_button=True,

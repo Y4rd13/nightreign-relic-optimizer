@@ -16,6 +16,7 @@ import reflex as rx
 
 from src import buffs as buffs_mod
 from src import characters as chars_mod
+from src import my_relics as my_relics_mod
 from src import presets as presets_mod
 from src import stats as stats_mod
 from src.constraints import MODE_DEEP_NIGHT, MODE_STANDARD
@@ -288,7 +289,7 @@ class NamedRelicRow(rx.Base):
     name: str = ""
     color: str = "U"
     source: str = ""                # legacy (deprecated — use source_type)
-    source_type: str = ""           # remembrance | shop | boss_standard | boss_everdark | boss_dlc | other
+    source_type: str = ""           # remembrance | shop | boss_standard | boss_everdark | boss_dlc | other | my_relic
     source_detail: str = ""         # human-readable "where" string
     character: str = ""
     description: str = ""
@@ -298,6 +299,25 @@ class NamedRelicRow(rx.Base):
     # from normal rolls (N/A tier / ILLEGAL group promoted in memory). Drives
     # the "includes unrollable effects" badge in the picker.
     has_bundle_only: bool = False
+
+
+class MyRelicRow(rx.Base):
+    """Reflex-serialisable view of a saved user relic. Flat fields only —
+    per-attr Effect objects are re-resolved at render time via attr_names."""
+    id: str = ""
+    name: str = ""
+    color: str = "U"
+    slot_tier: str = "common"        # "common" | "deep"
+    attr_ids: list[int] = []
+    attr_names: list[str] = []       # parallel to attr_ids, for card display
+    debuff_id: int = 0               # 0 ≡ no debuff (Reflex-dict friendly)
+    debuff_name: str = ""
+    created_at: str = ""
+    updated_at: str = ""
+    # True when *every* attr resolves cleanly against the current character's
+    # effect catalogue (no character_tag mismatch). Used to grey out relics
+    # that a different Nightfarer rolled but that can't apply here.
+    usable_on_current_character: bool = True
 
 
 class EditOption(rx.Base):
@@ -550,6 +570,16 @@ class State(rx.State):
 
     preset_dialog_open: bool = False
     preset_name_input: str = ""
+
+    # ── my-relics dialog + edit flow ──────────────────────────────
+    save_relic_dialog_open: bool = False
+    my_relic_name_input: str = ""
+    my_relic_color_input: str = "U"
+    # Empty string ≡ creating new. Non-empty ≡ editing that id in place.
+    my_relic_editing_id: str = ""
+    # Bumped on save/delete so @rx.var saved_my_relics re-reads the JSON
+    # file. Mirrors the preset_version pattern.
+    my_relics_version: int = 0
 
     # ── tabs ──────────────────────────────────────────────────────
     active_tab: str = "optimizer"
@@ -1638,8 +1668,41 @@ class State(rx.State):
     # ═════════════════════════════════════════════════════════════
     # EVENTS — locks, exclusions
     # ═════════════════════════════════════════════════════════════
+    def _normalize_slot_locks(self, slot_idx: int) -> None:
+        """Re-key all locks in this slot so their attr_idx order matches
+        ascending `sort_index` — the game always shows attrs in canonical
+        order, so our `attr_idx` lock position is fictional. Normalizing on
+        every mutation guarantees the UI never displays a composition the
+        game would render differently."""
+        slot_locks = [
+            (int(k.split(",")[1]), int(v))
+            for k, v in self.locked_picks.items()
+            if int(k.split(",")[0]) == slot_idx
+        ]
+        if not slot_locks:
+            return
+        eid_to_sort: dict[int, int] = {}
+        for _, eid in slot_locks:
+            try:
+                e = find_for_character(eid, self.character_id)
+                eid_to_sort[eid] = e.sort_index if e.sort_index >= 0 else eid
+            except KeyError:
+                eid_to_sort[eid] = eid
+        sorted_eids = sorted(
+            (eid for _, eid in slot_locks),
+            key=lambda eid: (eid_to_sort[eid], eid),
+        )
+        new_picks = {
+            k: v for k, v in self.locked_picks.items()
+            if int(k.split(",")[0]) != slot_idx
+        }
+        for new_attr_i, eid in enumerate(sorted_eids):
+            new_picks[_k(slot_idx, new_attr_i)] = eid
+        self.locked_picks = new_picks
+
     def lock_attr(self, slot_idx: int, attr_idx: int, effect_id: int):
         self.locked_picks[_k(slot_idx, attr_idx)] = effect_id
+        self._normalize_slot_locks(slot_idx)
         self.recompute()
 
     def unlock_all(self):
@@ -1658,6 +1721,7 @@ class State(rx.State):
         for attr_i, a in enumerate(slot.attrs):
             picks[_k(slot_idx, attr_i)] = int(a.id)
         self.locked_picks = picks
+        self._normalize_slot_locks(slot_idx)
         self.recompute()
 
     def unlock_slot(self, slot_idx: int):
@@ -1964,7 +2028,27 @@ class State(rx.State):
         if relic_id == "__unlock__":
             for ai in range(3):
                 self.locked_picks.pop(_k(self.named_slot_idx, ai), None)
+            # Also drop any pinned debuff so the slot returns to "solver-driven".
+            self.debuff_picks.pop(str(self.named_slot_idx), None)
             self.recompute()
+        elif relic_id.startswith("my_relic:"):
+            my_id = relic_id[len("my_relic:"):]
+            r = my_relics_mod.get(my_id)
+            if r is not None:
+                # Clear any previous locks on this slot so we don't leave
+                # stale attrs from a bigger bundle when the saved relic is
+                # shorter (1-2 attrs).
+                for ai in range(3):
+                    self.locked_picks.pop(_k(self.named_slot_idx, ai), None)
+                for ai, eid in enumerate(r.attr_ids):
+                    self.locked_picks[_k(self.named_slot_idx, ai)] = eid
+                if r.debuff_id:
+                    picks = dict(self.debuff_picks)
+                    picks[str(self.named_slot_idx)] = int(r.debuff_id)
+                    self.debuff_picks = picks
+                else:
+                    self.debuff_picks.pop(str(self.named_slot_idx), None)
+                self.recompute()
         else:
             for r in chars_mod.named_relics_for(self.character_id):
                 if r["id"] == relic_id:
@@ -1979,22 +2063,57 @@ class State(rx.State):
     def named_relics_list(self) -> list[NamedRelicRow]:
         cid = self.character_id
         filt = self.named_source_filter
-        out = []
-        # Priority: verified relics first, then by source_type bucket, then name.
+        # my_relic is source_type 0 so the user's own relics float above
+        # everything else when "all" is selected.
         bucket_order = {
-            "remembrance": 0, "shop": 1, "boss_standard": 2,
-            "boss_everdark": 3, "boss_dlc": 4, "other": 5,
+            "my_relic": 0, "remembrance": 1, "shop": 2, "boss_standard": 3,
+            "boss_everdark": 4, "boss_dlc": 5, "other": 6,
         }
+        slot_tier = self._slot_tier_for_idx(self.named_slot_idx)
+        out: list[NamedRelicRow] = []
+
+        # My Relics — bounded by current slot tier + character-tag compat.
+        _ = self.my_relics_version
+        if filt in ("all", "my_relic"):
+            for mr in my_relics_mod.load_all():
+                if slot_tier and mr.slot_tier != slot_tier:
+                    continue
+                # Skip relics that carry an attr tagged for another char —
+                # they aren't applyable here and would confuse the picker.
+                resolvable = True
+                for eid in mr.attr_ids:
+                    try:
+                        find_for_character(eid, cid)
+                    except KeyError:
+                        resolvable = False
+                        break
+                if not resolvable:
+                    continue
+                out.append(NamedRelicRow(
+                    id=f"my_relic:{mr.id}",
+                    name=mr.name,
+                    color=mr.color,
+                    source="my_relic",
+                    source_type="my_relic",
+                    source_detail=f"Saved {mr.updated_at[:10]}",
+                    character="any",
+                    description="",
+                    verified=True,
+                    attrs=list(mr.attr_ids),
+                    has_bundle_only=False,
+                ))
+
+        # Community named relics (remembrance / shop / boss / other).
         relics = chars_mod.named_relics_for(cid)
-        # Remembrance relics for *this* character float to the top; other
-        # characters' remembrance relics are filtered out entirely.
         filtered = []
         for r in relics:
             st = r.get("source_type", r.get("source", ""))
             ch = r.get("character", "any")
             if st == "remembrance" and ch != cid:
                 continue
-            if filt != "all" and st != filt:
+            if filt != "all" and filt != "my_relic" and st != filt:
+                continue
+            if filt == "my_relic":
                 continue
             filtered.append((r, st))
         filtered.sort(key=lambda rs: (
@@ -2023,10 +2142,20 @@ class State(rx.State):
             ))
         return out
 
+    def _slot_tier_for_idx(self, idx: int) -> str:
+        """Map the slot the user clicked on to 'common'/'deep' for filtering
+        the named-relic list. Returns '' when no slot is selected (e.g. the
+        dialog is closed) — caller treats that as 'don't filter by tier'."""
+        if idx < 0:
+            return ""
+        if self.mode == MODE_STANDARD:
+            return "common"
+        return "common" if idx < 3 else "deep"
+
     @rx.var
     def named_source_buckets(self) -> list[str]:
         """Ordered list of source filters the user can toggle between."""
-        return ["all", "remembrance", "shop", "boss_standard",
+        return ["all", "my_relic", "remembrance", "shop", "boss_standard",
                 "boss_everdark", "boss_dlc", "other"]
 
     def set_named_source_filter(self, f: str):
@@ -2234,6 +2363,8 @@ class State(rx.State):
             for a_i, eid in enumerate(ps.attr_ids):
                 new_locks[_k(s_i, a_i)] = int(eid)
         self.locked_picks = new_locks
+        for s_i in range(len(p.slots)):
+            self._normalize_slot_locks(s_i)
         ctx = p.ctx or {}
         for ctx_key, state_field in _CTX_TO_STATE.items():
             if ctx_key in ctx:
@@ -2363,3 +2494,184 @@ class State(rx.State):
             ValidationRow(rule=r.rule, ok=r.ok, severity=r.severity, message=r.message)
             for r in res
         ]
+
+    # ═════════════════════════════════════════════════════════════
+    # MY RELICS — save dialog + tab actions
+    # ═════════════════════════════════════════════════════════════
+    def open_save_relic_dialog(self):
+        """Open the dialog. If not already in edit mode (id cleared when the
+        validator fields are fresh), derive a starter name from the top attr
+        so the Save button is reachable without typing."""
+        if not self.my_relic_editing_id:
+            self.my_relic_name_input = self._suggested_relic_name()
+            self.my_relic_color_input = "U"
+        self.save_relic_dialog_open = True
+
+    def close_save_relic_dialog(self):
+        self.save_relic_dialog_open = False
+
+    def on_save_relic_open_change(self, v: bool):
+        if not v:
+            self.close_save_relic_dialog()
+
+    def set_my_relic_name(self, s: str):
+        self.my_relic_name_input = s
+
+    def set_my_relic_color(self, c: str):
+        if c in ("R", "G", "B", "Y", "U"):
+            self.my_relic_color_input = c
+
+    def _suggested_relic_name(self) -> str:
+        for eid in self.v_attr_ids:
+            if eid <= 0:
+                continue
+            try:
+                return find_for_character(eid, self.character_id).name
+            except KeyError:
+                continue
+        return "My Relic"
+
+    def _reset_save_relic_fields(self):
+        self.my_relic_editing_id = ""
+        self.my_relic_name_input = ""
+        self.my_relic_color_input = "U"
+
+    def _reset_validator_fields(self):
+        self.v_attr_ids = [0, 0, 0]
+        self.v_debuff_id = 0
+        self.v_search = ["", "", ""]
+
+    def save_my_relic(self):
+        """Persist the current validator-tab relic. Auto-sort + validation are
+        enforced inside my_relics_mod.upsert; UI should have blocked invalid
+        saves already, but we defend against races + show a toast if it trips."""
+        if self.v_slot_tier not in ("common", "deep"):
+            return rx.toast.error("Pick Common or Deep tier before saving.")
+        try:
+            effects = [
+                find_for_character(eid, self.character_id)
+                for eid in self.v_attr_ids if eid > 0
+            ]
+        except KeyError as ex:
+            return rx.toast.error(f"Unknown effect id: {ex}")
+        if not effects:
+            return rx.toast.error("Add at least one attribute.")
+        debuff = None
+        if self.v_debuff_id:
+            try:
+                debuff = find_for_character(self.v_debuff_id, self.character_id)
+            except KeyError:
+                debuff = None
+        try:
+            saved = my_relics_mod.upsert(
+                relic_id=self.my_relic_editing_id or None,
+                name=self.my_relic_name_input,
+                color=self.my_relic_color_input,
+                slot_tier=self.v_slot_tier,
+                effects=effects,
+                debuff=debuff,
+            )
+        except ValueError as ex:
+            return rx.toast.error(str(ex))
+        was_edit = bool(self.my_relic_editing_id)
+        self.my_relics_version += 1
+        self.save_relic_dialog_open = False
+        self._reset_save_relic_fields()
+        self._reset_validator_fields()
+        verb = "Updated" if was_edit else "Saved"
+        return rx.toast.success(f"{verb} '{saved.name}'")
+
+    def delete_my_relic(self, relic_id: str):
+        if my_relics_mod.delete(relic_id):
+            self.my_relics_version += 1
+            return rx.toast.info("Relic deleted")
+        return rx.toast.error("Relic not found")
+
+    def edit_my_relic(self, relic_id: str):
+        """Load a saved relic back into the Validator tab for editing. The
+        editing id sticks around until Save or explicit cancel, so the next
+        save_my_relic() does an in-place update rather than create."""
+        r = my_relics_mod.get(relic_id)
+        if r is None:
+            return rx.toast.error("Relic not found")
+        self.v_slot_tier = r.slot_tier
+        ids = list(r.attr_ids) + [0] * (3 - len(r.attr_ids))
+        self.v_attr_ids = ids[:3]
+        self.v_debuff_id = int(r.debuff_id) if r.debuff_id else 0
+        self.v_search = ["", "", ""]
+        self.my_relic_editing_id = r.id
+        self.my_relic_name_input = r.name
+        self.my_relic_color_input = r.color
+        self.active_tab = "validator"
+        return rx.toast.info(f"Editing '{r.name}' — save to update")
+
+    def cancel_edit_my_relic(self):
+        """Exit edit mode without touching the underlying relic."""
+        self._reset_save_relic_fields()
+        self._reset_validator_fields()
+
+    @rx.var
+    def my_relics_list(self) -> list[MyRelicRow]:
+        """All saved relics, newest first. Attr names are resolved against
+        the current character so CHARACTER-tagged attrs fall back to the raw
+        effect entry — usable_on_current_character lets the UI grey those out."""
+        _ = self.my_relics_version   # re-read trigger
+        out: list[MyRelicRow] = []
+        for r in my_relics_mod.load_all():
+            names: list[str] = []
+            all_resolvable = True
+            for eid in r.attr_ids:
+                try:
+                    names.append(find_for_character(eid, self.character_id).name)
+                except KeyError:
+                    names.append(f"#{eid}")
+                    all_resolvable = False
+            debuff_name = ""
+            if r.debuff_id:
+                try:
+                    debuff_name = find_for_character(r.debuff_id, self.character_id).name
+                except KeyError:
+                    debuff_name = f"#{r.debuff_id}"
+                    all_resolvable = False
+            out.append(MyRelicRow(
+                id=r.id,
+                name=r.name,
+                color=r.color,
+                slot_tier=r.slot_tier,
+                attr_ids=list(r.attr_ids),
+                attr_names=names,
+                debuff_id=int(r.debuff_id) if r.debuff_id else 0,
+                debuff_name=debuff_name,
+                created_at=r.created_at,
+                updated_at=r.updated_at,
+                usable_on_current_character=all_resolvable,
+            ))
+        out.sort(key=lambda r: r.updated_at, reverse=True)
+        return out
+
+    @rx.var
+    def v_can_save(self) -> bool:
+        """Save button on the Validator tab is enabled only when:
+        - at least one attr is placed,
+        - the slot tier is concrete (not "none"),
+        - every hard validation rule passes.
+        Keep in sync with save_my_relic() defensive checks."""
+        if self.v_slot_tier == "none":
+            return False
+        if not any(x > 0 for x in self.v_attr_ids):
+            return False
+        for r in self.v_results:
+            if r.severity == "error" and not r.ok:
+                return False
+        return True
+
+    @rx.var
+    def v_save_disabled_reason(self) -> str:
+        if self.v_slot_tier == "none":
+            return "Pick Common or Deep tier to enable saving."
+        if not any(x > 0 for x in self.v_attr_ids):
+            return "Add at least one attribute."
+        for r in self.v_results:
+            if r.severity == "error" and not r.ok:
+                return "Resolve validation errors first."
+        return ""

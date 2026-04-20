@@ -58,7 +58,11 @@
     },
     "hex_damage_type": "holy",
     "affinity_damage_fraction": 0.045,
-    "playstyle_tags": ["melee", "successive", "trance_loop"],
+    "playstyle_tags": [
+      "melee",
+      "successive",
+      "trance_loop"
+    ],
     "build_goal_weights": {
       "damage": 1.0,
       "survival": 0.2,
@@ -66,9 +70,19 @@
       "team": 0.0
     },
     "sidebar_open_sections": [
-      "Character", "Mode", "Vessel", "Boss routing",
-      "Buff uptime", "Combat patterns", "Controls", "Presets"
-    ]
+      "Character",
+      "Mode",
+      "Vessel",
+      "Boss routing",
+      "Buff uptime",
+      "Combat patterns",
+      "Controls",
+      "Presets"
+    ],
+    "damage_source_labels": {
+      "primary": "Hammer",
+      "secondary": "Hex"
+    }
   },
   "effects": {
     "7036800": {
@@ -77,31 +91,41 @@
       "mult": 1.13,
       "mult_scope": "all",
       "requires": "ult_active",
-      "uptime_boosts": {"ult_active": 0.05},
+      "uptime_boosts": {
+        "ult_active": 0.05
+      },
       "notes": "Also extends Ult-active slightly (longer burst window after activation)"
     },
     "7000902": {
       "label": "Ultimate Art Gauge +3",
       "utility_value": 0.05,
-      "uptime_boosts": {"ult_active": 0.10},
+      "uptime_boosts": {
+        "ult_active": 0.1
+      },
       "notes": "+10% gauge gain → Ult fires ~10% more often → ult_active uptime rises accordingly"
     },
     "7000800": {
       "label": "Character Skill Cooldown Reduction",
       "utility_value": 0.02,
-      "uptime_boosts": {"trance_active": 0.05},
+      "uptime_boosts": {
+        "trance_active": 0.05
+      },
       "notes": "5% skill cooldown reduction"
     },
     "7000801": {
       "label": "Character Skill Cooldown Reduction +1",
       "utility_value": 0.03,
-      "uptime_boosts": {"trance_active": 0.075},
+      "uptime_boosts": {
+        "trance_active": 0.075
+      },
       "notes": "7.5% skill cooldown reduction"
     },
     "7000802": {
       "label": "Character Skill Cooldown Reduction +3",
       "utility_value": 0.04,
-      "uptime_boosts": {"trance_active": 0.10},
+      "uptime_boosts": {
+        "trance_active": 0.1
+      },
       "notes": "10% skill cooldown reduction → Trance fires 10% more often"
     },
     "7037600": {
@@ -132,7 +156,10 @@
     "6500900": {
       "label": "L525 Executing Art readies Skill (Trance loop)",
       "utility_value": 0.12,
-      "uptime_boosts": {"trance_active": 0.45, "ult_active": 0.20},
+      "uptime_boosts": {
+        "trance_active": 0.45,
+        "ult_active": 0.2
+      },
       "notes": "Trance re-readies after each Ult cast → Trance uptime ~0.95, Ult uptime ~0.55-0.70 with this effect in build"
     },
     "6647400": {

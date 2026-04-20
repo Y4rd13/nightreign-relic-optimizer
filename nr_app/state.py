@@ -30,6 +30,7 @@ from src.effects_db import (
     curses_for_character,
     effects_by_id_for_character,
     find_for_character,
+    load_effects_for_character,
 )
 from src.solver import OptimizerConfig, optimize, per_attr_contributions, top_k_alternatives
 from src.validator import auto_sort, is_valid as relic_is_valid, validate_relic
@@ -605,6 +606,62 @@ class State(rx.State):
     # DERIVED
     # ═════════════════════════════════════════════════════════════
     @rx.var
+    def character_skill_name(self) -> str:
+        """Active character's skill label — drives the "<Skill> (skill) baseline"
+        slider so it reads "Specimen Thread" for Scholar instead of "Trance"."""
+        try:
+            name = chars_mod.get(self.character_id).skill.get("name")
+        except KeyError:
+            name = None
+        return name or "Skill"
+
+    @rx.var
+    def primary_damage_label(self) -> str:
+        """Human-friendly label for the character's primary damage lane —
+        replaces the Undertaker-default "HAMMER" tile for other chars."""
+        try:
+            g = chars_mod.get(self.character_id).globals_
+        except KeyError:
+            return "Primary"
+        return (g.get("damage_source_labels") or {}).get("primary") or "Primary"
+
+    @rx.var
+    def secondary_damage_label(self) -> str:
+        """Human-friendly label for the secondary damage lane. '—' hides the
+        tile/pie-slice for mono-lane characters (most chars aren't hybrid)."""
+        try:
+            g = chars_mod.get(self.character_id).globals_
+        except KeyError:
+            return "—"
+        return (g.get("damage_source_labels") or {}).get("secondary") or "—"
+
+    @rx.var
+    def has_secondary_damage(self) -> bool:
+        return self.secondary_damage_label not in ("", "—")
+
+    @rx.var
+    def character_uses_condition(self) -> dict[str, bool]:
+        """Which ctx-gated uptimes have at least one effect in the character's
+        pool that depends on them. Drives visibility of conditional sliders and
+        toggles in the sidebar so e.g. "3+ hammers" doesn't appear for Scholar."""
+        try:
+            pool = load_effects_for_character(self.character_id)
+        except Exception:
+            pool = []
+        # Named-relic-only effects count too — e.g. Undertaker's L522 is
+        # pruned from solver candidates but reachable via Leather Monocle.
+        used = {e.requires for e in pool if e.requires}
+        return {
+            "incant_buff_active": "incant_buff_active" in used,
+            "three_hammers_equipped": "three_hammers_equipped" in used,
+            "dual_wielding": "dual_wielding" in used,
+            "chain_last_hit": "chain_last_hit" in used,
+            "first_combo_hit": "first_combo_hit" in used,
+            "grease_used": "grease_used" in used,
+            "took_damage_recently": "took_damage_recently" in used,
+        }
+
+    @rx.var
     def naked_baseline_score(self) -> float:
         """Damage score with 0 relics, under the current playstyle context.
         Used to normalise the hero damage number into a multiplier over
@@ -1018,23 +1075,34 @@ class State(rx.State):
 
     @rx.var
     def damage_sources_data(self) -> list[dict[str, Any]]:
-        """Pie chart data: hammer / hex relative share of total damage.
-        Approximation from the exposed top-level mults + per-character rates."""
+        """Pie chart data: primary / secondary relative share of total damage.
+        Labels come from the character's `damage_source_labels`; the internal
+        model still tracks two lanes (hammer_mult / hex_mult) but they're
+        renamed per character. Mono-lane characters (non-hybrid) only get
+        the primary slice."""
         c = chars_mod.get(self.character_id)
         g = c.globals_
+        labels = g.get("damage_source_labels") or {}
+        primary_label = labels.get("primary") or "Primary"
+        secondary_label = labels.get("secondary") or "—"
+        has_secondary = secondary_label not in ("", "—")
+
         hammer_rate = float(g.get("hammer_hits_per_boss_window_s", 0.8))
         hex_rate = float(g.get("hex_casts_per_boss_window_s", 0.22))
         hex_coef = float(g.get("loathsome_hex_per_cast_coef", 0.30))
         boss_window = 30.0
         hammer_dmg = hammer_rate * boss_window * self.hammer_mult * (1.0 + self.additive_phys_pct / 100.0)
-        hex_dmg = hex_rate * boss_window * self.hex_mult * hex_coef
+        hex_dmg = hex_rate * boss_window * self.hex_mult * hex_coef if has_secondary else 0.0
         total = hammer_dmg + hex_dmg
         if total <= 0:
-            return [{"name": "Hammer", "value": 0}, {"name": "Hex", "value": 0}]
-        return [
-            {"name": "Hammer", "value": round(hammer_dmg / total * 100, 1)},
-            {"name": "Hex", "value": round(hex_dmg / total * 100, 1)},
-        ]
+            rows = [{"name": primary_label, "value": 0}]
+            if has_secondary:
+                rows.append({"name": secondary_label, "value": 0})
+            return rows
+        rows = [{"name": primary_label, "value": round(hammer_dmg / total * 100, 1)}]
+        if has_secondary:
+            rows.append({"name": secondary_label, "value": round(hex_dmg / total * 100, 1)})
+        return rows
 
     @rx.var
     def dormant_power_rows(self) -> list[DormantPowerRow]:

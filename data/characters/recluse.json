@@ -68,7 +68,11 @@
       "Enemy afflictions",
       "Controls",
       "Presets"
-    ]
+    ],
+    "damage_source_labels": {
+      "primary": "Sorcery",
+      "secondary": "—"
+    }
   },
   "effects": {}
 }

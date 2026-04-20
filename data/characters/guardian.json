@@ -71,7 +71,11 @@
       "Playstyle & weapons",
       "Controls",
       "Presets"
-    ]
+    ],
+    "damage_source_labels": {
+      "primary": "Halberd",
+      "secondary": "—"
+    }
   },
   "effects": {}
 }

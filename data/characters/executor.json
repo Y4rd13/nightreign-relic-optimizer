@@ -71,7 +71,11 @@
       "Combat patterns",
       "Controls",
       "Presets"
-    ]
+    ],
+    "damage_source_labels": {
+      "primary": "Katana",
+      "secondary": "—"
+    }
   },
   "effects": {}
 }

@@ -72,7 +72,11 @@
       "Combat patterns",
       "Controls",
       "Presets"
-    ]
+    ],
+    "damage_source_labels": {
+      "primary": "Weapon",
+      "secondary": "—"
+    }
   },
   "effects": {}
 }

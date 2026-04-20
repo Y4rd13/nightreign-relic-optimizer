@@ -70,7 +70,11 @@
       "Build goal",
       "Controls",
       "Presets"
-    ]
+    ],
+    "damage_source_labels": {
+      "primary": "Spellcast",
+      "secondary": "—"
+    }
   },
   "effects": {}
 }

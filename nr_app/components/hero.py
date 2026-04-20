@@ -30,11 +30,11 @@ BUCKET_CARD_STYLE = {
 
 
 _HERO_TOOLTIPS = {
-    "Hammer":       "Aggregate melee-hammer damage multiplier applied per hammer hit. Product of every hammer-scope bucket × utility × skill uptime.",
-    "Hex":          "Aggregate ranged-hex damage multiplier applied per Loathsome Hex cast.",
-    "Additive":     "Sum of additive physical-damage effects (L521 chain-last-hit, L522 incant buff, etc.). Adds after multipliers: damage × (1 + additive%).",
+    "Primary":      "Aggregate damage multiplier for this character's primary attack lane — product of bucket × utility × skill uptime.",
+    "Secondary":    "Aggregate damage multiplier for the character's secondary damage lane (e.g. Undertaker's hex casts).",
+    "Additive":     "Sum of additive damage effects (+N% phys / +N% all). Adds after multipliers: damage × (1 + additive%).",
     "Utility":      "Utility multiplier — folds in skill-uptime loops and other non-bucket effects.",
-    "Skill uptime": "Percentage of the boss window with the character's skill buff active. Jumps near 99% when a loop effect (e.g. Undertaker L525) is in build.",
+    "Skill uptime": "Percentage of the boss window with the character's skill buff active. A 'skill loop' relic pushes this toward 99%.",
 }
 
 
@@ -87,10 +87,14 @@ def _build_type_badge() -> rx.Component:
     return rx.box(build_type_pill(State.dominant_goal_label), margin_top="4px")
 
 
-def _mult(label: str, value) -> rx.Component:
+def _mult(label, value, tooltip_key: str | None = None) -> rx.Component:
+    """Generic multiplier card. `label` may be a Python str or a Reflex Var;
+    `tooltip_key` selects the tooltip text (defaults to the label string)."""
+    up = label.upper() if hasattr(label, "upper") else label
+    tooltip_text = _HERO_TOOLTIPS.get(tooltip_key or label, "")
     return rx.tooltip(
         rx.box(
-            rx.text(label.upper(), color=PAL["overlay1"],
+            rx.text(up, color=PAL["overlay1"],
                     font_size="0.64rem", letter_spacing="0.08em",
                     font_weight="700"),
             rx.hstack(
@@ -105,7 +109,7 @@ def _mult(label: str, value) -> rx.Component:
             ),
             style={**STAT_CARD_STYLE, "cursor": "help"},
         ),
-        content=_HERO_TOOLTIPS.get(label, label),
+        content=tooltip_text,
     )
 
 
@@ -269,8 +273,14 @@ def hero() -> rx.Component:
                            "Ally-oriented effects: team heals, party buffs, "
                            "summon/retinue. Weighted by 'Team' slider. "
                            "Revenant default = 0.8."),
-                _mult("Hammer",      State.hammer_mult),
-                _mult("Hex",         State.hex_mult),
+                _mult(State.primary_damage_label, State.hammer_mult,
+                      tooltip_key="Primary"),
+                rx.cond(
+                    State.has_secondary_damage,
+                    _mult(State.secondary_damage_label, State.hex_mult,
+                          tooltip_key="Secondary"),
+                    rx.box(),
+                ),
                 _pct ("Additive",    State.additive_phys_pct),
                 _mult("Utility",     State.utility_mult),
                 _raw ("Skill uptime", State.skill_uptime_pct, suffix="%"),

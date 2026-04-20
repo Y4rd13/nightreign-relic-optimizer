@@ -72,7 +72,11 @@
       "Buff uptime",
       "Controls",
       "Presets"
-    ]
+    ],
+    "damage_source_labels": {
+      "primary": "Dagger",
+      "secondary": "—"
+    }
   },
   "effects": {}
 }

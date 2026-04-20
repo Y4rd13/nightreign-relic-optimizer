@@ -70,7 +70,11 @@
       "Playstyle & weapons",
       "Controls",
       "Presets"
-    ]
+    ],
+    "damage_source_labels": {
+      "primary": "Bow",
+      "secondary": "—"
+    }
   },
   "effects": {}
 }

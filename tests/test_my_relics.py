@@ -172,6 +172,64 @@ def test_load_all_missing_file_returns_empty(tmp_relics_path):
     assert mr.load_all(tmp_relics_path) == []
 
 
+def test_export_import_round_trip(tmp_relics_path, tmp_path):
+    r1 = mr.upsert(name="alpha", color="G", slot_tier="common",
+                   effects=[_ef(E_CHAR), _ef(E_NONE)], debuff=None,
+                   path=tmp_relics_path)
+    r2 = mr.upsert(name="beta", color="R", slot_tier="common",
+                   effects=[_ef(E_ATTACK)], debuff=None, path=tmp_relics_path)
+    payload = mr.export_relics([r1.id, r2.id], path=tmp_relics_path)
+    assert payload["type"] == "relics"
+    assert len(payload["items"]) == 2
+
+    dst = tmp_path / "fresh.json"
+    report = mr.import_relics(payload, path=dst)
+    assert report.imported == 2
+    assert [r.id for r in mr.load_all(dst)] == [r1.id, r2.id]
+
+
+def test_import_skips_duplicate_by_default(tmp_relics_path):
+    r1 = mr.upsert(name="dup", color="G", slot_tier="common",
+                   effects=[_ef(E_CHAR)], debuff=None, path=tmp_relics_path)
+    payload = mr.export_relics([r1.id], path=tmp_relics_path)
+    report = mr.import_relics(payload, path=tmp_relics_path)
+    assert report.imported == 0 and report.skipped == 1
+
+
+def test_import_overwrite_replaces_by_id(tmp_relics_path):
+    r1 = mr.upsert(name="orig", color="G", slot_tier="common",
+                   effects=[_ef(E_CHAR)], debuff=None, path=tmp_relics_path)
+    payload = mr.export_relics([r1.id], path=tmp_relics_path)
+    payload["items"][0]["name"] = "renamed by import"
+    report = mr.import_relics(payload, overwrite=True, path=tmp_relics_path)
+    assert report.overwritten == 1
+    loaded = mr.get(r1.id, path=tmp_relics_path)
+    assert loaded and loaded.name == "renamed by import"
+
+
+def test_import_rejects_wrong_type(tmp_relics_path):
+    bad = {"schema": mr.EXPORT_SCHEMA, "type": "builds", "items": []}
+    report = mr.import_relics(bad, path=tmp_relics_path)
+    assert report.errors and "Wrong type" in report.errors[0]
+
+
+def test_import_flags_malformed_items(tmp_relics_path):
+    good = mr.upsert(name="good", color="G", slot_tier="common",
+                     effects=[_ef(E_CHAR)], debuff=None, path=tmp_relics_path)
+    payload = mr.export_relics([good.id], path=tmp_relics_path)
+    # Inject an item with a bad color code.
+    payload["items"].append({
+        "id": "bad-uuid", "name": "garbage", "color": "Z",
+        "slot_tier": "common", "attr_ids": [E_CHAR], "debuff_id": None,
+        "created_at": "2026-04-20T00:00:00+00:00",
+        "updated_at": "2026-04-20T00:00:00+00:00",
+    })
+    report = mr.import_relics(payload, path=tmp_relics_path)
+    assert any("invalid color" in e for e in report.errors)
+    # 'good' was already present → skipped; malformed → error; net 0 imported.
+    assert report.imported == 0
+
+
 def test_storage_is_global_not_scoped(tmp_relics_path):
     """MyRelic JSON has no character_id field — single inventory across chars."""
     mr.upsert(name="shared", color="G", slot_tier="common",

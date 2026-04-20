@@ -137,6 +137,11 @@ def _build_card(preset) -> rx.Component:
         rx.vstack(
             # Header — name + damage
             rx.hstack(
+                rx.checkbox(
+                    checked=State.selected_build_names.contains(preset.name),
+                    on_change=lambda _v: State.toggle_build_selected(preset.name),
+                    title="Select for export",
+                ),
                 rx.hstack(
                     rx.text(preset.character_icon, font_size="1.1rem"),
                     rx.text(preset.name,
@@ -286,6 +291,134 @@ def _build_card(preset) -> rx.Component:
     )
 
 
+def _export_btn() -> rx.Component:
+    disabled = State.selected_build_names.length() == 0
+    return rx.el.button(
+        rx.hstack(
+            rx.icon(tag="download", size=13),
+            rx.text("Export selected", font_weight="700", font_size="0.8rem"),
+            spacing="1", align="center",
+        ),
+        on_click=State.export_selected_builds,
+        disabled=disabled,
+        title="Download a JSON file with the selected builds",
+        style={
+            "background": "transparent",
+            "border": f"1px solid {PAL['surface1']}",
+            "color": rx.cond(disabled, PAL["overlay0"], PAL["lavender"]),
+            "padding": "6px 12px",
+            "border_radius": "6px",
+            "cursor": rx.cond(disabled, "not-allowed", "pointer"),
+            "opacity": rx.cond(disabled, "0.55", "1"),
+        },
+        _hover={"border_color": PAL["lavender"]},
+    )
+
+
+def _import_btn() -> rx.Component:
+    return rx.el.button(
+        rx.hstack(
+            rx.icon(tag="upload", size=13),
+            rx.text("Import…", font_weight="700", font_size="0.8rem"),
+            spacing="1", align="center",
+        ),
+        on_click=State.open_import_builds_dialog,
+        title="Load builds from a JSON file",
+        style={
+            "background": "transparent",
+            "border": f"1px solid {PAL['surface1']}",
+            "color": PAL["teal"],
+            "padding": "6px 12px",
+            "border_radius": "6px",
+            "cursor": "pointer",
+        },
+        _hover={"border_color": PAL["teal"]},
+    )
+
+
+def _selection_bar() -> rx.Component:
+    total = State.saved_presets.length()
+    chosen = State.selected_build_names.length()
+    return rx.hstack(
+        rx.checkbox(
+            "Select all",
+            checked=(chosen > 0) & (chosen == total),
+            on_change=State.set_all_builds_selected,
+        ),
+        rx.text(chosen.to_string() + " / " + total.to_string() + " selected",
+                color=PAL["overlay1"], font_size="0.78rem"),
+        rx.spacer(),
+        _export_btn(),
+        _import_btn(),
+        align="center", width="100%",
+        padding="8px 10px",
+        background=PAL["surface0"],
+        border_radius="8px",
+        margin_bottom="10px",
+    )
+
+
+def _import_dialog() -> rx.Component:
+    return rx.dialog.root(
+        rx.dialog.content(
+            rx.dialog.title("Import builds"),
+            rx.dialog.description(
+                "Upload a JSON file exported from this tool. "
+                "Duplicates (same name + character) are skipped unless "
+                "'Overwrite existing' is checked.",
+                color=PAL["subtext"], font_size="0.82rem",
+            ),
+            rx.vstack(
+                rx.upload.root(
+                    rx.vstack(
+                        rx.icon(tag="file_json", size=28, color=PAL["lavender"]),
+                        rx.text("Drop a .json file here or click to select",
+                                color=PAL["subtext"], font_size="0.88rem"),
+                        spacing="2", align="center",
+                    ),
+                    id="import_builds_upload",
+                    multiple=False,
+                    accept={"application/json": [".json"]},
+                    on_drop=State.handle_upload_builds(
+                        rx.upload_files(upload_id="import_builds_upload")
+                    ),
+                    style={
+                        "border": f"2px dashed {PAL['surface1']}",
+                        "border_radius": "8px",
+                        "padding": "28px",
+                        "cursor": "pointer",
+                        "background": PAL["mantle"],
+                    },
+                    _hover={"border_color": PAL["lavender"]},
+                ),
+                rx.checkbox(
+                    "Overwrite existing builds with the same name",
+                    checked=State.import_overwrite_builds,
+                    on_change=State.toggle_import_overwrite_builds,
+                ),
+                rx.cond(
+                    State.import_report_text != "",
+                    rx.callout(State.import_report_text, icon="info",
+                               color_scheme="gray"),
+                    rx.box(),
+                ),
+                rx.hstack(
+                    rx.spacer(),
+                    rx.dialog.close(
+                        rx.button("Close", variant="soft",
+                                  on_click=State.close_import_builds_dialog),
+                    ),
+                    width="100%",
+                ),
+                spacing="3", width="100%",
+            ),
+            max_width="520px",
+        ),
+        open=State.import_builds_dialog_open,
+        on_open_change=State.set_import_builds_dialog_open,
+    )
+
+
 def my_builds_tab() -> rx.Component:
     return rx.vstack(
         rx.hstack(
@@ -314,6 +447,12 @@ def my_builds_tab() -> rx.Component:
             color=PAL["overlay1"], font_size="0.86rem",
             margin_bottom="14px",
         ),
+        rx.cond(
+            State.saved_presets.length() > 0,
+            _selection_bar(),
+            rx.box(),
+        ),
+        _import_dialog(),
         rx.cond(
             State.saved_presets.length() == 0,
             _empty_state(),

@@ -581,6 +581,17 @@ class State(rx.State):
     # file. Mirrors the preset_version pattern.
     my_relics_version: int = 0
 
+    # ── export / import ───────────────────────────────────────────
+    # Selection is a plain list[str] (not set) so Reflex can serialise it
+    # over the wire; UI uses `.contains()` for membership tests.
+    selected_build_names: list[str] = []   # scoped to the active character
+    selected_relic_ids: list[str] = []     # global uuids
+    import_builds_dialog_open: bool = False
+    import_relics_dialog_open: bool = False
+    import_overwrite_builds: bool = False
+    import_overwrite_relics: bool = False
+    import_report_text: str = ""           # banner under the import dialog
+
     # ── tabs ──────────────────────────────────────────────────────
     active_tab: str = "optimizer"
 
@@ -2378,6 +2389,142 @@ class State(rx.State):
         presets_mod.delete(name, self.character_id)
         self.preset_version += 1
         return rx.toast.info(f"Deleted '{name}'")
+
+    # ═════════════════════════════════════════════════════════════
+    # EVENTS — export / import
+    # ═════════════════════════════════════════════════════════════
+    def toggle_build_selected(self, name: str):
+        if name in self.selected_build_names:
+            self.selected_build_names = [n for n in self.selected_build_names if n != name]
+        else:
+            self.selected_build_names = [*self.selected_build_names, name]
+
+    def select_all_builds(self):
+        self.selected_build_names = [p.name for p in self.saved_presets]
+
+    def clear_build_selection(self):
+        self.selected_build_names = []
+
+    def set_all_builds_selected(self, checked: bool):
+        if checked:
+            self.selected_build_names = [p.name for p in self.saved_presets]
+        else:
+            self.selected_build_names = []
+
+    def set_import_builds_dialog_open(self, v: bool):
+        self.import_builds_dialog_open = bool(v)
+        if not v:
+            self.import_report_text = ""
+
+    def export_selected_builds(self):
+        if not self.selected_build_names:
+            return rx.toast.error("Select at least one build to export.")
+        import json as _json
+        from datetime import datetime as _dt, timezone as _tz
+        keys = [(n, self.character_id) for n in self.selected_build_names]
+        payload = presets_mod.export_presets(keys)
+        stamp = _dt.now(_tz.utc).strftime("%Y%m%d")
+        return rx.download(
+            data=_json.dumps(payload, indent=2, ensure_ascii=False),
+            filename=f"nightreign-builds-{stamp}.json",
+        )
+
+    def open_import_builds_dialog(self):
+        self.import_builds_dialog_open = True
+        self.import_report_text = ""
+
+    def close_import_builds_dialog(self):
+        self.import_builds_dialog_open = False
+
+    def toggle_import_overwrite_builds(self, v: bool):
+        self.import_overwrite_builds = bool(v)
+
+    async def handle_upload_builds(self, files: list[rx.UploadFile]):
+        if not files:
+            self.import_report_text = "No file selected."
+            return rx.toast.error("No file selected")
+        import json as _json
+        try:
+            raw = await files[0].read()
+            payload = _json.loads(raw.decode("utf-8"))
+        except (UnicodeDecodeError, _json.JSONDecodeError) as e:
+            self.import_report_text = f"Invalid JSON: {e}"
+            return rx.toast.error("Invalid JSON file")
+        report = presets_mod.import_presets(
+            payload, overwrite=self.import_overwrite_builds
+        )
+        self.preset_version += 1
+        self.import_report_text = report.summary()
+        self.import_builds_dialog_open = False
+        if report.imported == 0 and report.overwritten == 0 and report.errors:
+            return rx.toast.error(report.summary())
+        return rx.toast.success(report.summary())
+
+    def toggle_relic_selected(self, relic_id: str):
+        if relic_id in self.selected_relic_ids:
+            self.selected_relic_ids = [x for x in self.selected_relic_ids if x != relic_id]
+        else:
+            self.selected_relic_ids = [*self.selected_relic_ids, relic_id]
+
+    def select_all_relics(self):
+        self.selected_relic_ids = [r.id for r in self.my_relics_list]
+
+    def clear_relic_selection(self):
+        self.selected_relic_ids = []
+
+    def set_all_relics_selected(self, checked: bool):
+        if checked:
+            self.selected_relic_ids = [r.id for r in self.my_relics_list]
+        else:
+            self.selected_relic_ids = []
+
+    def set_import_relics_dialog_open(self, v: bool):
+        self.import_relics_dialog_open = bool(v)
+        if not v:
+            self.import_report_text = ""
+
+    def export_selected_relics(self):
+        if not self.selected_relic_ids:
+            return rx.toast.error("Select at least one relic to export.")
+        import json as _json
+        from datetime import datetime as _dt, timezone as _tz
+        payload = my_relics_mod.export_relics(self.selected_relic_ids)
+        stamp = _dt.now(_tz.utc).strftime("%Y%m%d")
+        return rx.download(
+            data=_json.dumps(payload, indent=2, ensure_ascii=False),
+            filename=f"nightreign-relics-{stamp}.json",
+        )
+
+    def open_import_relics_dialog(self):
+        self.import_relics_dialog_open = True
+        self.import_report_text = ""
+
+    def close_import_relics_dialog(self):
+        self.import_relics_dialog_open = False
+
+    def toggle_import_overwrite_relics(self, v: bool):
+        self.import_overwrite_relics = bool(v)
+
+    async def handle_upload_relics(self, files: list[rx.UploadFile]):
+        if not files:
+            self.import_report_text = "No file selected."
+            return rx.toast.error("No file selected")
+        import json as _json
+        try:
+            raw = await files[0].read()
+            payload = _json.loads(raw.decode("utf-8"))
+        except (UnicodeDecodeError, _json.JSONDecodeError) as e:
+            self.import_report_text = f"Invalid JSON: {e}"
+            return rx.toast.error("Invalid JSON file")
+        report = my_relics_mod.import_relics(
+            payload, overwrite=self.import_overwrite_relics
+        )
+        self.my_relics_version += 1
+        self.import_report_text = report.summary()
+        self.import_relics_dialog_open = False
+        if report.imported == 0 and report.overwritten == 0 and report.errors:
+            return rx.toast.error(report.summary())
+        return rx.toast.success(report.summary())
 
     # ═════════════════════════════════════════════════════════════
     # EVENTS — tabs

@@ -174,6 +174,107 @@ def upsert(
     return relic
 
 
+EXPORT_SCHEMA = "nightreign-export/1"
+
+
+@dataclass
+class ImportReport:
+    imported: int = 0
+    skipped: int = 0
+    overwritten: int = 0
+    errors: list[str] = field(default_factory=list)
+
+    def summary(self) -> str:
+        parts = [f"Imported {self.imported}"]
+        if self.skipped:
+            parts.append(f"Skipped {self.skipped}")
+        if self.overwritten:
+            parts.append(f"Overwrote {self.overwritten}")
+        if self.errors:
+            parts.append(f"Errors {len(self.errors)}")
+        return " · ".join(parts)
+
+
+def export_relics(
+    ids: Sequence[str],
+    path: Path | None = None,
+) -> dict[str, Any]:
+    """Assemble an export payload for the MyRelic entries whose uuids match
+    `ids`. Unknown ids are silently dropped."""
+    wanted = set(ids)
+    items = [r.to_json() for r in load_all(path) if r.id in wanted]
+    return {
+        "schema": EXPORT_SCHEMA,
+        "type": "relics",
+        "exported_at": _now_iso(),
+        "items": items,
+    }
+
+
+def import_relics(
+    payload: Any,
+    *,
+    overwrite: bool = False,
+    path: Path | None = None,
+) -> ImportReport:
+    """Merge MyRelic entries from an exported payload into the inventory.
+    Duplicate key is `id` (uuid). Light schema validation is applied per
+    item; a malformed item is counted in `errors` and the rest still
+    import."""
+    report = ImportReport()
+    if not isinstance(payload, dict):
+        report.errors.append("Payload is not a JSON object")
+        return report
+    if payload.get("schema") != EXPORT_SCHEMA:
+        report.errors.append(f"Unknown schema: {payload.get('schema')!r}")
+        return report
+    if payload.get("type") != "relics":
+        report.errors.append(
+            f"Wrong type: expected 'relics', got {payload.get('type')!r}"
+        )
+        return report
+
+    items = payload.get("items")
+    if not isinstance(items, list):
+        report.errors.append("Payload 'items' is missing or not a list")
+        return report
+
+    existing = load_all(path)
+    id_index: dict[str, int] = {r.id: i for i, r in enumerate(existing)}
+    changed = False
+    for raw in items:
+        try:
+            relic = MyRelic.from_json(raw)
+            if relic.color not in _ALLOWED_COLORS:
+                raise ValueError(f"invalid color {relic.color!r}")
+            if relic.slot_tier not in _ALLOWED_SLOT_TIERS:
+                raise ValueError(f"invalid slot_tier {relic.slot_tier!r}")
+            if not relic.attr_ids or len(relic.attr_ids) > 3:
+                raise ValueError("attr_ids must contain 1-3 effect ids")
+            if not relic.name:
+                raise ValueError("name is required")
+        except Exception as e:
+            rid = raw.get("id", "?") if isinstance(raw, dict) else "?"
+            report.errors.append(f"Invalid relic {rid!r}: {e}")
+            continue
+        if relic.id in id_index:
+            if overwrite:
+                existing[id_index[relic.id]] = relic
+                report.overwritten += 1
+                changed = True
+            else:
+                report.skipped += 1
+        else:
+            id_index[relic.id] = len(existing)
+            existing.append(relic)
+            report.imported += 1
+            changed = True
+
+    if changed:
+        save_all(existing, path)
+    return report
+
+
 def delete(relic_id: str, path: Path | None = None) -> bool:
     before = load_all(path)
     after = [r for r in before if r.id != relic_id]

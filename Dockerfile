@@ -64,6 +64,10 @@ ENV REFLEX_DIR=/app/.reflex_cache
 # `user_data/` is the bind-mount target for persistent presets — kept outside
 # /app/data/ (which the image owns) so `docker build` rebuilds never wipe it.
 ENV NIGHTREIGN_PRESETS_FILE=/app/user_data/presets.json
+# Reflex's rx.upload writes to ./uploaded_files by default; redirect to a
+# writable path inside the bind-mounted user_data volume so imports work
+# under the unprivileged `app` user.
+ENV REFLEX_UPLOADED_FILES_DIR=/app/user_data/_uploads
 RUN mkdir -p /app/.reflex_cache /app/.local /app/.cache /app/user_data && \
     chown -R app:app /app/.reflex_cache /app/.local /app/.cache /app/user_data
 

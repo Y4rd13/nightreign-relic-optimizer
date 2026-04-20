@@ -210,6 +210,106 @@ def list_for_character(character_id: str, path: Path | None = None) -> list[Pres
     return [p for p in load_all(path) if p.character_id == character_id]
 
 
+EXPORT_SCHEMA = "nightreign-export/1"
+
+
+@dataclass
+class ImportReport:
+    imported: int = 0
+    skipped: int = 0
+    overwritten: int = 0
+    errors: list[str] = field(default_factory=list)
+
+    def summary(self) -> str:
+        parts = [f"Imported {self.imported}"]
+        if self.skipped:
+            parts.append(f"Skipped {self.skipped}")
+        if self.overwritten:
+            parts.append(f"Overwrote {self.overwritten}")
+        if self.errors:
+            parts.append(f"Errors {len(self.errors)}")
+        return " · ".join(parts)
+
+
+def export_presets(
+    keys: Sequence[tuple[str, str]],
+    path: Path | None = None,
+) -> dict[str, Any]:
+    """Assemble an export payload for presets identified by (name, character_id).
+    Unknown keys are silently dropped (caller pre-filters the selection)."""
+    index = {(p.name, p.character_id): p for p in load_all(path)}
+    items: list[dict[str, Any]] = []
+    for k in keys:
+        preset = index.get((k[0], k[1]))
+        if preset is not None:
+            items.append(preset.to_json())
+    return {
+        "schema": EXPORT_SCHEMA,
+        "type": "builds",
+        "exported_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        "items": items,
+    }
+
+
+def import_presets(
+    payload: Any,
+    *,
+    overwrite: bool = False,
+    path: Path | None = None,
+) -> ImportReport:
+    """Merge presets from a previously-exported payload into the on-disk store.
+
+    Duplicate key is `(name, character_id)` — matching `upsert`. When
+    `overwrite` is False, existing entries are left untouched and counted in
+    `skipped`; when True, they are replaced and counted in `overwritten`."""
+    report = ImportReport()
+    if not isinstance(payload, dict):
+        report.errors.append("Payload is not a JSON object")
+        return report
+    if payload.get("schema") != EXPORT_SCHEMA:
+        report.errors.append(f"Unknown schema: {payload.get('schema')!r}")
+        return report
+    if payload.get("type") != "builds":
+        report.errors.append(
+            f"Wrong type: expected 'builds', got {payload.get('type')!r}"
+        )
+        return report
+
+    items = payload.get("items")
+    if not isinstance(items, list):
+        report.errors.append("Payload 'items' is missing or not a list")
+        return report
+
+    existing = load_all(path)
+    key_index: dict[tuple[str, str], int] = {
+        (p.name, p.character_id): i for i, p in enumerate(existing)
+    }
+    changed = False
+    for raw in items:
+        try:
+            preset = Preset.from_json(raw)
+        except Exception as e:
+            report.errors.append(f"Invalid preset: {e}")
+            continue
+        key = (preset.name, preset.character_id)
+        if key in key_index:
+            if overwrite:
+                existing[key_index[key]] = preset
+                report.overwritten += 1
+                changed = True
+            else:
+                report.skipped += 1
+        else:
+            key_index[key] = len(existing)
+            existing.append(preset)
+            report.imported += 1
+            changed = True
+
+    if changed:
+        save_all(existing, path)
+    return report
+
+
 def resolve(preset: Preset) -> list[tuple[PresetSlot, list[Effect], Effect | None]]:
     """Expand effect ids → Effect objects for rendering (character-scoped)."""
     out = []

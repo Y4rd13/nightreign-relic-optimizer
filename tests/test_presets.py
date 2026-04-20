@@ -91,6 +91,94 @@ def test_preset_migration_recomputes_missing_scores():
     assert out["weighted"] >= out["damage"]
 
 
+def _seed_preset(path, name="A", character_id="undertaker"):
+    cfg = OptimizerConfig(character_id=character_id)
+    build, contrib = optimize(cfg)
+    return presets_mod.upsert(
+        name=name, character_id=character_id, mode=cfg.mode,
+        build=build, contrib=contrib, ctx=cfg.ctx,
+        excluded_ids=[], locked_attrs={}, path=path,
+    )
+
+
+def test_export_import_round_trip(tmp_presets_path, tmp_path):
+    """Exporting then importing into an empty store reproduces the preset."""
+    src = _seed_preset(tmp_presets_path, "rt")
+    payload = presets_mod.export_presets(
+        [("rt", src.character_id)], path=tmp_presets_path
+    )
+    assert payload["schema"] == presets_mod.EXPORT_SCHEMA
+    assert payload["type"] == "builds"
+    assert len(payload["items"]) == 1
+
+    dst = tmp_path / "fresh.json"
+    report = presets_mod.import_presets(payload, path=dst)
+    assert report.imported == 1 and report.skipped == 0 and report.errors == []
+
+    loaded = presets_mod.get("rt", src.character_id, path=dst)
+    assert loaded is not None
+    assert loaded.damage_score == src.damage_score
+    assert [s.attr_ids for s in loaded.slots] == [s.attr_ids for s in src.slots]
+
+
+def test_import_skips_duplicate_by_default(tmp_presets_path):
+    """Re-importing the same payload leaves existing items untouched."""
+    _seed_preset(tmp_presets_path, "dup")
+    payload = presets_mod.export_presets(
+        [("dup", "undertaker")], path=tmp_presets_path
+    )
+    report = presets_mod.import_presets(payload, path=tmp_presets_path)
+    assert report.imported == 0
+    assert report.skipped == 1
+    assert report.overwritten == 0
+
+
+def test_import_overwrite_replaces_existing(tmp_presets_path):
+    """With overwrite=True, same-key payload replaces the stored preset."""
+    src = _seed_preset(tmp_presets_path, "ow")
+    payload = presets_mod.export_presets(
+        [("ow", "undertaker")], path=tmp_presets_path
+    )
+    # Mutate the in-memory preset to prove the overwrite actually landed.
+    payload["items"][0]["damage_score"] = 9999.0
+    report = presets_mod.import_presets(
+        payload, overwrite=True, path=tmp_presets_path
+    )
+    assert report.overwritten == 1
+    assert report.skipped == 0
+    loaded = presets_mod.get("ow", "undertaker", path=tmp_presets_path)
+    assert loaded is not None and loaded.damage_score == 9999.0
+    assert loaded.damage_score != src.damage_score
+
+
+def test_import_rejects_unknown_schema(tmp_presets_path):
+    bad = {"schema": "foo/9", "type": "builds", "items": []}
+    report = presets_mod.import_presets(bad, path=tmp_presets_path)
+    assert report.errors and "Unknown schema" in report.errors[0]
+    assert report.imported == 0
+
+
+def test_import_rejects_wrong_type(tmp_presets_path):
+    bad = {"schema": presets_mod.EXPORT_SCHEMA, "type": "relics", "items": []}
+    report = presets_mod.import_presets(bad, path=tmp_presets_path)
+    assert report.errors and "Wrong type" in report.errors[0]
+
+
+def test_import_continues_past_invalid_item(tmp_presets_path, tmp_path):
+    """A malformed item is counted as error but the valid ones still import."""
+    src = _seed_preset(tmp_presets_path, "ok")
+    payload = presets_mod.export_presets(
+        [("ok", "undertaker")], path=tmp_presets_path
+    )
+    payload["items"].insert(0, {"name": "broken"})  # missing required fields
+
+    dst = tmp_path / "partial.json"
+    report = presets_mod.import_presets(payload, path=dst)
+    assert report.imported == 1
+    assert len(report.errors) == 1
+    assert presets_mod.get("ok", "undertaker", path=dst) is not None
+
+
 def test_named_relic_missing_effect_ids_skipped():
     """Relics that reference missing effect_ids must be marked
     attrs_verified=False AND their attr signatures must not appear in the

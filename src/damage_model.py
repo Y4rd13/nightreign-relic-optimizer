@@ -140,6 +140,12 @@ def _base_uptime_mapping(ctx: PlayContext) -> dict[str, float]:
         "dual_wielding": 1.0 if ctx.dual_wielding else 0.0,
         "two_handing": 1.0 if ctx.two_handing else 0.0,
         "three_hammers_equipped": 1.0 if ctx.three_hammers_equipped else 0.0,
+        # Generic "3+ of the character's primary weapon equipped" — gates all
+        # `Improved Attack Power with 3+ X Equipped` effects (one per weapon
+        # class). Bound to the same ctx flag as the hammer-specific gate so
+        # one toggle drives both; weapon-scope filtering (_detect_weapon_slug)
+        # keeps only the right effect per character in the candidate pool.
+        "three_primary_equipped": 1.0 if ctx.three_hammers_equipped else 0.0,
         "incant_buff_active": ctx.incant_buff_uptime,
         "first_combo_hit": ctx.first_combo_hit_fraction,
         "chain_last_hit": ctx.chain_last_hit_fraction,

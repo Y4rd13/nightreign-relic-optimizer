@@ -190,6 +190,55 @@ def _bucket(b) -> rx.Component:
     )
 
 
+def _weapon_pill(w) -> rx.Component:
+    """One weapon chip: name + how many effects in the pool key off this class.
+    The damage model can't split damage per weapon, but the pool count tells
+    the user which weapons actually unlock new effect surfaces for them."""
+    return rx.tooltip(
+        rx.hstack(
+            rx.icon(tag="sword", size=10, color=PAL["teal"]),
+            rx.text(w["label"], color=PAL["subtext"],
+                    font_size="0.72rem", font_weight="600"),
+            rx.box(
+                w["effect_count"].to_string(),
+                background="rgba(148,226,213,0.16)",
+                color=PAL["teal"],
+                padding="0 5px", border_radius="99px",
+                font_size="0.62rem", font_weight="700",
+                font_family="ui-monospace, SFMono-Regular, Menlo, monospace",
+                margin_left="2px",
+            ),
+            spacing="1", align="center",
+            padding="3px 8px",
+            border="1px solid rgba(148,226,213,0.22)",
+            border_radius="6px",
+            background="rgba(148,226,213,0.06)",
+        ),
+        content=("Effects in your character pool that reference this "
+                 "weapon class. Swap weapons in the sidebar to change "
+                 "which effects are eligible."),
+    )
+
+
+def _weapons_strip() -> rx.Component:
+    return rx.cond(
+        State.weapon_display_rows.length() > 0,
+        rx.vstack(
+            rx.text("Weapons active",
+                    color=PAL["overlay1"], font_size="0.58rem",
+                    letter_spacing="0.08em", font_weight="700",
+                    margin_top="2px"),
+            rx.flex(
+                rx.foreach(State.weapon_display_rows, _weapon_pill),
+                direction="row", wrap="wrap", gap="4px",
+            ),
+            spacing="1", align="start",
+            margin_top="4px",
+        ),
+        rx.box(),
+    )
+
+
 def hero() -> rx.Component:
     return rx.box(
         rx.flex(
@@ -245,6 +294,7 @@ def hero() -> rx.Component:
                 ),
                 _build_type_badge(),
                 dormant_summary_pill(),
+                _weapons_strip(),
                 spacing="1",
                 align="start",
                 min_width="180px",

@@ -342,6 +342,341 @@
     "6851200": {
       "label": "Lower Atk when below max HP (CURSE)",
       "debuff_cost": 0.1
+    },
+    "7080000": {
+      "label": "3+ Daggers",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7080100": {
+      "label": "3+ Straight Swords",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7080200": {
+      "label": "3+ Greatswords",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7080300": {
+      "label": "3+ Colossal Swords",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7080400": {
+      "label": "3+ Curved Swords",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7080500": {
+      "label": "3+ Curved Greatswords",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7080600": {
+      "label": "3+ Katana",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7080700": {
+      "label": "3+ Twinblades",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7080800": {
+      "label": "3+ Thrusting Swords",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7080900": {
+      "label": "3+ Heavy Thrusting Swords",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7081000": {
+      "label": "3+ Axes",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7081100": {
+      "label": "3+ Greataxes",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7081200": {
+      "label": "3+ Hammers",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7081300": {
+      "label": "3+ Great Hammers",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7081400": {
+      "label": "3+ Flails",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7081500": {
+      "label": "3+ Spears",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7081700": {
+      "label": "3+ Great Spears",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7081800": {
+      "label": "3+ Halberds",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7081900": {
+      "label": "3+ Reapers",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7082000": {
+      "label": "3+ Fists",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7082100": {
+      "label": "3+ Claws",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7082200": {
+      "label": "3+ Whips",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7082300": {
+      "label": "3+ Colossal Weapons",
+      "bucket": "B_3PLUS",
+      "mult": 1.2,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7082400": {
+      "label": "3+ Bows",
+      "bucket": "B_3PLUS",
+      "mult": 1.1,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "13002": {
+      "label": "3+ Bows",
+      "bucket": "B_3PLUS",
+      "mult": 1.1,
+      "mult_scope": "all",
+      "requires": "three_primary_equipped"
+    },
+    "7330000": {
+      "label": "Improved Dagger Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7330100": {
+      "label": "Improved Straight Sword Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7330200": {
+      "label": "Improved Greatsword Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7330300": {
+      "label": "Improved Colossal Sword Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7330400": {
+      "label": "Improved Curved Sword Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7330500": {
+      "label": "Improved Curved Greatsword Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7330600": {
+      "label": "Improved Katana Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7330700": {
+      "label": "Improved Twinblade Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7330800": {
+      "label": "Improved Thrusting Sword Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7330900": {
+      "label": "Improved Heavy Thrusting Sword Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7331000": {
+      "label": "Improved Axe Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7331100": {
+      "label": "Improved Greataxe Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7331200": {
+      "label": "Improved Hammer Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7331300": {
+      "label": "Improved Great Hammer Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7331400": {
+      "label": "Improved Flail Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7331500": {
+      "label": "Improved Spear Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7331700": {
+      "label": "Improved Great Spear Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7331800": {
+      "label": "Improved Halberd Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7331900": {
+      "label": "Improved Reaper Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7332000": {
+      "label": "Improved Fist Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7332100": {
+      "label": "Improved Claw Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7332200": {
+      "label": "Improved Whip Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7332300": {
+      "label": "Improved Colossal Weapon Atk",
+      "additive": 0.09,
+      "additive_scope": "phys"
+    },
+    "7332400": {
+      "label": "Improved Bow Atk",
+      "additive": 0.06,
+      "additive_scope": "phys"
+    },
+    "7006600": {
+      "label": "Improved Melee Attack Power",
+      "additive": 0.06,
+      "additive_scope": "phys"
+    },
+    "7006700": {
+      "label": "Improved Skill Attack Power",
+      "additive": 0.15,
+      "additive_scope": "all",
+      "requires": "trance_active",
+      "uptime_default": 0.5
+    },
+    "7260000": {
+      "label": "Atk vs poisoned",
+      "additive": 0.1,
+      "additive_scope": "all"
+    },
+    "7260300": {
+      "label": "Atk vs rot-afflicted",
+      "additive": 0.1,
+      "additive_scope": "all"
+    },
+    "7260400": {
+      "label": "Atk vs frostbitten",
+      "additive": 0.1,
+      "additive_scope": "all"
+    },
+    "7040201": {
+      "label": "Improved Critical Hits +1",
+      "bucket": "B_CRIT",
+      "mult": 1.2,
+      "mult_scope": "crit",
+      "uptime_default": 0.0
+    },
+    "7001409": {
+      "label": "Physical Attack Up +2 (alt)",
+      "additive": 0.035,
+      "additive_scope": "phys",
+      "stackable": true
     }
   }
 }

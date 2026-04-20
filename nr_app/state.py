@@ -653,13 +653,94 @@ class State(rx.State):
         used = {e.requires for e in pool if e.requires}
         return {
             "incant_buff_active": "incant_buff_active" in used,
-            "three_hammers_equipped": "three_hammers_equipped" in used,
+            # 3+ of the character's primary weapon. Unified gate covers
+            # both the original B_L18 (Undertaker hammer) and the shared
+            # B_3PLUS bucket added for all other weapon classes.
+            "three_hammers_equipped": (
+                "three_hammers_equipped" in used
+                or "three_primary_equipped" in used
+            ),
             "dual_wielding": "dual_wielding" in used,
             "chain_last_hit": "chain_last_hit" in used,
             "first_combo_hit": "first_combo_hit" in used,
             "grease_used": "grease_used" in used,
             "took_damage_recently": "took_damage_recently" in used,
         }
+
+    @rx.var
+    def weapon_display_rows(self) -> list[dict[str, Any]]:
+        """Each selected weapon slug → {slug, label, effect_count} for the
+        Hero banner's "weapons active" strip. `effect_count` is how many
+        effects in the character's pool reference this weapon class — lets
+        the user see the search surface each weapon unlocks."""
+        try:
+            pool = load_effects_for_character(self.character_id)
+        except Exception:
+            return []
+        # Delayed import to avoid a module-level cycle with effects_db.
+        from src.effects_db import _detect_weapon_slug
+        count_by_slug: dict[str, int] = {}
+        for e in pool:
+            slug = _detect_weapon_slug(e.name)
+            if slug:
+                count_by_slug[slug] = count_by_slug.get(slug, 0) + 1
+        DISPLAY = {
+            "hammer": "Hammer", "greathammer": "Great Hammer",
+            "greatsword": "Greatsword", "colossal_sword": "Colossal Sword",
+            "colossal_weapon": "Colossal Weapon",
+            "halberd": "Halberd", "great_spear": "Great Spear",
+            "spear": "Spear", "reaper": "Reaper", "flail": "Flail",
+            "axe": "Axe", "greataxe": "Greataxe",
+            "dagger": "Dagger", "straight_sword": "Straight Sword",
+            "curved_sword": "Curved Sword",
+            "curved_greatsword": "Curved Greatsword",
+            "katana": "Katana", "twinblade": "Twinblade",
+            "thrusting_sword": "Thrusting Sword",
+            "heavy_thrusting_sword": "Heavy Thrusting Sword",
+            "fist": "Fist", "claw": "Claw", "whip": "Whip",
+            "bow": "Bow", "light_bow": "Light Bow",
+            "greatbow": "Greatbow", "crossbow": "Crossbow",
+            "ballista": "Ballista", "torch": "Torch",
+            "staff": "Staff", "sacred_seal": "Sacred Seal",
+            "shield": "Shield", "great_shield": "Great Shield",
+        }
+        rows = []
+        for slug in self.effective_weapon_types:
+            rows.append({
+                "slug": slug,
+                "label": DISPLAY.get(slug, slug.replace("_", " ").title()),
+                "effect_count": int(count_by_slug.get(slug, 0)),
+            })
+        return rows
+
+    @rx.var
+    def primary_weapon_label(self) -> str:
+        """Display label for the character's primary weapon class — drives
+        the "3+ {weapon}" toggle wording so Guardian sees "3+ Halberds"
+        instead of the Undertaker-baked "3+ hammers"."""
+        weaps = self.effective_weapon_types
+        if not weaps:
+            return "weapons"
+        DISPLAY = {
+            "hammer": "Hammers", "greathammer": "Great Hammers",
+            "greatsword": "Greatswords", "colossal_sword": "Colossal Swords",
+            "colossal_weapon": "Colossal Weapons",
+            "halberd": "Halberds", "great_spear": "Great Spears",
+            "spear": "Spears", "reaper": "Reapers", "flail": "Flails",
+            "axe": "Axes", "greataxe": "Greataxes",
+            "dagger": "Daggers", "straight_sword": "Straight Swords",
+            "curved_sword": "Curved Swords", "curved_greatsword": "Curved Greatswords",
+            "katana": "Katana", "twinblade": "Twinblades",
+            "thrusting_sword": "Thrusting Swords",
+            "heavy_thrusting_sword": "Heavy Thrusting Swords",
+            "fist": "Fists", "claw": "Claws", "whip": "Whips",
+            "bow": "Bows", "light_bow": "Light Bows",
+            "greatbow": "Greatbows", "crossbow": "Crossbows",
+            "ballista": "Ballistas", "torch": "Torches",
+            "staff": "Staves", "sacred_seal": "Sacred Seals",
+            "shield": "Shields", "great_shield": "Great Shields",
+        }
+        return DISPLAY.get(weaps[0], weaps[0].replace("_", " ").title() + "s")
 
     @rx.var
     def naked_baseline_score(self) -> float:

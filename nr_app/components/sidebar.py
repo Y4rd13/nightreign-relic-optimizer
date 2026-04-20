@@ -938,8 +938,9 @@ def sidebar() -> rx.Component:
                         rx.hstack(
                             rx.checkbox(checked=State.three_hammers, on_change=State.toggle_hammers),
                             rx.tooltip(
-                                rx.text("3+ hammers", color=PAL["subtext"], font_size="0.78rem"),
-                                content="Required for L18 +10% mult.",
+                                rx.text("3+ " + State.primary_weapon_label,
+                                        color=PAL["subtext"], font_size="0.78rem"),
+                                content="Unlocks the +20% 'Improved Attack Power with 3+ X Equipped' bucket for your primary weapon class.",
                             ),
                             spacing="1", align="center",
                         ),

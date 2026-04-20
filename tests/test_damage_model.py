@@ -79,6 +79,31 @@ def test_stat_bonuses_stack_additively():
     )
 
 
+def test_three_plus_weapon_effects_apply_to_non_undertaker_chars():
+    """Guardian's 3+ Halberds / Ironeye's 3+ Bows / etc. were silently
+    unmodeled — only Undertaker's 3+ Hammers had bucket+mult overrides.
+    Baseline now supplies B_3PLUS × 1.20 for every weapon-class variant,
+    gated on `three_primary_equipped` (shared with the hammer toggle).
+
+    Removing the baseline metadata makes this test fail, catching regressions
+    on any future edit to the 3+ family."""
+    ctx = PlayContext()
+    # Guardian / Halberd (new case)
+    h = find_for_character(7081800, "guardian")
+    assert h.bucket == "B_3PLUS"
+    assert h.mult > 1.19
+    empty = compute([], ctx=ctx, character_id="guardian")
+    withh = compute([h], ctx=ctx, character_id="guardian")
+    assert withh.hammer_mult > empty.hammer_mult + 0.05, (
+        f"halberd 3+ didn't raise Guardian mult: {empty.hammer_mult:.3f} "
+        f"→ {withh.hammer_mult:.3f}"
+    )
+    # Undertaker / Hammer (existing case stays intact via B_L18 override)
+    u = find_for_character(7081200, "undertaker")
+    assert u.bucket == "B_L18"
+    assert u.mult > 1.19
+
+
 def test_physical_attack_up_copies_stack_additively():
     """Two different Physical Attack Up tiers in the same build must sum
     their additive values (2% + 2.5% = 4.5% phys), not max-dedupe to 2.5%.

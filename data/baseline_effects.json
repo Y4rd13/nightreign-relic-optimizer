@@ -12,27 +12,32 @@
     "7001400": {
       "label": "Physical Attack Up",
       "additive": 0.02,
-      "additive_scope": "phys"
+      "additive_scope": "phys",
+      "stackable": true
     },
     "7001401": {
       "label": "Physical Attack Up +1",
       "additive": 0.025,
-      "additive_scope": "phys"
+      "additive_scope": "phys",
+      "stackable": true
     },
     "7001402": {
       "label": "Physical Attack Up +2 (BTH)",
       "additive": 0.035,
-      "additive_scope": "phys"
+      "additive_scope": "phys",
+      "stackable": true
     },
     "6001400": {
       "label": "Physical Attack Up +3 (DoN)",
       "additive": 0.05,
-      "additive_scope": "phys"
+      "additive_scope": "phys",
+      "stackable": true
     },
     "6001401": {
       "label": "Physical Attack Up +4 (DoN)",
       "additive": 0.065,
-      "additive_scope": "phys"
+      "additive_scope": "phys",
+      "stackable": true
     },
     "7000302": {
       "label": "Strength +3",

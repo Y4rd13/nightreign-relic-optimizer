@@ -628,7 +628,10 @@ def _apply_meta(row: dict[str, Any], meta: dict[str, Any],
         flag=row["flag"],
         group=row["group"],
         name=row["name"],
-        stackable=bool(row.get("stackable", False)),
+        stackable=bool(
+            meta["stackable"] if meta.get("stackable") is not None
+            else row.get("stackable", False)
+        ),
         label=meta.get("label", ""),
         bucket=meta.get("bucket"),
         mult=float(meta_mult) if meta_mult is not None else 1.0,

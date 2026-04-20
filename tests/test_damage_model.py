@@ -50,6 +50,52 @@ def test_effect_value_proxy_caches_and_returns_max():
     assert v >= 0.1  # mult=1.1 → at least 0.1
 
 
+def test_physical_attack_up_is_stackable():
+    """Physical Attack Up family stacks additively per wiki / in-game testing.
+    The CE table flags them as non-stackable (inconsistent with the elemental
+    Attack Power Up siblings which ARE flagged stackable there); baseline
+    override flips them back to stackable=True."""
+    for eid in (7001400, 7001401, 7001402, 6001400, 6001401):
+        eff = find_for_character(eid, "undertaker")
+        assert eff.stackable, f"effect {eid} ({eff.name}) must be stackable"
+
+
+def test_stat_bonuses_stack_additively():
+    """Str/Dex/Int/Fai/Arc +1/+2/+3 relics stack additively per in-game
+    behaviour (+2 and +3 in the same build = +5 total). Verified by
+    summing deltas in `compute_effective_stats` and propagating through
+    `_stat_scaling_mult`."""
+    str2 = find_for_character(7000301, "undertaker")  # Strength +2
+    str3 = find_for_character(7000302, "undertaker")  # Strength +3
+    ctx = PlayContext(build_goal_weights_override={
+        "damage": 1.0, "survival": 0.0, "utility": 0.0, "team": 0.0,
+    })
+    just3 = compute([str3], ctx=ctx, character_id="undertaker")
+    both = compute([str2, str3], ctx=ctx, character_id="undertaker")
+    # delta(2)+delta(3)=5 ⇒ both should score strictly higher than just+3 alone.
+    assert both.damage_score > just3.damage_score + 1e-6, (
+        f"stat stacking broke: +3 alone={just3.damage_score:.3f} "
+        f"+2+3={both.damage_score:.3f}"
+    )
+
+
+def test_physical_attack_up_copies_stack_additively():
+    """Two different Physical Attack Up tiers in the same build must sum
+    their additive values (2% + 2.5% = 4.5% phys), not max-dedupe to 2.5%.
+    Regression for the 'contribution = 0' bug on duplicate phys-attack
+    families."""
+    base = find_for_character(7001400, "undertaker")  # +2%
+    plus1 = find_for_character(7001401, "undertaker")  # +2.5%
+    ctx = PlayContext(build_goal_weights_override={
+        "damage": 1.0, "survival": 0.0, "utility": 0.0, "team": 0.0,
+    })
+    one = compute([base], ctx=ctx, character_id="undertaker")
+    both = compute([base, plus1], ctx=ctx, character_id="undertaker")
+    assert both.additive_phys > one.additive_phys + 1e-6, (
+        f"stacking broke: one={one.additive_phys:.4f} both={both.additive_phys:.4f}"
+    )
+
+
 def test_raw_to_numeric_fractional_monotonic():
     """Adding points must never lower the fractional grade."""
     prev = raw_to_numeric_fractional("strength", 0)

@@ -34,7 +34,7 @@
     "name": "Untamable",
     "description": "Attack power grows as HP drops."
   },
-  "data_quality": "skeleton",
+  "data_quality": "full",
   "remembrance_slots": [
     {
       "name": "Black Claw Necklace",
@@ -78,7 +78,14 @@
     "damage_source_labels": {
       "primary": "Heavy arm",
       "secondary": "—"
-    }
+    },
+    "damage_scaling": {
+      "strength": 1.0,
+      "arcane": 0.3,
+      "dexterity": 0.3
+    },
+    "hex_damage_type": "physical",
+    "affinity_damage_fraction": 0.0
   },
   "effects": {}
 }

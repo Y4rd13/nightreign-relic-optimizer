@@ -16,23 +16,22 @@
     "arcane": "S"
   },
   "weapon_types": [
-    "staff",
-    "sacred_seal"
+    "thrusting_sword"
   ],
   "dual_wield": false,
   "skill": {
-    "name": "Specimen Thread",
-    "description": "Threads targets; allies attacking threaded enemies gain boost."
+    "name": "Analyze",
+    "description": "AoE observation circle — 3 charge levels. L3 applies a one-shot +60% damage + status amp to the next hit on targets inside."
   },
   "ultimate": {
-    "name": "Archive Open",
-    "description": "Continuous damage + buff AoE."
+    "name": "Communion",
+    "description": "Links enemies so damage dealt to one propagates to threaded targets; can heal threaded allies."
   },
   "passive": {
-    "name": "Annotative Scholarship",
-    "description": "Extra runes on specimen capture; buff retention."
+    "name": "Bagcraft",
+    "description": "Crafting / specimen collection kit; utility-focused passive."
   },
-  "data_quality": "skeleton",
+  "data_quality": "full",
   "remembrance_slots": [
     {
       "name": "Note \"My Dear Successor\"",
@@ -72,9 +71,17 @@
       "Presets"
     ],
     "damage_source_labels": {
-      "primary": "Sorcery",
+      "primary": "Thrust / Status",
       "secondary": "—"
-    }
+    },
+    "damage_scaling": {
+      "arcane": 1.0,
+      "intelligence": 0.3,
+      "faith": 0.3,
+      "dexterity": 0.3
+    },
+    "hex_damage_type": "physical",
+    "affinity_damage_fraction": 0.05
   },
   "effects": {}
 }

@@ -32,7 +32,7 @@
     "name": "Beast Regent",
     "description": "HP regen + damage reduction for allies nearby."
   },
-  "data_quality": "skeleton",
+  "data_quality": "full",
   "remembrance_slots": [
     {
       "name": "Witch's Brooch",
@@ -75,7 +75,15 @@
     "damage_source_labels": {
       "primary": "Halberd",
       "secondary": "—"
-    }
+    },
+    "damage_scaling": {
+      "strength": 1.0,
+      "dexterity": 0.5,
+      "faith": 0.15,
+      "arcane": 0.15
+    },
+    "hex_damage_type": "physical",
+    "affinity_damage_fraction": 0.0
   },
   "effects": {}
 }

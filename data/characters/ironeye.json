@@ -32,7 +32,7 @@
     "name": "Enhanced Senses",
     "description": "Reveals treasure and enemy weak points."
   },
-  "data_quality": "skeleton",
+  "data_quality": "full",
   "remembrance_slots": [
     {
       "name": "Edge of Order",
@@ -74,7 +74,14 @@
     "damage_source_labels": {
       "primary": "Bow",
       "secondary": "—"
-    }
+    },
+    "damage_scaling": {
+      "dexterity": 1.0,
+      "arcane": 0.4,
+      "strength": 0.3
+    },
+    "hex_damage_type": "physical",
+    "affinity_damage_fraction": 0.0
   },
   "effects": {}
 }

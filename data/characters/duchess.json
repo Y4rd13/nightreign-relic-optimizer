@@ -32,7 +32,7 @@
     "name": "Aristocratic Grace",
     "description": "Speed + evasion bonus after successful dodge."
   },
-  "data_quality": "skeleton",
+  "data_quality": "full",
   "remembrance_slots": [
     {
       "name": "Blessed Iron Coin",
@@ -76,7 +76,15 @@
     "damage_source_labels": {
       "primary": "Dagger",
       "secondary": "—"
-    }
+    },
+    "damage_scaling": {
+      "intelligence": 0.5,
+      "dexterity": 0.5,
+      "faith": 0.2,
+      "arcane": 0.1
+    },
+    "hex_damage_type": "physical",
+    "affinity_damage_fraction": 0.15
   },
   "effects": {}
 }

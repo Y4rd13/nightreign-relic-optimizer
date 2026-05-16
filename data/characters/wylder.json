@@ -32,7 +32,7 @@
     "name": "Sturdy Build",
     "description": "Slight HP and damage negation boost."
   },
-  "data_quality": "skeleton",
+  "data_quality": "full",
   "remembrance_slots": [
     {
       "name": "The Wylder's Earring",
@@ -76,7 +76,13 @@
     "damage_source_labels": {
       "primary": "Weapon",
       "secondary": "—"
-    }
+    },
+    "damage_scaling": {
+      "strength": 0.7,
+      "dexterity": 0.3
+    },
+    "hex_damage_type": "physical",
+    "affinity_damage_fraction": 0.08
   },
   "effects": {}
 }

@@ -21,18 +21,18 @@
   ],
   "dual_wield": true,
   "skill": {
-    "name": "Cragblade Stance",
-    "description": "Perfect parry stance; counter-hits with buffed damage."
+    "name": "Suncatcher",
+    "description": "Perfect-deflect stance that charges a counter strike; 4 deflects fill the charge, next heavy hits ~1.6× damage."
   },
   "ultimate": {
-    "name": "Crimson Slaughter",
-    "description": "Unlocks cursed sword with massive damage during channel."
+    "name": "Aspects of the Crucible: Beast",
+    "description": "Transform into a Crucible Beast (physical claws + roar + conjured blade finisher); doubles max HP while active."
   },
   "passive": {
     "name": "Aspects of the Crucible: Beast",
-    "description": "HP regen + attack boost after successful parry/skill."
+    "description": "Aggressive melee kit rewarded by successful parries/skill charges."
   },
-  "data_quality": "skeleton",
+  "data_quality": "full",
   "remembrance_slots": [
     {
       "name": "Golden Sprout",
@@ -75,7 +75,16 @@
     "damage_source_labels": {
       "primary": "Katana",
       "secondary": "—"
-    }
+    },
+    "damage_scaling": {
+      "dexterity": 1.0,
+      "arcane": 0.9,
+      "strength": 0.25,
+      "intelligence": 0.1,
+      "faith": 0.1
+    },
+    "hex_damage_type": "physical",
+    "affinity_damage_fraction": 0.05
   },
   "effects": {}
 }

@@ -31,7 +31,7 @@
     "name": "Affinity Draw",
     "description": "Auto-collects affinity residues from defeated enemies."
   },
-  "data_quality": "skeleton",
+  "data_quality": "full",
   "remembrance_slots": [
     {
       "name": "Bone-Like Stone",
@@ -72,7 +72,14 @@
     "damage_source_labels": {
       "primary": "Sorcery",
       "secondary": "—"
-    }
+    },
+    "damage_scaling": {
+      "intelligence": 0.6,
+      "faith": 0.6,
+      "arcane": 0.3
+    },
+    "hex_damage_type": "magic",
+    "affinity_damage_fraction": 0.9
   },
   "effects": {}
 }

@@ -476,6 +476,17 @@ def compute(
     g: dict[str, Any] = chars_mod.merged_globals(character_id)
     effects = list(effects)
 
+    # Character's weapon categories — drives weapon-scope bucket routing. Any
+    # effect whose `mult_scope` matches one of the character's weapons (e.g.
+    # "hammer" for Undertaker, "dagger"/"straight_sword" for Duchess) routes
+    # to the primary weapon scope mult. Empty set falls back to legacy "hammer"
+    # so old presets serialised before per-weapon support keep behavior.
+    character_weapons: set[str] = set(
+        chars_mod.get(character_id).weapon_types or ()
+    )
+    if not character_weapons:
+        character_weapons = {"hammer"}
+
     trance_base = float(g.get("trance_multiplier", 1.15))
 
     # Compose effective uptimes once per build. This lets "trance_active"
@@ -520,10 +531,17 @@ def compute(
         if prior is None or effective > prior[0]:
             buckets[e.bucket] = (effective, e.mult_scope)
 
+    # `hammer_scope_mult` is a historical name — it's really "primary-weapon
+    # scope mult" for the character. Any bucket whose scope matches one of the
+    # character's weapon_types routes here multiplicatively. For Undertaker
+    # (weapons={"hammer"}) the behavior is unchanged; for e.g. Duchess
+    # (weapons={"dagger","straight_sword"}) an Improved Dagger Attack Power
+    # effect now cascades through this mult the same way Improved Hammer does
+    # for Undertaker.
     hammer_scope_mult = 1.0
     hex_scope_mult = 1.0
     for bucket_name, (val, scope) in buckets.items():
-        if scope == "hammer":
+        if scope in character_weapons:
             hammer_scope_mult *= val
         elif scope == "hex_only":
             hex_scope_mult *= val
@@ -595,9 +613,14 @@ def compute(
 
     all_bucket_product = 1.0
     for bucket_name, (val, scope) in buckets.items():
-        if scope in ("hammer", "hex_only"):
-            continue
-        all_bucket_product *= val
+        # Only "all"-scoped buckets (and affinity_only, which rewrites itself
+        # to "all" above) contribute to the universal multiplier.
+        # Weapon-scoped buckets go to hammer_scope_mult when they match the
+        # character's weapons — and are dropped entirely when they don't
+        # (wrong weapon = no contribution).
+        # hex_only stays isolated in hex_scope_mult.
+        if scope == "all":
+            all_bucket_product *= val
 
     trance_scope = 1.0 + (trance_base - 1.0) * trance_uptime
 
@@ -605,7 +628,12 @@ def compute(
     hex_mult = all_bucket_product * hex_scope_mult * trance_scope * utility_mult
 
     per_hammer = hammer_mult * (1.0 + additive_phys)
-    per_hex = hex_mult * (1.0 + additive_all + additive_phys * 0.5)
+    # Phys additives hit hex at full weight when the character's hex is
+    # physical (e.g. Undertaker's Loathsome Hex — a melee bone-strike).
+    # For elemental/mixed hex damage types the 0.5 compromise matches the
+    # historical tuning. Unset hex_damage_type falls through to 0.5.
+    hex_phys_weight = 1.0 if hex_affinity == "physical" else 0.5
+    per_hex = hex_mult * (1.0 + additive_all + additive_phys * hex_phys_weight)
 
     hammer_rate = float(g.get("hammer_hits_per_boss_window_s", 0.8))
     hex_rate = float(g.get("hex_casts_per_boss_window_s", 0.22))

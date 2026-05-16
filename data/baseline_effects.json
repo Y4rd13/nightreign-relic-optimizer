@@ -11,31 +11,31 @@
   "effects": {
     "7001400": {
       "label": "Physical Attack Up",
-      "additive": 0.02,
+      "additive": 0.04,
       "additive_scope": "phys",
       "stackable": true
     },
     "7001401": {
       "label": "Physical Attack Up +1",
-      "additive": 0.025,
+      "additive": 0.05,
       "additive_scope": "phys",
       "stackable": true
     },
     "7001402": {
       "label": "Physical Attack Up +2 (BTH)",
-      "additive": 0.035,
+      "additive": 0.06,
       "additive_scope": "phys",
       "stackable": true
     },
     "6001400": {
       "label": "Physical Attack Up +3 (DoN)",
-      "additive": 0.05,
+      "additive": 0.105,
       "additive_scope": "phys",
       "stackable": true
     },
     "6001401": {
       "label": "Physical Attack Up +4 (DoN)",
-      "additive": 0.065,
+      "additive": 0.12,
       "additive_scope": "phys",
       "stackable": true
     },
@@ -284,14 +284,14 @@
     "6030900": {
       "label": "Grease Buff +1 (DoN)",
       "bucket": "B_GREASE",
-      "mult": 1.13,
+      "mult": 1.17,
       "mult_scope": "all",
       "requires": "grease_used"
     },
     "6030901": {
       "label": "Grease Buff +2 (DoN)",
       "bucket": "B_GREASE",
-      "mult": 1.16,
+      "mult": 1.2,
       "mult_scope": "all",
       "requires": "grease_used"
     },
@@ -519,124 +519,148 @@
       "requires": "three_primary_equipped"
     },
     "7330000": {
-      "label": "Improved Dagger Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Dagger Attack Power",
+      "bucket": "B_IMPROVED_DAGGER",
+      "mult": 1.09,
+      "mult_scope": "dagger"
     },
     "7330100": {
-      "label": "Improved Straight Sword Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Straight Sword Attack Power",
+      "bucket": "B_IMPROVED_STRAIGHT_SWORD",
+      "mult": 1.09,
+      "mult_scope": "straight_sword"
     },
     "7330200": {
-      "label": "Improved Greatsword Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Greatsword Attack Power",
+      "bucket": "B_IMPROVED_GREATSWORD",
+      "mult": 1.09,
+      "mult_scope": "greatsword"
     },
     "7330300": {
-      "label": "Improved Colossal Sword Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Colossal Sword Attack Power",
+      "bucket": "B_IMPROVED_COLOSSAL_SWORD",
+      "mult": 1.09,
+      "mult_scope": "colossal_sword"
     },
     "7330400": {
-      "label": "Improved Curved Sword Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Curved Sword Attack Power",
+      "bucket": "B_IMPROVED_CURVED_SWORD",
+      "mult": 1.09,
+      "mult_scope": "curved_sword"
     },
     "7330500": {
-      "label": "Improved Curved Greatsword Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Curved Greatsword Attack Power",
+      "bucket": "B_IMPROVED_CURVED_GREATSWORD",
+      "mult": 1.09,
+      "mult_scope": "curved_greatsword"
     },
     "7330600": {
-      "label": "Improved Katana Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Katana Attack Power",
+      "bucket": "B_IMPROVED_KATANA",
+      "mult": 1.09,
+      "mult_scope": "katana"
     },
     "7330700": {
-      "label": "Improved Twinblade Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Twinblade Attack Power",
+      "bucket": "B_IMPROVED_TWINBLADE",
+      "mult": 1.09,
+      "mult_scope": "twinblade"
     },
     "7330800": {
-      "label": "Improved Thrusting Sword Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Thrusting Sword Attack Power",
+      "bucket": "B_IMPROVED_THRUSTING_SWORD",
+      "mult": 1.09,
+      "mult_scope": "thrusting_sword"
     },
     "7330900": {
-      "label": "Improved Heavy Thrusting Sword Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Heavy Thrusting Sword Attack Power",
+      "bucket": "B_IMPROVED_HEAVY_THRUSTING_SWORD",
+      "mult": 1.09,
+      "mult_scope": "heavy_thrusting_sword"
     },
     "7331000": {
-      "label": "Improved Axe Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Axe Attack Power",
+      "bucket": "B_IMPROVED_AXE",
+      "mult": 1.09,
+      "mult_scope": "axe"
     },
     "7331100": {
-      "label": "Improved Greataxe Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Greataxe Attack Power",
+      "bucket": "B_IMPROVED_GREATAXE",
+      "mult": 1.09,
+      "mult_scope": "greataxe"
     },
     "7331200": {
-      "label": "Improved Hammer Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Hammer Attack Power",
+      "bucket": "B_IMPROVED_HAMMER",
+      "mult": 1.09,
+      "mult_scope": "hammer"
     },
     "7331300": {
-      "label": "Improved Great Hammer Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Great Hammer Attack Power",
+      "bucket": "B_IMPROVED_GREATHAMMER",
+      "mult": 1.09,
+      "mult_scope": "greathammer"
     },
     "7331400": {
-      "label": "Improved Flail Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Flail Attack Power",
+      "bucket": "B_IMPROVED_FLAIL",
+      "mult": 1.09,
+      "mult_scope": "flail"
     },
     "7331500": {
-      "label": "Improved Spear Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Spear Attack Power",
+      "bucket": "B_IMPROVED_SPEAR",
+      "mult": 1.09,
+      "mult_scope": "spear"
     },
     "7331700": {
-      "label": "Improved Great Spear Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Great Spear Attack Power",
+      "bucket": "B_IMPROVED_GREAT_SPEAR",
+      "mult": 1.09,
+      "mult_scope": "great_spear"
     },
     "7331800": {
-      "label": "Improved Halberd Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Halberd Attack Power",
+      "bucket": "B_IMPROVED_HALBERD",
+      "mult": 1.09,
+      "mult_scope": "halberd"
     },
     "7331900": {
-      "label": "Improved Reaper Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Reaper Attack Power",
+      "bucket": "B_IMPROVED_REAPER",
+      "mult": 1.09,
+      "mult_scope": "reaper"
     },
     "7332000": {
-      "label": "Improved Fist Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Fist Attack Power",
+      "bucket": "B_IMPROVED_FIST",
+      "mult": 1.09,
+      "mult_scope": "fist"
     },
     "7332100": {
-      "label": "Improved Claw Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Claw Attack Power",
+      "bucket": "B_IMPROVED_CLAW",
+      "mult": 1.09,
+      "mult_scope": "claw"
     },
     "7332200": {
-      "label": "Improved Whip Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Whip Attack Power",
+      "bucket": "B_IMPROVED_WHIP",
+      "mult": 1.09,
+      "mult_scope": "whip"
     },
     "7332300": {
-      "label": "Improved Colossal Weapon Atk",
-      "additive": 0.09,
-      "additive_scope": "phys"
+      "label": "Improved Colossal Weapon Attack Power",
+      "bucket": "B_IMPROVED_COLOSSAL_WEAPON",
+      "mult": 1.09,
+      "mult_scope": "colossal_weapon"
     },
     "7332400": {
-      "label": "Improved Bow Atk",
-      "additive": 0.06,
-      "additive_scope": "phys"
+      "label": "Improved Bow Attack Power",
+      "bucket": "B_IMPROVED_BOW",
+      "mult": 1.06,
+      "mult_scope": "bow"
     },
     "7006600": {
       "label": "Improved Melee Attack Power",
@@ -676,6 +700,126 @@
       "label": "Physical Attack Up +2 (alt)",
       "additive": 0.035,
       "additive_scope": "phys",
+      "stackable": true
+    },
+    "7001500": {
+      "label": "Magic Attack Power Up",
+      "additive": 0.045,
+      "additive_scope": "magic",
+      "stackable": true
+    },
+    "7001501": {
+      "label": "Magic Attack Power Up +1",
+      "additive": 0.055,
+      "additive_scope": "magic",
+      "stackable": true
+    },
+    "7001502": {
+      "label": "Magic Attack Power Up +2 (BTH)",
+      "additive": 0.065,
+      "additive_scope": "magic",
+      "stackable": true
+    },
+    "6001500": {
+      "label": "Magic Attack Power Up +3 (DoN)",
+      "additive": 0.105,
+      "additive_scope": "magic",
+      "stackable": true
+    },
+    "6001501": {
+      "label": "Magic Attack Power Up +4 (DoN)",
+      "additive": 0.12,
+      "additive_scope": "magic",
+      "stackable": true
+    },
+    "7001600": {
+      "label": "Fire Attack Power Up",
+      "additive": 0.045,
+      "additive_scope": "fire",
+      "stackable": true
+    },
+    "7001601": {
+      "label": "Fire Attack Power Up +1",
+      "additive": 0.055,
+      "additive_scope": "fire",
+      "stackable": true
+    },
+    "7001602": {
+      "label": "Fire Attack Power Up +2 (BTH)",
+      "additive": 0.065,
+      "additive_scope": "fire",
+      "stackable": true
+    },
+    "6001600": {
+      "label": "Fire Attack Power Up +3 (DoN)",
+      "additive": 0.105,
+      "additive_scope": "fire",
+      "stackable": true
+    },
+    "6001601": {
+      "label": "Fire Attack Power Up +4 (DoN)",
+      "additive": 0.12,
+      "additive_scope": "fire",
+      "stackable": true
+    },
+    "7001700": {
+      "label": "Lightning Attack Power Up",
+      "additive": 0.045,
+      "additive_scope": "lightning",
+      "stackable": true
+    },
+    "7001701": {
+      "label": "Lightning Attack Power Up +1",
+      "additive": 0.055,
+      "additive_scope": "lightning",
+      "stackable": true
+    },
+    "7001702": {
+      "label": "Lightning Attack Power Up +2 (BTH)",
+      "additive": 0.065,
+      "additive_scope": "lightning",
+      "stackable": true
+    },
+    "6001700": {
+      "label": "Lightning Attack Power Up +3 (DoN)",
+      "additive": 0.105,
+      "additive_scope": "lightning",
+      "stackable": true
+    },
+    "6001701": {
+      "label": "Lightning Attack Power Up +4 (DoN)",
+      "additive": 0.12,
+      "additive_scope": "lightning",
+      "stackable": true
+    },
+    "7001800": {
+      "label": "Holy Attack Power Up",
+      "additive": 0.045,
+      "additive_scope": "holy",
+      "stackable": true
+    },
+    "7001801": {
+      "label": "Holy Attack Power Up +1",
+      "additive": 0.055,
+      "additive_scope": "holy",
+      "stackable": true
+    },
+    "7001802": {
+      "label": "Holy Attack Power Up +2 (BTH)",
+      "additive": 0.065,
+      "additive_scope": "holy",
+      "stackable": true
+    },
+    "6001800": {
+      "label": "Holy Attack Power Up +3 (DoN)",
+      "additive": 0.105,
+      "additive_scope": "holy",
+      "stackable": true
+    },
+    "6001801": {
+      "label": "Holy Attack Power Up +4 (DoN)",
+      "additive": 0.12,
+      "additive_scope": "holy",
       "stackable": true
     }
   }

@@ -25,7 +25,7 @@
   },
   "ultimate": {
     "name": "Loathsome Hex",
-    "description": "Channelled holy damage projection; scales with character level."
+    "description": "Physical melee strike after a bone-pull lunge; scales with character level."
   },
   "passive": {
     "name": "Confluence",
@@ -56,7 +56,7 @@
       "strength": 0.4,
       "faith": 0.4
     },
-    "hex_damage_type": "holy",
+    "hex_damage_type": "physical",
     "affinity_damage_fraction": 0.045,
     "playstyle_tags": [
       "melee",
@@ -176,12 +176,6 @@
       "mult": 1.2,
       "mult_scope": "all",
       "requires": "three_hammers_equipped"
-    },
-    "7331200": {
-      "label": "L21 Improved Hammer Atk",
-      "bucket": "B_L21",
-      "mult": 1.06,
-      "mult_scope": "hammer"
     }
   }
 }

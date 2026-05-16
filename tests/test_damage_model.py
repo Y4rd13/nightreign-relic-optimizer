@@ -137,3 +137,36 @@ def test_raw_to_numeric_fractional_intra_grade_visible():
     assert a_plus3 - a_base >= 0.15, (
         f"+3 STR barely moves radar: {a_base} → {a_plus3}"
     )
+
+
+# ═════════════════════════════════════════════════════════════
+# Weapon-scope routing — bucket routes to primary-weapon mult
+# when the effect's mult_scope matches one of the character's
+# declared weapon_types.
+# ═════════════════════════════════════════════════════════════
+def test_weapon_scope_routes_for_undertaker_hammer():
+    """Improved Hammer Attack Power (#7331200, mult 1.09 hammer) must raise
+    Undertaker's hammer_mult — her weapon_types includes 'hammer'. Safety
+    anchor for the weapon-scope router."""
+    eff = find_for_character(7331200, "undertaker")
+    empty = compute([], character_id="undertaker")
+    withh = compute([eff], character_id="undertaker")
+    assert withh.hammer_mult > empty.hammer_mult + 0.08, (
+        f"Undertaker hammer_mult barely moved: {empty.hammer_mult:.3f} "
+        f"→ {withh.hammer_mult:.3f}"
+    )
+
+
+def test_weapon_scope_ignored_when_weapon_not_in_types():
+    """If an effect is weapon-scoped to a category the character doesn't use,
+    it must not boost hammer_mult. Uses the Hammer effect against Ironeye
+    (weapon_types=bow/light_bow), which ignores hammer-scoped effects."""
+    eff = find_for_character(7331200, "ironeye")  # Improved Hammer
+    empty = compute([], character_id="ironeye")
+    withh = compute([eff], character_id="ironeye")
+    # Allow tiny drift from other side-effects; the 1.09 mult should NOT land.
+    assert withh.hammer_mult < empty.hammer_mult + 0.02, (
+        f"Ironeye hammer_mult leaked 'hammer'-scope boost: "
+        f"{empty.hammer_mult:.3f} → {withh.hammer_mult:.3f} "
+        f"(ironeye uses bows, not hammers)"
+    )

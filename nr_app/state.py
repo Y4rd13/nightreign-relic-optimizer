@@ -368,6 +368,57 @@ class DormantPowerRow(rx.Base):
     is_damage: bool = False
 
 
+# ── compendium rows — flat dicts for the browsable reference DB ──
+class CompendiumEffectRow(rx.Base):
+    effect_id: int = 0
+    name: str = ""
+    group: str = ""
+    tier: str = ""
+    category: str = ""          # from effects_enriched.json (Utility/Offensive/…)
+    effect_text: str = ""       # rich description when available
+    stackable: bool = False
+    character_tag: str = ""     # "[Guardian]" etc. extracted, empty if none
+
+
+class CompendiumRelicRow(rx.Base):
+    id: str = ""
+    name: str = ""
+    source_type: str = ""       # shop / remembrance / boss_everdark / other
+    source_detail: str = ""
+    color: str = "U"
+    character: str = ""
+    attr_ids: list[int] = []
+    attr_names: list[str] = []
+    description: str = ""
+
+
+class CompendiumCharacterRow(rx.Base):
+    id: str = ""
+    name: str = ""
+    icon: str = ""
+    tag: str = ""
+    tagline: str = ""
+    weapon_types: list[str] = []
+    dual_wield: bool = False
+    skill_name: str = ""
+    skill_desc: str = ""
+    ultimate_name: str = ""
+    ultimate_desc: str = ""
+    passive_name: str = ""
+    passive_desc: str = ""
+    remembrance_name: str = ""
+    data_quality: str = ""
+
+
+class CompendiumBossRow(rx.Base):
+    id: int = 0
+    name: str = ""
+    type: str = ""              # Evergoal / Field / Night / Location
+    threat: str = ""            # Small / Medium / Large / Night
+    npc_id: int = 0
+    notes: str = ""
+
+
 _TEXT_PCT_RE = re.compile(r"by\s*(\d+(?:\.\d+)?)\s*%", re.I)
 _TEXT_FLAT_RE = re.compile(
     r"(?:by|restores?|raises?|increases?|reduces?)\s*(\d+(?:\.\d+)?)\b", re.I
@@ -388,6 +439,46 @@ def _classify_contrib_status(e: Effect) -> str:
     if txt and (_TEXT_PCT_RE.search(txt) or _TEXT_FLAT_RE.search(txt)):
         return "textual"
     return "flat"
+
+
+_COMPENDIUM_ROOT = None   # resolved once lazily to avoid circular imports
+
+
+def _compendium_data_dir():
+    """Path to data/ lazily — avoids importing src.characters at module top."""
+    global _COMPENDIUM_ROOT
+    if _COMPENDIUM_ROOT is None:
+        from pathlib import Path as _P
+        _COMPENDIUM_ROOT = _P(__file__).resolve().parent.parent / "data"
+    return _COMPENDIUM_ROOT
+
+
+def _load_enriched_effects() -> dict[str, dict]:
+    """effects_enriched.json keyed by str(effect_id) → {category, effect_text, ...}.
+    Cached via simple module-level memo."""
+    if not hasattr(_load_enriched_effects, "_cache"):
+        import json as _json
+        p = _compendium_data_dir() / "effects_enriched.json"
+        if p.exists():
+            with p.open(encoding="utf-8") as fh:
+                raw = _json.load(fh)
+            _load_enriched_effects._cache = raw.get("effects", {}) if isinstance(raw, dict) else {}
+        else:
+            _load_enriched_effects._cache = {}
+    return _load_enriched_effects._cache
+
+
+def _load_bosses() -> list[dict]:
+    if not hasattr(_load_bosses, "_cache"):
+        import json as _json
+        p = _compendium_data_dir() / "bosses.json"
+        if p.exists():
+            with p.open(encoding="utf-8") as fh:
+                raw = _json.load(fh)
+            _load_bosses._cache = raw.get("bosses", []) if isinstance(raw, dict) else []
+        else:
+            _load_bosses._cache = []
+    return _load_bosses._cache
 
 
 def _attr_row(e: Effect, contrib_info: dict | float = 0.0) -> AttrRow:
@@ -518,6 +609,12 @@ class State(rx.State):
     # Without this, Reflex caches the first call and later saves never show up.
     preset_version: int = 0
 
+    # Name of the preset currently loaded in the editor (""=none). Drives the
+    # sidebar "Save" button (in-place overwrite of the active preset) vs.
+    # "Save as…" (prompt for a new name). Set by load_preset, cleared by
+    # set_character and by delete_preset when the active name matches.
+    active_preset_name: str = ""
+
     # ── computed build cache (populated by recompute()) ───────────
     build_slots: list[SlotData] = []
     damage_total: float = 0.0
@@ -601,6 +698,19 @@ class State(rx.State):
     v_attr_ids: list[int] = [0, 0, 0]
     v_debuff_id: int = 0
     v_search: list[str] = ["", "", ""]
+
+    # ── compendium state ─────────────────────────────────────────
+    # Browsable reference DB — Effects / Relics / Characters / Bosses. Filters
+    # live on State so Reflex re-derives the @rx.var lists on each keystroke.
+    compendium_sub_tab: str = "effects"
+    cmp_effects_search: str = ""
+    cmp_effects_category: str = "all"
+    cmp_effects_page: int = 0
+    cmp_relics_search: str = ""
+    cmp_relics_source: str = "all"         # all | shop | remembrance | boss_everdark | other
+    cmp_relics_color: str = "all"          # all | R | G | B | Y | U
+    cmp_bosses_search: str = ""
+    cmp_bosses_type: str = "all"           # all | Evergoal | Field | Night | Location
 
     # ═════════════════════════════════════════════════════════════
     # DERIVED
@@ -1630,6 +1740,9 @@ class State(rx.State):
         self.damage_scaling_override = {}
         self.build_goal_weights_override = {}
         self.explore_seed = 0
+        # Presets are per-character; a loaded Undertaker preset must not
+        # be overwritable after the user switches to Guardian.
+        self.active_preset_name = ""
         self.recompute()
 
     def set_mode(self, m: str):
@@ -2356,9 +2469,38 @@ class State(rx.State):
             locked_attrs=locks,
             vessel_id=self.vessel_id or None,
         )
+        # A fresh "Save as" becomes the new active preset — the next click of
+        # the plain "Save" button should overwrite this one, not prompt again.
+        self.active_preset_name = name
         self.preset_version += 1
         self.close_preset()
         return rx.toast.success(f"Saved preset '{name}'")
+
+    def save_active_preset(self):
+        """In-place save for the currently-loaded preset. No dialog — reuses
+        the stored name. If nothing is loaded, surfaces an error instead of
+        silently falling back to 'Save as', which would be a footgun."""
+        name = self.active_preset_name.strip()
+        if not name:
+            return rx.toast.error(
+                "No build loaded to save over. Use 'Save as…' to name a new one."
+            )
+        cfg = self._cfg()
+        build, contrib = optimize(cfg)
+        locks = {_unk(k): v for k, v in self.locked_picks.items()}
+        presets_mod.upsert(
+            name=name,
+            character_id=self.character_id,
+            mode=self.mode,
+            build=build,
+            contrib=contrib,
+            ctx=self._ctx(),
+            excluded_ids=self.excluded_ids,
+            locked_attrs=locks,
+            vessel_id=self.vessel_id or None,
+        )
+        self.preset_version += 1
+        return rx.toast.success(f"Updated '{name}'")
 
     @rx.var
     def saved_presets(self) -> list[PresetRow]:
@@ -2531,11 +2673,14 @@ class State(rx.State):
                 setattr(self, state_field, ctx[ctx_key])
         if p.build_goal_weights:
             self.build_goal_weights_override = dict(p.build_goal_weights)
+        self.active_preset_name = name
         self.recompute()
         return rx.toast.success(f"Loaded '{name}' ({p.total_boss_window:.2f} dmg)")
 
     def delete_preset(self, name: str):
         presets_mod.delete(name, self.character_id)
+        if name == self.active_preset_name:
+            self.active_preset_name = ""
         self.preset_version += 1
         return rx.toast.info(f"Deleted '{name}'")
 
@@ -2680,6 +2825,218 @@ class State(rx.State):
     # ═════════════════════════════════════════════════════════════
     def set_tab(self, t: str):
         self.active_tab = t
+
+    # ═════════════════════════════════════════════════════════════
+    # COMPENDIUM — browsable reference DB
+    # ═════════════════════════════════════════════════════════════
+    _COMPENDIUM_PAGE_SIZE = 50
+
+    def set_compendium_sub_tab(self, t: str): self.compendium_sub_tab = t
+
+    def set_cmp_effects_search(self, s: str):
+        self.cmp_effects_search = s
+        self.cmp_effects_page = 0  # reset pagination when search changes
+
+    def set_cmp_effects_category(self, c: str):
+        self.cmp_effects_category = c
+        self.cmp_effects_page = 0
+
+    def cmp_effects_next_page(self):
+        self.cmp_effects_page += 1
+
+    def cmp_effects_prev_page(self):
+        if self.cmp_effects_page > 0:
+            self.cmp_effects_page -= 1
+
+    def set_cmp_relics_search(self, s: str): self.cmp_relics_search = s
+    def set_cmp_relics_source(self, v: str): self.cmp_relics_source = v
+    def set_cmp_relics_color(self, v: str): self.cmp_relics_color = v
+    def set_cmp_bosses_search(self, s: str): self.cmp_bosses_search = s
+    def set_cmp_bosses_type(self, v: str): self.cmp_bosses_type = v
+
+    @rx.var
+    def cmp_effects_categories(self) -> list[str]:
+        """Distinct categories from effects_enriched.json — for the filter dropdown."""
+        cats = {"all"}
+        for meta in _load_enriched_effects().values():
+            c = (meta.get("category") or "").strip()
+            if c:
+                cats.add(c)
+        return sorted(cats, key=lambda x: (x != "all", x.lower()))
+
+    @rx.var
+    def cmp_effects_filtered(self) -> list[CompendiumEffectRow]:
+        """Filtered + paginated effect list. Shows ONLY rollable entries
+        (tier in STD/BTH/DoN). ILLEGAL/N/A placeholders create visual
+        duplicates with the same name and have no value in a browse-only
+        reference tab."""
+        from src.effects_db import ROLLABLE_TIERS, _raw_ce_rows, _character_tag
+        enriched = _load_enriched_effects()
+        q = self.cmp_effects_search.strip().lower()
+        cat_filter = self.cmp_effects_category
+        rows: list[CompendiumEffectRow] = []
+        for r in _raw_ce_rows():
+            name = r.get("name", "")
+            if name.strip() == "#N/A":
+                continue
+            if r.get("tier") not in ROLLABLE_TIERS:
+                continue
+            if q and q not in name.lower():
+                continue
+            meta = enriched.get(str(r["effect_id"]), {})
+            cat = (meta.get("category") or "").strip()
+            if cat_filter != "all" and cat != cat_filter:
+                continue
+            rows.append(CompendiumEffectRow(
+                effect_id=r["effect_id"],
+                name=name,
+                group=r.get("group", ""),
+                tier=r.get("tier", ""),
+                category=cat,
+                effect_text=(meta.get("effect_text") or "").strip(),
+                stackable=bool(r.get("stackable") or meta.get("stack_self")),
+                character_tag=(_character_tag(name) or ""),
+            ))
+        rows.sort(key=lambda x: x.name.lower())
+        start = self.cmp_effects_page * self._COMPENDIUM_PAGE_SIZE
+        return rows[start:start + self._COMPENDIUM_PAGE_SIZE]
+
+    @rx.var
+    def cmp_effects_total_count(self) -> int:
+        """Total count matching current filter (pre-pagination) — drives pager UI."""
+        from src.effects_db import ROLLABLE_TIERS, _raw_ce_rows
+        enriched = _load_enriched_effects()
+        q = self.cmp_effects_search.strip().lower()
+        cat_filter = self.cmp_effects_category
+        n = 0
+        for r in _raw_ce_rows():
+            if r.get("name", "").strip() == "#N/A":
+                continue
+            if r.get("tier") not in ROLLABLE_TIERS:
+                continue
+            if q and q not in r.get("name", "").lower():
+                continue
+            meta = enriched.get(str(r["effect_id"]), {})
+            cat = (meta.get("category") or "").strip()
+            if cat_filter != "all" and cat != cat_filter:
+                continue
+            n += 1
+        return n
+
+    @rx.var
+    def cmp_effects_page_info(self) -> str:
+        total = self.cmp_effects_total_count
+        start = self.cmp_effects_page * self._COMPENDIUM_PAGE_SIZE + 1
+        end = min(start + self._COMPENDIUM_PAGE_SIZE - 1, total)
+        if total == 0:
+            return "no matches"
+        return f"{start}-{end} of {total}"
+
+    @rx.var
+    def cmp_effects_has_next(self) -> bool:
+        return (self.cmp_effects_page + 1) * self._COMPENDIUM_PAGE_SIZE < self.cmp_effects_total_count
+
+    @rx.var
+    def cmp_relics_filtered(self) -> list[CompendiumRelicRow]:
+        from src.effects_db import _raw_ce_rows
+        eff_by_id = {int(r["effect_id"]): r.get("name", "") for r in _raw_ce_rows()}
+        q = self.cmp_relics_search.strip().lower()
+        sf = self.cmp_relics_source
+        cf = self.cmp_relics_color
+        rows: list[CompendiumRelicRow] = []
+        for r in chars_mod.list_named_relics():
+            name = r.get("name", "")
+            source_type = r.get("source_type") or r.get("source", "other")
+            color = r.get("color", "U")
+            if sf != "all" and source_type != sf:
+                continue
+            if cf != "all" and color != cf:
+                continue
+            if q and q not in name.lower() and q not in (r.get("description") or "").lower():
+                continue
+            attr_ids = [int(x) for x in r.get("attrs", [])]
+            rows.append(CompendiumRelicRow(
+                id=r.get("id", ""),
+                name=name,
+                source_type=source_type,
+                source_detail=r.get("source_detail", ""),
+                color=color,
+                character=r.get("character", "any"),
+                attr_ids=attr_ids,
+                attr_names=[eff_by_id.get(aid, f"#{aid}") for aid in attr_ids],
+                description=r.get("description", ""),
+            ))
+        rows.sort(key=lambda x: (x.source_type, x.name.lower()))
+        return rows
+
+    @rx.var
+    def cmp_characters(self) -> list[CompendiumCharacterRow]:
+        rows: list[CompendiumCharacterRow] = []
+        for c in chars_mod.list_characters():
+            remembrance_name = ""
+            if c.remembrance_slots:
+                remembrance_name = c.remembrance_slots[0].get("name", "")
+            rows.append(CompendiumCharacterRow(
+                id=c.id,
+                name=c.name,
+                icon=c.icon,
+                tag=c.tag,
+                tagline=c.tagline,
+                weapon_types=list(c.weapon_types),
+                dual_wield=c.dual_wield,
+                skill_name=(c.skill or {}).get("name", ""),
+                skill_desc=(c.skill or {}).get("description", ""),
+                ultimate_name=(c.ultimate or {}).get("name", ""),
+                ultimate_desc=(c.ultimate or {}).get("description", ""),
+                passive_name=(c.passive or {}).get("name", ""),
+                passive_desc=(c.passive or {}).get("description", ""),
+                remembrance_name=remembrance_name,
+                data_quality=c.data_quality,
+            ))
+        rows.sort(key=lambda x: x.name.lower())
+        return rows
+
+    @rx.var
+    def cmp_bosses_filtered(self) -> list[CompendiumBossRow]:
+        """Skip entries without a proper display name — bosses.json carries
+        ~27 NPC-id-only stubs that aren't useful for browsing. They'll
+        surface once the data source attaches display names."""
+        q = self.cmp_bosses_search.strip().lower()
+        tf = self.cmp_bosses_type
+        rows: list[CompendiumBossRow] = []
+        for b in _load_bosses():
+            name = (b.get("name") or "").strip()
+            if not name:
+                continue
+            btype = b.get("type") or ""
+            if tf != "all" and btype != tf:
+                continue
+            if q and q not in name.lower():
+                continue
+            rows.append(CompendiumBossRow(
+                id=int(b.get("id") or 0),
+                name=name,
+                type=btype,
+                threat=b.get("threat") or "",
+                npc_id=int(b.get("npc_id") or 0),
+                notes=(b.get("notes") or "").strip(),
+            ))
+        rows.sort(key=lambda x: (x.type, x.name.lower()))
+        return rows
+
+    @rx.var
+    def cmp_bosses_total_count(self) -> int:
+        """Total bosses in data/bosses.json — for the 'X of Y shown' hint."""
+        return sum(1 for b in _load_bosses() if (b.get("name") or "").strip())
+
+    @rx.var
+    def cmp_boss_types(self) -> list[str]:
+        types = {"all"}
+        for b in _load_bosses():
+            t = b.get("type")
+            if t:
+                types.add(t)
+        return sorted(types, key=lambda x: (x != "all", x.lower()))
 
     # ═════════════════════════════════════════════════════════════
     # VALIDATOR TAB

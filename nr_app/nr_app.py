@@ -5,6 +5,7 @@ from __future__ import annotations
 import reflex as rx
 
 from .components.compare_tab import compare_tab
+from .components.compendium_tab import compendium_tab
 from .components.dialogs import (
     debuff_dialog,
     edit_dialog,
@@ -156,6 +157,7 @@ def _tabs() -> rx.Component:
             _tab_trigger("my_relics", "package", "My relics"),
             _tab_trigger("builds", "bookmark", "My builds"),
             _tab_trigger("compare", "scale", "Compare presets"),
+            _tab_trigger("compendium", "book_open", "Compendium"),
             style={
                 "gap": "8px",
                 "border_bottom": f"1px solid {PAL['surface0']}",
@@ -172,6 +174,8 @@ def _tabs() -> rx.Component:
         rx.tabs.content(my_builds_tab(), value="builds",
                         padding_top="4px"),
         rx.tabs.content(compare_tab(), value="compare",
+                        padding_top="4px"),
+        rx.tabs.content(compendium_tab(), value="compendium",
                         padding_top="4px"),
         value=State.active_tab,
         on_change=State.set_tab,

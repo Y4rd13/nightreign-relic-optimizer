@@ -151,6 +151,38 @@ def test_import_overwrite_replaces_existing(tmp_presets_path):
     assert loaded.damage_score != src.damage_score
 
 
+def test_upsert_same_key_replaces_in_place(tmp_presets_path):
+    """Contract the 'Save' (in-place) UX relies on: calling upsert twice with
+    the same (name, character_id) must overwrite — never produce a duplicate —
+    and the second call's payload must be what gets read back."""
+    cfg = OptimizerConfig(character_id="undertaker")
+    build, contrib = optimize(cfg)
+    first = presets_mod.upsert(
+        name="v1", character_id="undertaker", mode=cfg.mode,
+        build=build, contrib=contrib, ctx=cfg.ctx,
+        excluded_ids=[], locked_attrs={}, path=tmp_presets_path,
+    )
+    # Second call for the SAME key with a different payload (non-empty
+    # excluded_ids) — simulates the user loading v1, editing, then saving.
+    second = presets_mod.upsert(
+        name="v1", character_id="undertaker", mode=cfg.mode,
+        build=build, contrib=contrib, ctx=cfg.ctx,
+        excluded_ids=[12345, 67890], locked_attrs={}, path=tmp_presets_path,
+    )
+    all_for_char = presets_mod.list_for_character("undertaker", path=tmp_presets_path)
+    assert len(all_for_char) == 1, "upsert must replace, not append"
+    assert all_for_char[0].excluded_ids == [12345, 67890]
+    # Different character_id with same name is a different key — must NOT
+    # collide with the undertaker entry (guards the character scoping).
+    presets_mod.upsert(
+        name="v1", character_id="guardian", mode=cfg.mode,
+        build=build, contrib=contrib, ctx=cfg.ctx,
+        excluded_ids=[], locked_attrs={}, path=tmp_presets_path,
+    )
+    assert len(presets_mod.load_all(tmp_presets_path)) == 2
+    assert second.name == first.name
+
+
 def test_import_rejects_unknown_schema(tmp_presets_path):
     bad = {"schema": "foo/9", "type": "builds", "items": []}
     report = presets_mod.import_presets(bad, path=tmp_presets_path)

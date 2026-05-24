@@ -11,7 +11,7 @@ from __future__ import annotations
 import reflex as rx
 
 from ..state import State
-from ..theme import COLOR_SLOT, PAL
+from ..theme import COLOR_SLOT, PAL, bp
 
 
 def _empty_state() -> rx.Component:
@@ -325,7 +325,7 @@ def _import_dialog() -> rx.Component:
                 ),
                 spacing="3", width="100%",
             ),
-            max_width="520px",
+            max_width="min(95vw, 520px)",
         ),
         open=State.import_relics_dialog_open,
         on_open_change=State.set_import_relics_dialog_open,
@@ -388,7 +388,7 @@ def my_relics_tab() -> rx.Component:
                 _empty_state(),
                 rx.grid(
                     rx.foreach(State.my_relics_list, _relic_card),
-                    columns="repeat(auto-fit, minmax(340px, 1fr))",
+                    columns=bp("1", "repeat(auto-fit, minmax(340px, 1fr))"),
                     gap="14px",
                     width="100%",
                 ),

@@ -5,7 +5,7 @@ from __future__ import annotations
 import reflex as rx
 
 from ..state import State
-from ..theme import PAL
+from ..theme import PAL, bp
 from ..widgets import (
     attr_id_box,
     attr_sort,
@@ -330,7 +330,7 @@ def validator_tab() -> rx.Component:
             _attr_picker(0, State.v_candidate_options_0),
             _attr_picker(1, State.v_candidate_options_1),
             _attr_picker(2, State.v_candidate_options_2),
-            columns="repeat(auto-fit, minmax(280px, 1fr))",
+            columns=bp("1", "repeat(auto-fit, minmax(280px, 1fr))"),
             gap="12px",
             width="100%",
             margin_bottom="16px",

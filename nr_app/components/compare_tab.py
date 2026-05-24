@@ -320,7 +320,7 @@ def _current_build_radar_panel() -> rx.Component:
         ),
         rx.box(
             stats_radar(height=320, show_legend=True),
-            max_width="520px",
+            max_width="min(100%, 520px)",
         ),
         background=PAL["mantle"],
         border="1px solid",

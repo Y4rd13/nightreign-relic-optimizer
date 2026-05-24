@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import reflex as rx
+
 PAL = {
     "base":     "#11111b",
     "crust":    "#181825",
@@ -59,6 +61,15 @@ COLOR_SLOT = {
     "Y": ("Yellow",    "#f9e2af"),
     "U": ("Universal", "#cdd6f4"),
 }
+
+
+def bp(mobile, desktop, *, at: str = "md"):
+    """Two-step responsive value: ``mobile`` below the ``at`` breakpoint, ``desktop``
+    at/above it. Reflex named breakpoints are mobile-first (xs 30em, sm 48em,
+    md 62em≈992px, lg 80em, xl 96em); ``initial`` applies from 0 up. ``md`` is the
+    same desktop/mobile boundary ``rx.desktop_only`` uses, so the fixed sidebar and
+    the multi-column grids flip to single-column at the same width."""
+    return rx.breakpoints(initial=mobile, **{at: desktop})
 
 
 GLOBAL_STYLE = f"""

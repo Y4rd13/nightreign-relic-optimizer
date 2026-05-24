@@ -14,7 +14,7 @@ from __future__ import annotations
 import reflex as rx
 
 from ..state import State
-from ..theme import PAL
+from ..theme import PAL, bp
 
 
 def _legend_chip(color: str, label: str, dashed: bool = False) -> rx.Component:
@@ -390,7 +390,9 @@ def _chart_card(icon: str, label: str, child: rx.Component,
         ),
         child,
         flex="1",
-        min_width=min_width,
+        # Phones: each chart stacks full-width (min_width 100%); ≥sm keeps the
+        # original min_width so the desktop multi-column wrap is unchanged.
+        min_width=bp("100%", min_width, at="sm"),
         padding="8px 10px",
         background=PAL["crust"],
         border="1px solid",

@@ -642,8 +642,9 @@ def _controls_row() -> rx.Component:
     )
 
 
-def sidebar() -> rx.Component:
-    return rx.box(
+def _sidebar_body() -> rx.Component:
+    """Logo + controls accordion — reused by the desktop column and the mobile drawer."""
+    return rx.fragment(
         rx.hstack(
             rx.icon(tag="swords", size=22, color=PAL["mauve"]),
             rx.text("Nightreign",
@@ -1459,14 +1460,78 @@ def sidebar() -> rx.Component:
             variant="ghost",
             width="100%",
         ),
+    )
 
-        padding="14px 16px",
-        background=PAL["crust"],
-        border_right=f"1px solid {PAL['surface0']}",
-        width="320px",
-        min_width="320px",
-        height="100vh",
-        overflow_y="auto",
-        position="sticky",
-        top="0",
+
+def sidebar() -> rx.Component:
+    """Desktop: fixed 320px sticky left column. Renders nothing on mobile/tablet —
+    those widths use :func:`sidebar_drawer` instead."""
+    return rx.desktop_only(
+        rx.box(
+            _sidebar_body(),
+            padding="14px 16px",
+            background=PAL["crust"],
+            border_right=f"1px solid {PAL['surface0']}",
+            width="320px",
+            min_width="320px",
+            height="100vh",
+            overflow_y="auto",
+            position="sticky",
+            top="0",
+        ),
+    )
+
+
+def sidebar_drawer() -> rx.Component:
+    """Mobile/tablet: a hamburger button (placed in the title bar) that opens a
+    left drawer holding the same body. Renders nothing on desktop."""
+    return rx.mobile_and_tablet(
+        rx.drawer.root(
+            rx.drawer.trigger(
+                rx.button(
+                    rx.icon(tag="menu", size=22, color=PAL["mauve"]),
+                    variant="ghost",
+                    size="2",
+                ),
+            ),
+            rx.drawer.overlay(z_index="40"),
+            rx.drawer.portal(
+                rx.drawer.content(
+                    # Visually-hidden a11y title/description (Radix requires them on
+                    # dialog content for screen readers; the logo header is the visual title).
+                    rx.drawer.title(
+                        "Controls",
+                        style={"position": "absolute", "width": "1px", "height": "1px",
+                               "padding": "0", "margin": "-1px", "overflow": "hidden",
+                               "clip": "rect(0,0,0,0)", "white_space": "nowrap", "border": "0"},
+                    ),
+                    rx.drawer.description(
+                        "Character, mode, vessel, sliders, and presets.",
+                        style={"position": "absolute", "width": "1px", "height": "1px",
+                               "padding": "0", "margin": "-1px", "overflow": "hidden",
+                               "clip": "rect(0,0,0,0)", "white_space": "nowrap", "border": "0"},
+                    ),
+                    rx.vstack(
+                        rx.box(
+                            rx.drawer.close(
+                                rx.icon(tag="x", size=24, color=PAL["overlay1"]),
+                            ),
+                            width="100%",
+                            display="flex",
+                            justify_content="flex-end",
+                        ),
+                        _sidebar_body(),
+                        spacing="2",
+                        width="100%",
+                    ),
+                    height="100%",
+                    width="86vw",
+                    max_width="340px",
+                    padding="14px 16px",
+                    background=PAL["crust"],
+                    overflow_y="auto",
+                ),
+            ),
+            direction="left",
+        ),
     )

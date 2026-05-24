@@ -16,12 +16,12 @@ from .components.dialogs import (
 from .components.hero import hero
 from .components.my_builds_tab import my_builds_tab
 from .components.my_relics_tab import my_relics_tab
-from .components.sidebar import sidebar
+from .components.sidebar import sidebar, sidebar_drawer
 from .components.slot_card import slot_card
 from .components.stats_chart import character_stats_panel
 from .components.validator_tab import validator_tab
 from .state import State
-from .theme import PAL
+from .theme import PAL, bp
 
 
 def _title_bar() -> rx.Component:
@@ -61,7 +61,7 @@ def _title_bar() -> rx.Component:
             align="start",
             flex="1",
         ),
-        rx.box(),  # placeholder for future right-side controls
+        sidebar_drawer(),  # hamburger → drawer (mobile/tablet only; empty on desktop)
         width="100%",
         align="center",
         margin_bottom="18px",
@@ -105,7 +105,7 @@ def _optimizer_content() -> rx.Component:
                 ),
                 rx.grid(
                     rx.foreach(State.build_slots, slot_card),
-                    columns="repeat(auto-fit, minmax(460px, 1fr))",
+                    columns=bp("1", "repeat(auto-fit, minmax(460px, 1fr))"),
                     gap="14px",
                     width="100%",
                 ),
@@ -138,7 +138,7 @@ def _optimizer_content() -> rx.Component:
                     spacing="2",
                     align="stretch",
                 ),
-                columns="2",
+                columns=bp("1", "2"),
                 gap="20px",
                 width="100%",
             ),
@@ -160,6 +160,7 @@ def _tabs() -> rx.Component:
             _tab_trigger("compendium", "book_open", "Compendium"),
             style={
                 "gap": "8px",
+                "flex_wrap": "wrap",
                 "border_bottom": f"1px solid {PAL['surface0']}",
                 "margin_bottom": "18px",
                 "padding_bottom": "2px",
@@ -189,10 +190,11 @@ def index() -> rx.Component:
         rx.box(
             _title_bar(),
             _tabs(),
-            padding="22px 28px",
+            padding=bp("14px 12px", "22px 28px"),
             flex="1",
-            overflow_y="auto",
-            height="100vh",
+            min_width="0",
+            overflow_y=bp("visible", "auto"),
+            height=bp("auto", "100vh"),
         ),
         edit_dialog(),
         named_dialog(),
@@ -206,7 +208,7 @@ def index() -> rx.Component:
         ),
         spacing="0",
         align="start",
-        width="100vw",
+        width="100%",
         min_height="100vh",
         background=PAL["base"],
     )

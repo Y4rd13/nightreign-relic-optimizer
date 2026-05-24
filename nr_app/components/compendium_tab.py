@@ -15,7 +15,7 @@ from ..state import (
     CompendiumRelicRow,
     State,
 )
-from ..theme import COLOR_SLOT, PAL
+from ..theme import COLOR_SLOT, PAL, bp
 from ..widgets import group_badge, tier_badge
 
 
@@ -397,7 +397,7 @@ def _relics_subtab() -> rx.Component:
         _relics_filters(),
         rx.grid(
             rx.foreach(State.cmp_relics_filtered, _relic_card),
-            columns="repeat(auto-fit, minmax(360px, 1fr))",
+            columns=bp("1", "repeat(auto-fit, minmax(360px, 1fr))"),
             gap="12px",
             width="100%",
         ),
@@ -513,7 +513,7 @@ def _characters_subtab() -> rx.Component:
         ),
         rx.grid(
             rx.foreach(State.cmp_characters, _character_card),
-            columns="repeat(auto-fit, minmax(380px, 1fr))",
+            columns=bp("1", "repeat(auto-fit, minmax(380px, 1fr))"),
             gap="14px",
             width="100%",
         ),
@@ -677,6 +677,7 @@ def compendium_tab() -> rx.Component:
                 _sub_tab_trigger("bosses", "skull", "Bosses"),
                 style={
                     "gap": "6px",
+                    "flex_wrap": "wrap",
                     "border_bottom": f"1px solid {PAL['surface0']}",
                     "margin_bottom": "14px",
                     "padding_bottom": "2px",

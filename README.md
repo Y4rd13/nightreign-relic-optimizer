@@ -1,3 +1,17 @@
+---
+# Hugging Face Spaces reads this block to configure the Space; it must stay
+# first in the file. app_port 7860 + sdk docker route HF traffic to Caddy,
+# which fronts the Reflex frontend (:3000) and backend WebSocket (:8000).
+title: Nightreign Relic Optimizer
+emoji: ⚰️
+colorFrom: purple
+colorTo: blue
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+---
+
 # Nightreign Relic Optimizer
 
 Multi-objective build calculator for every Nightfarer in **Elden Ring: Nightreign**.

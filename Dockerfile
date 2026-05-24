@@ -30,6 +30,11 @@ COPY data/ ./data/
 # Build the Reflex frontend bundle (installs npm/bun deps + next build).
 # Using `reflex run --env prod` bootstraps frontend + backend on first run;
 # doing it during docker build lets the image start instantly at runtime.
+# NIGHTREIGN_API_URL is baked into the frontend bundle here, so it must be the
+# public origin the browser will hit on a single-port host. Default targets the
+# HF Space; override with --build-arg for local single-port testing.
+ARG NIGHTREIGN_API_URL=https://y4rd13-nightreign-relic-optimizer.hf.space
+ENV NIGHTREIGN_API_URL=${NIGHTREIGN_API_URL}
 ENV REFLEX_TELEMETRY_ENABLED=false
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev && \
@@ -53,29 +58,39 @@ RUN curl -fsSL https://bun.sh/install | bash \
     && mv /root/.bun/bin/bun /usr/local/bin/bun \
     && chmod +x /usr/local/bin/bun
 
-RUN groupadd --system app && useradd --system --gid app --home /app --shell /bin/false app
+# Caddy fronts the single port (7860) Hugging Face Spaces exposes.
+COPY --from=caddy:2 /usr/bin/caddy /usr/local/bin/caddy
+
+# Hugging Face Spaces run the container as uid 1000 with HOME=/home/user.
+RUN useradd -m -u 1000 user
+ENV HOME=/home/user
 
 WORKDIR /app
 
-COPY --from=builder --chown=app:app /app /app
+COPY --from=builder --chown=user:user /app /app
+# Caddyfile + start.sh come straight from the build context (not via the
+# builder) so editing them never busts the expensive builder export layer.
+COPY --chown=user:user Caddyfile start.sh /app/
 
+# Baked into the frontend at build time AND read at runtime by the backend for
+# CORS/allowed origins — must match the public origin (see builder ARG).
+ARG NIGHTREIGN_API_URL=https://y4rd13-nightreign-relic-optimizer.hf.space
+ENV NIGHTREIGN_API_URL=${NIGHTREIGN_API_URL}
 # Pre-create the reflex cache dir so the unprivileged runtime user can write.
 ENV REFLEX_DIR=/app/.reflex_cache
-# `user_data/` is the bind-mount target for persistent presets — kept outside
-# /app/data/ (which the image owns) so `docker build` rebuilds never wipe it.
+# Presets file — ephemeral on HF (no persistent disk) until the localStorage
+# refactor lands; the bind-mount path still works for local runs.
 ENV NIGHTREIGN_PRESETS_FILE=/app/user_data/presets.json
-# Reflex's rx.upload writes to ./uploaded_files by default; redirect to a
-# writable path inside the bind-mounted user_data volume so imports work
-# under the unprivileged `app` user.
 ENV REFLEX_UPLOADED_FILES_DIR=/app/user_data/_uploads
-RUN mkdir -p /app/.reflex_cache /app/.local /app/.cache /app/user_data && \
-    chown -R app:app /app/.reflex_cache /app/.local /app/.cache /app/user_data
+RUN chmod +x /app/start.sh && \
+    mkdir -p /app/.reflex_cache /app/user_data /home/user/.local /home/user/.cache && \
+    chown -R user:user /app/.reflex_cache /app/user_data /home/user
 
-USER app
+USER user
 
-EXPOSE 3000 8000
+EXPOSE 7860
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:3000').read()"
+HEALTHCHECK --interval=30s --timeout=5s --start-period=45s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:7860').read()"
 
-CMD ["reflex", "run", "--env", "prod"]
+CMD ["bash", "/app/start.sh"]

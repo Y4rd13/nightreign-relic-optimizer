@@ -72,33 +72,71 @@ class MyRelic:
         )
 
 
+# --- Pure list/blob operations (no file I/O) -------------------------------
+# The Reflex UI keeps the inventory in a browser localStorage string blob and
+# drives these; the file-based helpers are thin wrappers for local dev / CLI.
+
+
+def serialize(relics: Sequence[MyRelic]) -> str:
+    """Compact JSON for a localStorage blob (size matters — no indent)."""
+    return json.dumps([r.to_json() for r in relics], ensure_ascii=False)
+
+
+def deserialize(blob: str) -> list[MyRelic]:
+    """Parse a blob into relics, tolerant of '', invalid JSON, non-lists, and
+    malformed items (a corrupt localStorage value must never crash the app)."""
+    if not blob:
+        return []
+    try:
+        raw = json.loads(blob)
+    except (json.JSONDecodeError, ValueError):
+        return []
+    if not isinstance(raw, list):
+        return []
+    out: list[MyRelic] = []
+    for r in raw:
+        try:
+            out.append(MyRelic.from_json(r))
+        except Exception:
+            continue
+    return out
+
+
+def upsert_in_list(relics: Sequence[MyRelic], new: MyRelic) -> list[MyRelic]:
+    """Replace the entry with the same id, else append."""
+    out = [r for r in relics if r.id != new.id]
+    out.append(new)
+    return out
+
+
+def delete_from_list(relics: Sequence[MyRelic], relic_id: str) -> list[MyRelic]:
+    return [r for r in relics if r.id != relic_id]
+
+
+def get_in_list(relics: Sequence[MyRelic], relic_id: str) -> MyRelic | None:
+    for r in relics:
+        if r.id == relic_id:
+            return r
+    return None
+
+
 def load_all(path: Path | None = None) -> list[MyRelic]:
     path = path or _default_path()
     if not path.exists():
         return []
-    try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return []
-    return [MyRelic.from_json(r) for r in raw]
+    return deserialize(path.read_text(encoding="utf-8"))
 
 
 def save_all(relics: Sequence[MyRelic], path: Path | None = None) -> None:
     path = path or _default_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".json.tmp")
-    tmp.write_text(
-        json.dumps([r.to_json() for r in relics], ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    tmp.write_text(serialize(relics), encoding="utf-8")
     tmp.replace(path)
 
 
 def get(relic_id: str, path: Path | None = None) -> MyRelic | None:
-    for r in load_all(path):
-        if r.id == relic_id:
-            return r
-    return None
+    return get_in_list(load_all(path), relic_id)
 
 
 def _tier_set_for(slot_tier: str) -> frozenset[str]:
@@ -109,7 +147,7 @@ def _tier_set_for(slot_tier: str) -> frozenset[str]:
     raise ValueError(f"slot_tier must be 'common' or 'deep', got {slot_tier!r}")
 
 
-def upsert(
+def make_relic(
     *,
     name: str,
     color: str,
@@ -117,9 +155,11 @@ def upsert(
     effects: Sequence[Effect],
     debuff: Effect | None,
     relic_id: str | None = None,
-    path: Path | None = None,
+    created_at: str | None = None,
 ) -> MyRelic:
-    """Persist a user relic, auto-sorting attrs and enforcing validation.
+    """Validate + construct a MyRelic (no I/O). Auto-sorts attrs and enforces
+    the same hard-severity validator rules as an on-disk save. Pass `relic_id`
+    and `created_at` to preserve identity/timestamp when updating in place.
 
     Parameters
     ----------
@@ -156,21 +196,42 @@ def upsert(
         raise ValueError(f"relic failed validation: {'; '.join(bad)}")
 
     now = _now_iso()
-    existing = load_all(path)
-    prior = next((r for r in existing if r.id == relic_id), None) if relic_id else None
-    relic = MyRelic(
+    return MyRelic(
         id=relic_id or str(uuid.uuid4()),
         name=name,
         color=color,
         slot_tier=slot_tier,
         attr_ids=[e.effect_id for e in sorted_effects],
         debuff_id=debuff.effect_id if debuff is not None else None,
-        created_at=prior.created_at if prior else now,
+        created_at=created_at or now,
         updated_at=now,
     )
-    remaining = [r for r in existing if r.id != relic.id]
-    remaining.append(relic)
-    save_all(remaining, path)
+
+
+def upsert(
+    *,
+    name: str,
+    color: str,
+    slot_tier: str,
+    effects: Sequence[Effect],
+    debuff: Effect | None,
+    relic_id: str | None = None,
+    path: Path | None = None,
+) -> MyRelic:
+    """File-backed upsert — thin wrapper over make_relic + upsert_in_list.
+    Preserves created_at when updating an existing id."""
+    existing = load_all(path)
+    prior = get_in_list(existing, relic_id) if relic_id else None
+    relic = make_relic(
+        name=name,
+        color=color,
+        slot_tier=slot_tier,
+        effects=effects,
+        debuff=debuff,
+        relic_id=relic_id,
+        created_at=prior.created_at if prior else None,
+    )
+    save_all(upsert_in_list(existing, relic), path)
     return relic
 
 
@@ -195,14 +256,13 @@ class ImportReport:
         return " · ".join(parts)
 
 
-def export_relics(
+def export_from_list(
+    relics: Sequence[MyRelic],
     ids: Sequence[str],
-    path: Path | None = None,
 ) -> dict[str, Any]:
-    """Assemble an export payload for the MyRelic entries whose uuids match
-    `ids`. Unknown ids are silently dropped."""
+    """Pure export: payload from an in-memory relic list. Unknown ids dropped."""
     wanted = set(ids)
-    items = [r.to_json() for r in load_all(path) if r.id in wanted]
+    items = [r.to_json() for r in relics if r.id in wanted]
     return {
         "schema": EXPORT_SCHEMA,
         "type": "relics",
@@ -211,37 +271,33 @@ def export_relics(
     }
 
 
-def import_relics(
+def import_into_list(
+    relics: Sequence[MyRelic],
     payload: Any,
     *,
     overwrite: bool = False,
-    path: Path | None = None,
-) -> ImportReport:
-    """Merge MyRelic entries from an exported payload into the inventory.
-    Duplicate key is `id` (uuid). Light schema validation is applied per
-    item; a malformed item is counted in `errors` and the rest still
-    import."""
+) -> tuple[list[MyRelic], ImportReport]:
+    """Pure import: merge a payload into an in-memory relic list, returning the
+    new list and a report. Duplicate key is `id` (uuid); each item gets light
+    schema validation. On a bad schema/type the list is returned unchanged."""
     report = ImportReport()
+    merged = list(relics)
     if not isinstance(payload, dict):
         report.errors.append("Payload is not a JSON object")
-        return report
+        return merged, report
     if payload.get("schema") != EXPORT_SCHEMA:
         report.errors.append(f"Unknown schema: {payload.get('schema')!r}")
-        return report
+        return merged, report
     if payload.get("type") != "relics":
         report.errors.append(
             f"Wrong type: expected 'relics', got {payload.get('type')!r}"
         )
-        return report
-
+        return merged, report
     items = payload.get("items")
     if not isinstance(items, list):
         report.errors.append("Payload 'items' is missing or not a list")
-        return report
-
-    existing = load_all(path)
-    id_index: dict[str, int] = {r.id: i for i, r in enumerate(existing)}
-    changed = False
+        return merged, report
+    id_index: dict[str, int] = {r.id: i for i, r in enumerate(merged)}
     for raw in items:
         try:
             relic = MyRelic.from_json(raw)
@@ -259,25 +315,45 @@ def import_relics(
             continue
         if relic.id in id_index:
             if overwrite:
-                existing[id_index[relic.id]] = relic
+                merged[id_index[relic.id]] = relic
                 report.overwritten += 1
-                changed = True
             else:
                 report.skipped += 1
         else:
-            id_index[relic.id] = len(existing)
-            existing.append(relic)
+            id_index[relic.id] = len(merged)
+            merged.append(relic)
             report.imported += 1
-            changed = True
+    return merged, report
 
-    if changed:
-        save_all(existing, path)
+
+def export_relics(
+    ids: Sequence[str],
+    path: Path | None = None,
+) -> dict[str, Any]:
+    """Assemble an export payload for the MyRelic entries whose uuids match
+    `ids`. Unknown ids are silently dropped."""
+    return export_from_list(load_all(path), ids)
+
+
+def import_relics(
+    payload: Any,
+    *,
+    overwrite: bool = False,
+    path: Path | None = None,
+) -> ImportReport:
+    """Merge MyRelic entries from an exported payload into the inventory.
+    Duplicate key is `id` (uuid). Light schema validation is applied per
+    item; a malformed item is counted in `errors` and the rest still
+    import."""
+    merged, report = import_into_list(load_all(path), payload, overwrite=overwrite)
+    if report.imported or report.overwritten:
+        save_all(merged, path)
     return report
 
 
 def delete(relic_id: str, path: Path | None = None) -> bool:
     before = load_all(path)
-    after = [r for r in before if r.id != relic_id]
+    after = delete_from_list(before, relic_id)
     if len(after) == len(before):
         return False
     save_all(after, path)

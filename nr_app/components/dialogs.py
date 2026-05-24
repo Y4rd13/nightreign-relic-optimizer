@@ -579,7 +579,7 @@ def _color_chip(code: str) -> rx.Component:
 
 def save_relic_dialog() -> rx.Component:
     """Dialog fired from the Validator tab to name + colour-tag the current
-    relic before persisting it to user_data/my_relics.json. In edit mode
+    relic before saving it to the browser (localStorage). In edit mode
     (editing_id non-empty) the same dialog updates the saved relic in place."""
     title = rx.cond(
         State.my_relic_editing_id != "",
@@ -665,7 +665,7 @@ def preset_dialog() -> rx.Component:
             rx.dialog.title("Save current build as preset",
                             color=PAL["text"]),
             rx.dialog.description(
-                "Stored per-character in presets/presets.json. "
+                "Stored per-character in your browser (localStorage). "
                 "Use the Compare Presets tab to diff multiple saves.",
                 color=PAL["overlay1"],
                 font_size="0.82rem",

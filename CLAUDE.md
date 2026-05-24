@@ -58,8 +58,8 @@ data/                    # Authoritative data (checked in)
 ├── stat_effects.json    # Stat-delta curses (STR/DEX swaps, +1/+2/+3 lines)
 └── vessels.json         # Chalice color layouts
 
-tests/                   # Pytest — 33 tests covering the 9 bug classes we've hit
-user_data/               # Runtime preset store (bind-mount target, gitignored)
+tests/                   # Pytest — domain + State tests (guards the 9 bug classes)
+user_data/               # Local-dev file store for the CLI helpers only (gitignored)
 ```
 
 ## Commands
@@ -74,12 +74,12 @@ uv run reflex run                 # dev server, hot reload at :3000
 uv run pytest tests/              # full suite (~35 s)
 uv run pytest tests/test_solver.py -v  # single module
 
-# Docker
+# Docker — Caddy fronts frontend + backend WebSocket on the single port 7860
+# (matches the Hugging Face Spaces deploy). Presets/relics live in the browser
+# (localStorage), so no volume mount is needed.
 docker build -t nightreign-optimizer .
-docker run --rm -p 3000:3000 -p 8000:8000 \
-    -v "$(pwd)/user_data:/app/user_data" \
-    --name nightreign nightreign-optimizer
-docker exec nightreign /app/.venv/bin/python3 -m pytest /app/tests
+docker run --rm -p 3000:7860 --name nightreign nightreign-optimizer
+# open http://localhost:3000
 ```
 
 ## Local development (Docker hot-reload)
@@ -136,9 +136,13 @@ Non-negotiable — any PR violating these is 🔴 BLOCKING in code review:
   pure functions of `effect_id` / `name`.** No character-specific or
   context-specific state can leak into them — a cache hit for Undertaker
   will be reused by Scholar.
-- **Preset persistence stays in `/app/user_data/` (or `$NIGHTREIGN_PRESETS_FILE`).**
-  Never write to `/app/data/` at runtime — that path is owned by the
-  image and gets overwritten on `docker build`.
+- **Preset + owned-relic persistence is client-side (browser `localStorage`).**
+  `State.presets_blob` / `State.my_relics_blob` are `rx.LocalStorage` strings;
+  every handler parses → mutates → re-serializes the blob via the pure
+  functions in `src/presets.py` / `src/my_relics.py` (`serialize`,
+  `deserialize`, `upsert_in_list`, …). The server is stateless — it must NOT
+  write preset/relic files at runtime. The file-based helpers in those modules
+  (`load_all`/`save_all`/`upsert`) are kept only for local dev / CLI / tests.
 - **Defensive stats are derived, never stored.** `compute_defensive_stats`
   scans the active effect set every render; don't persist it or cache it
   on the preset — recomputing is cheap and avoids schema churn.

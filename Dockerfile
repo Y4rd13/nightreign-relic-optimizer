@@ -78,13 +78,14 @@ ARG NIGHTREIGN_API_URL=https://y4rd13-nightreign-relic-optimizer.hf.space
 ENV NIGHTREIGN_API_URL=${NIGHTREIGN_API_URL}
 # Pre-create the reflex cache dir so the unprivileged runtime user can write.
 ENV REFLEX_DIR=/app/.reflex_cache
-# Presets file — ephemeral on HF (no persistent disk) until the localStorage
-# refactor lands; the bind-mount path still works for local runs.
-ENV NIGHTREIGN_PRESETS_FILE=/app/user_data/presets.json
-ENV REFLEX_UPLOADED_FILES_DIR=/app/user_data/_uploads
+# Presets and the owned-relic inventory live in the browser (localStorage) —
+# the server is stateless, so there are no preset/relic files on disk. rx.upload
+# still needs a writable scratch dir for transient JSON imports; /tmp is fine
+# (ephemeral by design — the file is consumed immediately on upload).
+ENV REFLEX_UPLOADED_FILES_DIR=/tmp/nightreign_uploads
 RUN chmod +x /app/start.sh && \
-    mkdir -p /app/.reflex_cache /app/user_data /home/user/.local /home/user/.cache && \
-    chown -R user:user /app/.reflex_cache /app/user_data /home/user
+    mkdir -p /app/.reflex_cache /tmp/nightreign_uploads /home/user/.local /home/user/.cache && \
+    chown -R user:user /app/.reflex_cache /tmp/nightreign_uploads /home/user
 
 USER user
 

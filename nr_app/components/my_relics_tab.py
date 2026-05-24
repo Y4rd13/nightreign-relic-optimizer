@@ -332,6 +332,21 @@ def _import_dialog() -> rx.Component:
     )
 
 
+def _loading_state() -> rx.Component:
+    """Shown while the client hydrates the localStorage blob — avoids a flash
+    of the empty state before the saved inventory arrives."""
+    return rx.center(
+        rx.vstack(
+            rx.spinner(size="3"),
+            rx.text("Loading your saved relics…",
+                    color=PAL["overlay1"], font_size="0.9rem"),
+            spacing="3", align="center",
+        ),
+        padding="80px 20px",
+        width="100%",
+    )
+
+
 def my_relics_tab() -> rx.Component:
     return rx.vstack(
         rx.hstack(
@@ -356,7 +371,7 @@ def my_relics_tab() -> rx.Component:
         rx.text(
             "Single relics you've saved from the Validator. Pickable from "
             "the Named Relic dialog on every slot — stored globally across "
-            "all characters at user_data/my_relics.json.",
+            "all characters in your browser (localStorage).",
             color=PAL["overlay1"], font_size="0.86rem",
             margin_bottom="14px",
         ),
@@ -367,14 +382,18 @@ def my_relics_tab() -> rx.Component:
         ),
         _import_dialog(),
         rx.cond(
-            State.my_relics_list.length() == 0,
-            _empty_state(),
-            rx.grid(
-                rx.foreach(State.my_relics_list, _relic_card),
-                columns="repeat(auto-fit, minmax(340px, 1fr))",
-                gap="14px",
-                width="100%",
+            State.is_hydrated,
+            rx.cond(
+                State.my_relics_list.length() == 0,
+                _empty_state(),
+                rx.grid(
+                    rx.foreach(State.my_relics_list, _relic_card),
+                    columns="repeat(auto-fit, minmax(340px, 1fr))",
+                    gap="14px",
+                    width="100%",
+                ),
             ),
+            _loading_state(),
         ),
         width="100%",
         align="start",

@@ -233,3 +233,114 @@ def test_named_relic_missing_effect_ids_skipped():
         assert sig not in bundle_sigs, (
             f"broken bundle {r['name']} with attrs {sig} leaked into solver"
         )
+
+
+# ---------------------------------------------------------------------------
+# Pure (blob-based) functions — the localStorage refactor moves persistence
+# from a server-side JSON file to a browser string blob. These operate on
+# in-memory lists/strings with no file I/O.
+# ---------------------------------------------------------------------------
+
+
+def _mk_preset(name="k", character_id="undertaker", excluded_ids=None):
+    cfg = OptimizerConfig(character_id=character_id)
+    build, contrib = optimize(cfg)
+    return presets_mod._preset_from_build(
+        name=name, character_id=character_id, mode=cfg.mode,
+        build=build, contrib=contrib, ctx=cfg.ctx,
+        excluded_ids=excluded_ids or [], locked_attrs={},
+    )
+
+
+def test_serialize_deserialize_round_trip():
+    """serialize(list)->str and deserialize(str)->list are inverses, scores survive."""
+    p = _mk_preset(name="blob1", excluded_ids=[7])
+    blob = presets_mod.serialize([p])
+    assert isinstance(blob, str)
+    out = presets_mod.deserialize(blob)
+    assert len(out) == 1
+    assert out[0].name == "blob1"
+    assert out[0].excluded_ids == [7]
+    assert out[0].damage_score == p.damage_score
+
+
+def test_deserialize_tolerates_empty_and_garbage():
+    """LocalStorage may hold '', invalid JSON, or a non-list — never raise."""
+    assert presets_mod.deserialize("") == []
+    assert presets_mod.deserialize("[]") == []
+    assert presets_mod.deserialize("not json at all") == []
+    assert presets_mod.deserialize("{}") == []  # object, not list
+
+
+def test_upsert_in_list_replaces_by_key_not_append():
+    lst = presets_mod.upsert_in_list([], _mk_preset(excluded_ids=[1]))
+    assert len(lst) == 1
+    lst = presets_mod.upsert_in_list(lst, _mk_preset(excluded_ids=[2, 3]))
+    assert len(lst) == 1, "same (name, character_id) must replace, not append"
+    assert lst[0].excluded_ids == [2, 3]
+    # Different character with the same name is a distinct key.
+    lst = presets_mod.upsert_in_list(lst, _mk_preset(character_id="guardian"))
+    assert len(lst) == 2
+
+
+def test_delete_from_list_removes_only_matching_key():
+    lst = [_mk_preset(name="A", character_id="undertaker"),
+           _mk_preset(name="A", character_id="guardian")]
+    out = presets_mod.delete_from_list(lst, "A", "undertaker")
+    assert len(out) == 1
+    assert out[0].character_id == "guardian"
+    # Deleting a non-existent key is a no-op (returns an equal-length list).
+    assert len(presets_mod.delete_from_list(out, "nope", "undertaker")) == 1
+
+
+def test_get_in_list_and_list_for_character_in_list():
+    lst = [_mk_preset(name="A", character_id="undertaker"),
+           _mk_preset(name="B", character_id="undertaker"),
+           _mk_preset(name="A", character_id="guardian")]
+    got = presets_mod.get_in_list(lst, "B", "undertaker")
+    assert got is not None and got.name == "B"
+    assert presets_mod.get_in_list(lst, "B", "guardian") is None
+    undertaker = presets_mod.list_for_character_in_list(lst, "undertaker")
+    assert {p.name for p in undertaker} == {"A", "B"}
+    assert len(presets_mod.list_for_character_in_list(lst, "guardian")) == 1
+
+
+def test_export_from_list_builds_payload():
+    lst = [_mk_preset(name="X", character_id="undertaker", excluded_ids=[5])]
+    payload = presets_mod.export_from_list(lst, [("X", "undertaker")])
+    assert payload["schema"] == presets_mod.EXPORT_SCHEMA
+    assert payload["type"] == "builds"
+    assert len(payload["items"]) == 1
+    assert payload["items"][0]["name"] == "X"
+    # Unknown keys are silently dropped.
+    assert presets_mod.export_from_list(lst, [("nope", "undertaker")])["items"] == []
+
+
+def test_import_into_list_adds_skips_overwrites():
+    base = [_mk_preset(name="A", character_id="undertaker")]
+    payload = presets_mod.export_from_list(
+        [_mk_preset(name="B", character_id="undertaker", excluded_ids=[9])],
+        [("B", "undertaker")],
+    )
+    merged, report = presets_mod.import_into_list(base, payload)
+    assert report.imported == 1
+    assert {p.name for p in merged} == {"A", "B"}
+    # Re-importing the same key skips by default (no append).
+    merged2, report2 = presets_mod.import_into_list(merged, payload)
+    assert report2.imported == 0 and report2.skipped == 1
+    assert len(merged2) == 2
+    # overwrite=True replaces the stored entry.
+    payload["items"][0]["damage_score"] = 12345.0
+    merged3, report3 = presets_mod.import_into_list(merged, payload, overwrite=True)
+    assert report3.overwritten == 1
+    got = presets_mod.get_in_list(merged3, "B", "undertaker")
+    assert got is not None and got.damage_score == 12345.0
+
+
+def test_import_into_list_rejects_bad_payload_leaves_list_unchanged():
+    base = [_mk_preset(name="A", character_id="undertaker")]
+    merged, report = presets_mod.import_into_list(
+        base, {"schema": "bogus/9", "type": "builds", "items": []}
+    )
+    assert report.errors and "Unknown schema" in report.errors[0]
+    assert merged == base

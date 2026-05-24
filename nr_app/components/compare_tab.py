@@ -330,8 +330,24 @@ def _current_build_radar_panel() -> rx.Component:
     )
 
 
+def _loading_state() -> rx.Component:
+    """Shown while the client hydrates the localStorage blob."""
+    return rx.center(
+        rx.vstack(
+            rx.spinner(size="3"),
+            rx.text("Loading saved builds…",
+                    color=PAL["overlay1"], font_size="0.9rem"),
+            spacing="3", align="center",
+        ),
+        padding="80px 20px", width="100%",
+    )
+
+
 def compare_tab() -> rx.Component:
     return rx.cond(
+        ~State.is_hydrated,
+        _loading_state(),
+        rx.cond(
         State.saved_presets.length() == 0,
         rx.vstack(
             _current_build_radar_panel(),
@@ -383,5 +399,6 @@ def compare_tab() -> rx.Component:
             width="100%",
             align="start",
             spacing="3",
+        ),
         ),
     )

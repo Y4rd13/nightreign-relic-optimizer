@@ -1,0 +1,23 @@
+# Single-port reverse proxy for Hugging Face Spaces (and any single-port host).
+# Reflex serves the Next.js frontend on :3000 and the backend Socket.IO
+# WebSocket on :8000. HF Spaces only routes traffic to one port (7860), so
+# Caddy fronts both: backend paths to :8000, everything else to the frontend.
+{
+	admin off
+	auto_https off
+}
+
+:7860 {
+	# Use 127.0.0.1 (not "localhost"): Reflex binds IPv4 only, so "localhost"
+	# makes Caddy try [::1] first, fail, then retry IPv4 on every new conn.
+	# Reflex backend endpoints: event WebSocket, file uploads, health ping.
+	@backend path /_event* /_upload* /ping*
+	handle @backend {
+		reverse_proxy 127.0.0.1:8000
+	}
+
+	# Everything else is the compiled frontend.
+	handle {
+		reverse_proxy 127.0.0.1:3000
+	}
+}

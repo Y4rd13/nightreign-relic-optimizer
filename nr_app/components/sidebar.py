@@ -1429,18 +1429,27 @@ def sidebar() -> rx.Component:
                     spacing="2", width="100%",
                 ),
                 rx.cond(
-                    State.saved_presets.length() == 0,
+                    State.is_hydrated,
+                    rx.cond(
+                        State.saved_presets.length() == 0,
+                        rx.box(
+                            rx.text("No presets saved for this character.",
+                                    color=PAL["overlay0"], font_size="0.74rem",
+                                    font_style="italic"),
+                            padding="8px 4px",
+                        ),
+                        rx.vstack(
+                            rx.foreach(State.saved_presets, _preset_row),
+                            spacing="1",
+                            width="100%",
+                            margin_top="4px",
+                        ),
+                    ),
                     rx.box(
-                        rx.text("No presets saved for this character.",
+                        rx.text("Loading saved builds…",
                                 color=PAL["overlay0"], font_size="0.74rem",
                                 font_style="italic"),
                         padding="8px 4px",
-                    ),
-                    rx.vstack(
-                        rx.foreach(State.saved_presets, _preset_row),
-                        spacing="1",
-                        width="100%",
-                        margin_top="4px",
                     ),
                 ),
             ),

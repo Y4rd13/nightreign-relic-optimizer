@@ -605,9 +605,11 @@ class State(rx.State):
     # near-optimal alternative build.
     explore_seed: int = 0
 
-    # Bumped on save/delete so @rx.var saved_presets re-reads the JSON file.
-    # Without this, Reflex caches the first call and later saves never show up.
-    preset_version: int = 0
+    # Presets live in the browser via localStorage — the server is stateless
+    # (HF Spaces / any free host has no persistent disk). rx.LocalStorage is
+    # reactive, so @rx.var saved_presets re-runs automatically when this blob
+    # changes; no manual version bump needed.
+    presets_blob: str = rx.LocalStorage("[]")
 
     # Name of the preset currently loaded in the editor (""=none). Drives the
     # sidebar "Save" button (in-place overwrite of the active preset) vs.
@@ -675,9 +677,9 @@ class State(rx.State):
     my_relic_color_input: str = "U"
     # Empty string ≡ creating new. Non-empty ≡ editing that id in place.
     my_relic_editing_id: str = ""
-    # Bumped on save/delete so @rx.var saved_my_relics re-reads the JSON
-    # file. Mirrors the preset_version pattern.
-    my_relics_version: int = 0
+    # Owned-relic inventory in the browser via localStorage (same rationale as
+    # presets_blob). Reactive — dependent @rx.vars re-run on change.
+    my_relics_blob: str = rx.LocalStorage("[]")
 
     # ── export / import ───────────────────────────────────────────
     # Selection is a plain list[str] (not set) so Reflex can serialise it
@@ -2306,7 +2308,9 @@ class State(rx.State):
             self.recompute()
         elif relic_id.startswith("my_relic:"):
             my_id = relic_id[len("my_relic:"):]
-            r = my_relics_mod.get(my_id)
+            r = my_relics_mod.get_in_list(
+                my_relics_mod.deserialize(self.my_relics_blob), my_id
+            )
             if r is not None:
                 # Clear any previous locks on this slot so we don't leave
                 # stale attrs from a bigger bundle when the saved relic is
@@ -2346,9 +2350,8 @@ class State(rx.State):
         out: list[NamedRelicRow] = []
 
         # My Relics — bounded by current slot tier + character-tag compat.
-        _ = self.my_relics_version
         if filt in ("all", "my_relic"):
-            for mr in my_relics_mod.load_all():
+            for mr in my_relics_mod.deserialize(self.my_relics_blob):
                 if slot_tier and mr.slot_tier != slot_tier:
                     continue
                 # Skip relics that carry an attr tagged for another char —
@@ -2451,14 +2454,12 @@ class State(rx.State):
     def set_preset_name(self, s: str):
         self.preset_name_input = s
 
-    def save_preset(self):
-        name = self.preset_name_input.strip()
-        if not name:
-            return rx.toast.error("Please enter a preset name.")
+    def _persist_preset(self, name: str) -> None:
+        """Solve the current config and upsert it into the localStorage blob."""
         cfg = self._cfg()
         build, contrib = optimize(cfg)
         locks = {_unk(k): v for k, v in self.locked_picks.items()}
-        presets_mod.upsert(
+        preset = presets_mod._preset_from_build(
             name=name,
             character_id=self.character_id,
             mode=self.mode,
@@ -2469,10 +2470,20 @@ class State(rx.State):
             locked_attrs=locks,
             vessel_id=self.vessel_id or None,
         )
+        self.presets_blob = presets_mod.serialize(
+            presets_mod.upsert_in_list(
+                presets_mod.deserialize(self.presets_blob), preset
+            )
+        )
+
+    def save_preset(self):
+        name = self.preset_name_input.strip()
+        if not name:
+            return rx.toast.error("Please enter a preset name.")
+        self._persist_preset(name)
         # A fresh "Save as" becomes the new active preset — the next click of
         # the plain "Save" button should overwrite this one, not prompt again.
         self.active_preset_name = name
-        self.preset_version += 1
         self.close_preset()
         return rx.toast.success(f"Saved preset '{name}'")
 
@@ -2485,31 +2496,15 @@ class State(rx.State):
             return rx.toast.error(
                 "No build loaded to save over. Use 'Save as…' to name a new one."
             )
-        cfg = self._cfg()
-        build, contrib = optimize(cfg)
-        locks = {_unk(k): v for k, v in self.locked_picks.items()}
-        presets_mod.upsert(
-            name=name,
-            character_id=self.character_id,
-            mode=self.mode,
-            build=build,
-            contrib=contrib,
-            ctx=self._ctx(),
-            excluded_ids=self.excluded_ids,
-            locked_attrs=locks,
-            vessel_id=self.vessel_id or None,
-        )
-        self.preset_version += 1
+        self._persist_preset(name)
         return rx.toast.success(f"Updated '{name}'")
 
     @rx.var
     def saved_presets(self) -> list[PresetRow]:
-        # `preset_version` is only here to force Reflex to re-run this var
-        # after save_preset / delete_preset mutate the JSON on disk.
-        _ = self.preset_version
         out = []
         vessel_lookup = {v["id"]: v for v in chars_mod.list_vessels()}
-        for p in presets_mod.list_for_character(self.character_id):
+        all_presets = presets_mod.deserialize(self.presets_blob)
+        for p in presets_mod.list_for_character_in_list(all_presets, self.character_id):
             char = chars_mod.get(p.character_id)
             # Resolve vessel: show friendly name + per-slot colour list.
             vessel_name = "— no vessel —"
@@ -2655,7 +2650,9 @@ class State(rx.State):
         under — otherwise a preset tuned for a Guardian tank profile would
         score wildly differently under an Undertaker DPS slider set.
         """
-        p = presets_mod.get(name, self.character_id)
+        p = presets_mod.get_in_list(
+            presets_mod.deserialize(self.presets_blob), name, self.character_id
+        )
         if p is None:
             return rx.toast.error(f"Preset '{name}' not found")
         self.excluded_ids = list(p.excluded_ids)
@@ -2678,10 +2675,13 @@ class State(rx.State):
         return rx.toast.success(f"Loaded '{name}' ({p.total_boss_window:.2f} dmg)")
 
     def delete_preset(self, name: str):
-        presets_mod.delete(name, self.character_id)
+        self.presets_blob = presets_mod.serialize(
+            presets_mod.delete_from_list(
+                presets_mod.deserialize(self.presets_blob), name, self.character_id
+            )
+        )
         if name == self.active_preset_name:
             self.active_preset_name = ""
-        self.preset_version += 1
         return rx.toast.info(f"Deleted '{name}'")
 
     # ═════════════════════════════════════════════════════════════
@@ -2716,7 +2716,9 @@ class State(rx.State):
         import json as _json
         from datetime import datetime as _dt, timezone as _tz
         keys = [(n, self.character_id) for n in self.selected_build_names]
-        payload = presets_mod.export_presets(keys)
+        payload = presets_mod.export_from_list(
+            presets_mod.deserialize(self.presets_blob), keys
+        )
         stamp = _dt.now(_tz.utc).strftime("%Y%m%d")
         return rx.download(
             data=_json.dumps(payload, indent=2, ensure_ascii=False),
@@ -2744,10 +2746,11 @@ class State(rx.State):
         except (UnicodeDecodeError, _json.JSONDecodeError) as e:
             self.import_report_text = f"Invalid JSON: {e}"
             return rx.toast.error("Invalid JSON file")
-        report = presets_mod.import_presets(
-            payload, overwrite=self.import_overwrite_builds
+        merged, report = presets_mod.import_into_list(
+            presets_mod.deserialize(self.presets_blob),
+            payload, overwrite=self.import_overwrite_builds,
         )
-        self.preset_version += 1
+        self.presets_blob = presets_mod.serialize(merged)
         self.import_report_text = report.summary()
         self.import_builds_dialog_open = False
         if report.imported == 0 and report.overwritten == 0 and report.errors:
@@ -2782,7 +2785,9 @@ class State(rx.State):
             return rx.toast.error("Select at least one relic to export.")
         import json as _json
         from datetime import datetime as _dt, timezone as _tz
-        payload = my_relics_mod.export_relics(self.selected_relic_ids)
+        payload = my_relics_mod.export_from_list(
+            my_relics_mod.deserialize(self.my_relics_blob), self.selected_relic_ids
+        )
         stamp = _dt.now(_tz.utc).strftime("%Y%m%d")
         return rx.download(
             data=_json.dumps(payload, indent=2, ensure_ascii=False),
@@ -2810,10 +2815,11 @@ class State(rx.State):
         except (UnicodeDecodeError, _json.JSONDecodeError) as e:
             self.import_report_text = f"Invalid JSON: {e}"
             return rx.toast.error("Invalid JSON file")
-        report = my_relics_mod.import_relics(
-            payload, overwrite=self.import_overwrite_relics
+        merged, report = my_relics_mod.import_into_list(
+            my_relics_mod.deserialize(self.my_relics_blob),
+            payload, overwrite=self.import_overwrite_relics,
         )
-        self.my_relics_version += 1
+        self.my_relics_blob = my_relics_mod.serialize(merged)
         self.import_report_text = report.summary()
         self.import_relics_dialog_open = False
         if report.imported == 0 and report.overwritten == 0 and report.errors:
@@ -3196,7 +3202,7 @@ class State(rx.State):
 
     def save_my_relic(self):
         """Persist the current validator-tab relic. Auto-sort + validation are
-        enforced inside my_relics_mod.upsert; UI should have blocked invalid
+        enforced inside my_relics_mod.make_relic; UI should have blocked invalid
         saves already, but we defend against races + show a toast if it trips."""
         if self.v_slot_tier not in ("common", "deep"):
             return rx.toast.error("Pick Common or Deep tier before saving.")
@@ -3215,19 +3221,27 @@ class State(rx.State):
                 debuff = find_for_character(self.v_debuff_id, self.character_id)
             except KeyError:
                 debuff = None
+        relics = my_relics_mod.deserialize(self.my_relics_blob)
+        prior = (
+            my_relics_mod.get_in_list(relics, self.my_relic_editing_id)
+            if self.my_relic_editing_id else None
+        )
         try:
-            saved = my_relics_mod.upsert(
+            saved = my_relics_mod.make_relic(
                 relic_id=self.my_relic_editing_id or None,
                 name=self.my_relic_name_input,
                 color=self.my_relic_color_input,
                 slot_tier=self.v_slot_tier,
                 effects=effects,
                 debuff=debuff,
+                created_at=prior.created_at if prior else None,
             )
         except ValueError as ex:
             return rx.toast.error(str(ex))
         was_edit = bool(self.my_relic_editing_id)
-        self.my_relics_version += 1
+        self.my_relics_blob = my_relics_mod.serialize(
+            my_relics_mod.upsert_in_list(relics, saved)
+        )
         self.save_relic_dialog_open = False
         self._reset_save_relic_fields()
         self._reset_validator_fields()
@@ -3235,16 +3249,20 @@ class State(rx.State):
         return rx.toast.success(f"{verb} '{saved.name}'")
 
     def delete_my_relic(self, relic_id: str):
-        if my_relics_mod.delete(relic_id):
-            self.my_relics_version += 1
-            return rx.toast.info("Relic deleted")
-        return rx.toast.error("Relic not found")
+        relics = my_relics_mod.deserialize(self.my_relics_blob)
+        after = my_relics_mod.delete_from_list(relics, relic_id)
+        if len(after) == len(relics):
+            return rx.toast.error("Relic not found")
+        self.my_relics_blob = my_relics_mod.serialize(after)
+        return rx.toast.info("Relic deleted")
 
     def edit_my_relic(self, relic_id: str):
         """Load a saved relic back into the Validator tab for editing. The
         editing id sticks around until Save or explicit cancel, so the next
         save_my_relic() does an in-place update rather than create."""
-        r = my_relics_mod.get(relic_id)
+        r = my_relics_mod.get_in_list(
+            my_relics_mod.deserialize(self.my_relics_blob), relic_id
+        )
         if r is None:
             return rx.toast.error("Relic not found")
         self.v_slot_tier = r.slot_tier
@@ -3268,9 +3286,8 @@ class State(rx.State):
         """All saved relics, newest first. Attr names are resolved against
         the current character so CHARACTER-tagged attrs fall back to the raw
         effect entry — usable_on_current_character lets the UI grey those out."""
-        _ = self.my_relics_version   # re-read trigger
         out: list[MyRelicRow] = []
-        for r in my_relics_mod.load_all():
+        for r in my_relics_mod.deserialize(self.my_relics_blob):
             names: list[str] = []
             all_resolvable = True
             for eid in r.attr_ids:

@@ -236,3 +236,101 @@ def test_storage_is_global_not_scoped(tmp_relics_path):
               effects=[_ef(E_CHAR)], debuff=None, path=tmp_relics_path)
     raw = json.loads(tmp_relics_path.read_text(encoding="utf-8"))
     assert "character_id" not in raw[0]
+
+
+# ---------------------------------------------------------------------------
+# Pure (blob-based) functions — the localStorage refactor moves the inventory
+# from a server-side JSON file to a browser string blob.
+# ---------------------------------------------------------------------------
+
+
+def _mk(name="r", color="G", slot_tier="common",
+        effect_ids=(E_CHAR, E_NONE, E_ATTACK), relic_id=None):
+    return mr.make_relic(
+        name=name, color=color, slot_tier=slot_tier,
+        effects=[_ef(e) for e in effect_ids], debuff=None, relic_id=relic_id,
+    )
+
+
+def test_make_relic_validates_and_autosorts():
+    r = mr.make_relic(
+        name="x", color="G", slot_tier="common",
+        effects=[_ef(E_ATTACK), _ef(E_CHAR), _ef(E_NONE)], debuff=None,
+    )
+    assert r.attr_ids == [E_CHAR, E_NONE, E_ATTACK]   # re-sorted
+    assert r.id                                        # uuid generated
+    with pytest.raises(ValueError, match="relic failed validation"):
+        mr.make_relic(name="bad", color="G", slot_tier="common",
+                      effects=[_ef(E_CHAR), _ef(E_CHAR_2)], debuff=None)
+
+
+def test_make_relic_preserves_created_at_when_given():
+    r = mr.make_relic(name="x", color="G", slot_tier="common",
+                      effects=[_ef(E_CHAR)], debuff=None,
+                      relic_id="fixed-id", created_at="2020-01-01T00:00:00+00:00")
+    assert r.id == "fixed-id"
+    assert r.created_at == "2020-01-01T00:00:00+00:00"
+
+
+def test_serialize_deserialize_round_trip_relics():
+    r = _mk(name="rt")
+    blob = mr.serialize([r])
+    assert isinstance(blob, str)
+    out = mr.deserialize(blob)
+    assert len(out) == 1 and out[0] == r
+
+
+def test_deserialize_relics_tolerates_garbage():
+    assert mr.deserialize("") == []
+    assert mr.deserialize("nope") == []
+    assert mr.deserialize("{}") == []
+
+
+def test_upsert_in_list_relics_replaces_by_id():
+    r1 = _mk(name="a")
+    lst = mr.upsert_in_list([], r1)
+    assert len(lst) == 1
+    r1b = mr.make_relic(name="a-edited", color=r1.color, slot_tier=r1.slot_tier,
+                        effects=[_ef(E_CHAR), _ef(E_NONE), _ef(E_ATTACK)],
+                        debuff=None, relic_id=r1.id)
+    lst = mr.upsert_in_list(lst, r1b)
+    assert len(lst) == 1 and lst[0].name == "a-edited"
+    lst = mr.upsert_in_list(lst, _mk(name="b"))
+    assert len(lst) == 2
+
+
+def test_delete_and_get_in_list_relics():
+    r1, r2 = _mk(name="a"), _mk(name="b")
+    lst = [r1, r2]
+    assert mr.get_in_list(lst, r1.id) is r1
+    assert mr.get_in_list(lst, "nope") is None
+    out = mr.delete_from_list(lst, r1.id)
+    assert [r.id for r in out] == [r2.id]
+
+
+def test_export_import_into_list_relics():
+    r = _mk(name="exp")
+    payload = mr.export_from_list([r], [r.id])
+    assert payload["type"] == "relics" and len(payload["items"]) == 1
+    merged, report = mr.import_into_list([], payload)
+    assert report.imported == 1 and merged[0].id == r.id
+    merged2, report2 = mr.import_into_list(merged, payload)
+    assert report2.skipped == 1 and report2.imported == 0
+    # bad payload leaves the list unchanged
+    m3, rep3 = mr.import_into_list([r], {"schema": "x/9", "type": "relics", "items": []})
+    assert rep3.errors and m3 == [r]
+
+
+def test_import_into_list_relics_flags_bad_color():
+    payload = {
+        "schema": mr.EXPORT_SCHEMA, "type": "relics",
+        "items": [{
+            "id": "bad", "name": "g", "color": "Z", "slot_tier": "common",
+            "attr_ids": [E_CHAR], "debuff_id": None,
+            "created_at": "2026-04-20T00:00:00+00:00",
+            "updated_at": "2026-04-20T00:00:00+00:00",
+        }],
+    }
+    merged, report = mr.import_into_list([], payload)
+    assert any("invalid color" in e for e in report.errors)
+    assert report.imported == 0 and merged == []

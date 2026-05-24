@@ -1,3 +1,17 @@
+---
+# Hugging Face Spaces reads this block to configure the Space; it must stay
+# first in the file. app_port 7860 + sdk docker route HF traffic to Caddy,
+# which fronts the Reflex frontend (:3000) and backend WebSocket (:8000).
+title: Nightreign Relic Optimizer
+emoji: ⚰️
+colorFrom: purple
+colorTo: blue
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+---
+
 # Nightreign Relic Optimizer
 
 Multi-objective build calculator for every Nightfarer in **Elden Ring: Nightreign**.
@@ -38,23 +52,21 @@ cd nightreign-relic-optimizer
 
 # 2. Build + run
 docker build -t nightreign-optimizer .
-docker run --rm \
-    -p 3000:3000 -p 8000:8000 \
-    -v "$(pwd)/user_data:/app/user_data" \
-    --name nightreign \
-    nightreign-optimizer
+docker run --rm -p 3000:7860 --name nightreign nightreign-optimizer
 ```
 
-Open **http://localhost:3000**. The backend WebSocket + API runs on
-port 8000. First boot takes ~3 min while Reflex builds the frontend bundle;
-subsequent starts are instant.
+Open **http://localhost:3000**. Inside the container, Caddy fronts the Reflex
+frontend and the backend WebSocket on a single port (7860), mapped to host
+port 3000 here. First boot takes ~3 min while Reflex builds the frontend
+bundle; subsequent starts are instant.
 
-### Persisting builds across rebuilds
+### Where your builds are stored
 
-The `-v "$(pwd)/user_data:/app/user_data"` flag above maps the host
-`user_data/` directory to the container's preset store. Your saved
-builds live in `user_data/presets.json` and survive container rebuilds,
-version upgrades, and `docker rm`.
+Saved builds and your relic inventory live in your **browser's localStorage** —
+not on the server. The app needs no database or volume mount, and your data
+never leaves your machine. Use **Export** (in the My builds / My relics tabs)
+to back them up to a JSON file, and **Import** to restore them or move them to
+another browser.
 
 ### Stopping / restarting
 

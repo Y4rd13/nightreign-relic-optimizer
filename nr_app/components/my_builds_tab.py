@@ -16,14 +16,29 @@ def _empty_state() -> rx.Component:
             rx.heading("No builds saved yet", size="5", color=PAL["subtext"]),
             rx.text(
                 "Tune sliders, locks, vessel, and dormant powers to your liking, "
-                "then click 'Save current build' in the sidebar. Saved builds "
-                "show up here and survive docker rebuilds.",
+                "then click 'Save as…' in the sidebar. Saved builds show up "
+                "here and persist in your browser via localStorage.",
                 color=PAL["overlay1"], font_size="0.92rem",
                 text_align="center", max_width="520px",
                 line_height="1.5",
             ),
             spacing="3",
             align="center",
+        ),
+        padding="80px 20px",
+        width="100%",
+    )
+
+
+def _loading_state() -> rx.Component:
+    """Shown while the client hydrates the localStorage blob — avoids a flash
+    of the 'No builds saved yet' empty state before saved data arrives."""
+    return rx.center(
+        rx.vstack(
+            rx.spinner(size="3"),
+            rx.text("Loading your saved builds…",
+                    color=PAL["overlay1"], font_size="0.9rem"),
+            spacing="3", align="center",
         ),
         padding="80px 20px",
         width="100%",
@@ -454,19 +469,23 @@ def my_builds_tab() -> rx.Component:
         ),
         _import_dialog(),
         rx.cond(
-            State.saved_presets.length() == 0,
-            _empty_state(),
-            rx.grid(
-                rx.foreach(State.saved_presets, _build_card),
-                columns="repeat(auto-fit, minmax(460px, 1fr))",
-                gap="14px",
-                width="100%",
+            State.is_hydrated,
+            rx.cond(
+                State.saved_presets.length() == 0,
+                _empty_state(),
+                rx.grid(
+                    rx.foreach(State.saved_presets, _build_card),
+                    columns="repeat(auto-fit, minmax(460px, 1fr))",
+                    gap="14px",
+                    width="100%",
+                ),
             ),
+            _loading_state(),
         ),
         rx.callout(
             rx.text(
-                "Saved builds live on your host at user_data/presets.json — "
-                "safe to back up or edit. The Compare presets tab overlays "
+                "Saved builds live in your browser (localStorage) — use Export "
+                "to back them up to a file. The Compare presets tab overlays "
                 "the current build's stat radar plus a grouped bar chart "
                 "against whichever preset you Load here.",
                 font_size="0.82rem",

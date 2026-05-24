@@ -138,25 +138,79 @@ def _preset_from_build(
     )
 
 
+# --- Pure list/blob operations (no file I/O) -------------------------------
+# The Reflex UI keeps presets in a browser localStorage string blob and drives
+# these; the file-based helpers further down are thin wrappers over them for
+# local dev / CLI use.
+
+
+def serialize(presets: Sequence[Preset]) -> str:
+    """Compact JSON for a localStorage blob (size matters — no indent)."""
+    return json.dumps([p.to_json() for p in presets], ensure_ascii=False)
+
+
+def deserialize(blob: str) -> list[Preset]:
+    """Parse a blob into presets, tolerant of '', invalid JSON, non-lists, and
+    malformed items (a corrupt localStorage value must never crash the app)."""
+    if not blob:
+        return []
+    try:
+        raw = json.loads(blob)
+    except (json.JSONDecodeError, ValueError):
+        return []
+    if not isinstance(raw, list):
+        return []
+    out: list[Preset] = []
+    for r in raw:
+        try:
+            out.append(Preset.from_json(r))
+        except Exception:
+            continue
+    return out
+
+
+def upsert_in_list(presets: Sequence[Preset], new: Preset) -> list[Preset]:
+    """Replace the entry with the same (name, character_id) key, else append."""
+    key = (new.name, new.character_id)
+    out = [p for p in presets if (p.name, p.character_id) != key]
+    out.append(new)
+    return out
+
+
+def delete_from_list(
+    presets: Sequence[Preset], name: str, character_id: str
+) -> list[Preset]:
+    key = (name, character_id)
+    return [p for p in presets if (p.name, p.character_id) != key]
+
+
+def get_in_list(
+    presets: Sequence[Preset], name: str, character_id: str
+) -> Preset | None:
+    for p in presets:
+        if p.name == name and p.character_id == character_id:
+            return p
+    return None
+
+
+def list_for_character_in_list(
+    presets: Sequence[Preset], character_id: str
+) -> list[Preset]:
+    return [p for p in presets if p.character_id == character_id]
+
+
 def load_all(path: Path | None = None) -> list[Preset]:
     path = path or _default_path()
     if not path.exists():
         return []
-    try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return []
-    return [Preset.from_json(r) for r in raw]
+    return deserialize(path.read_text(encoding="utf-8"))
 
 
 def save_all(presets: Sequence[Preset], path: Path | None = None) -> None:
     path = path or _default_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".json.tmp")
-    tmp.write_text(
-        json.dumps([p.to_json() for p in presets], ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    tmp.write_text(serialize(presets), encoding="utf-8")
     tmp.replace(path)
 
 
@@ -183,16 +237,13 @@ def upsert(
         locked_attrs=locked_attrs,
         vessel_id=vessel_id,
     )
-    key = (name, character_id)
-    all_ = [p for p in load_all(path) if (p.name, p.character_id) != key]
-    all_.append(preset)
-    save_all(all_, path)
+    save_all(upsert_in_list(load_all(path), preset), path)
     return preset
 
 
 def delete(name: str, character_id: str, path: Path | None = None) -> bool:
     before = load_all(path)
-    after = [p for p in before if (p.name, p.character_id) != (name, character_id)]
+    after = delete_from_list(before, name, character_id)
     if len(after) == len(before):
         return False
     save_all(after, path)
@@ -200,14 +251,11 @@ def delete(name: str, character_id: str, path: Path | None = None) -> bool:
 
 
 def get(name: str, character_id: str, path: Path | None = None) -> Preset | None:
-    for p in load_all(path):
-        if p.name == name and p.character_id == character_id:
-            return p
-    return None
+    return get_in_list(load_all(path), name, character_id)
 
 
 def list_for_character(character_id: str, path: Path | None = None) -> list[Preset]:
-    return [p for p in load_all(path) if p.character_id == character_id]
+    return list_for_character_in_list(load_all(path), character_id)
 
 
 EXPORT_SCHEMA = "nightreign-export/1"
@@ -231,13 +279,13 @@ class ImportReport:
         return " · ".join(parts)
 
 
-def export_presets(
+def export_from_list(
+    presets: Sequence[Preset],
     keys: Sequence[tuple[str, str]],
-    path: Path | None = None,
 ) -> dict[str, Any]:
-    """Assemble an export payload for presets identified by (name, character_id).
-    Unknown keys are silently dropped (caller pre-filters the selection)."""
-    index = {(p.name, p.character_id): p for p in load_all(path)}
+    """Pure export: assemble a payload from an in-memory preset list. Unknown
+    keys are silently dropped (caller pre-filters the selection)."""
+    index = {(p.name, p.character_id): p for p in presets}
     items: list[dict[str, Any]] = []
     for k in keys:
         preset = index.get((k[0], k[1]))
@@ -251,6 +299,64 @@ def export_presets(
     }
 
 
+def import_into_list(
+    presets: Sequence[Preset],
+    payload: Any,
+    *,
+    overwrite: bool = False,
+) -> tuple[list[Preset], ImportReport]:
+    """Pure import: merge a payload into an in-memory preset list, returning the
+    new list and a report. Duplicate key is `(name, character_id)`. On a bad
+    schema/type the list is returned unchanged with errors in the report."""
+    report = ImportReport()
+    merged = list(presets)
+    if not isinstance(payload, dict):
+        report.errors.append("Payload is not a JSON object")
+        return merged, report
+    if payload.get("schema") != EXPORT_SCHEMA:
+        report.errors.append(f"Unknown schema: {payload.get('schema')!r}")
+        return merged, report
+    if payload.get("type") != "builds":
+        report.errors.append(
+            f"Wrong type: expected 'builds', got {payload.get('type')!r}"
+        )
+        return merged, report
+    items = payload.get("items")
+    if not isinstance(items, list):
+        report.errors.append("Payload 'items' is missing or not a list")
+        return merged, report
+    key_index: dict[tuple[str, str], int] = {
+        (p.name, p.character_id): i for i, p in enumerate(merged)
+    }
+    for raw in items:
+        try:
+            preset = Preset.from_json(raw)
+        except Exception as e:
+            report.errors.append(f"Invalid preset: {e}")
+            continue
+        key = (preset.name, preset.character_id)
+        if key in key_index:
+            if overwrite:
+                merged[key_index[key]] = preset
+                report.overwritten += 1
+            else:
+                report.skipped += 1
+        else:
+            key_index[key] = len(merged)
+            merged.append(preset)
+            report.imported += 1
+    return merged, report
+
+
+def export_presets(
+    keys: Sequence[tuple[str, str]],
+    path: Path | None = None,
+) -> dict[str, Any]:
+    """Assemble an export payload for presets identified by (name, character_id).
+    Unknown keys are silently dropped (caller pre-filters the selection)."""
+    return export_from_list(load_all(path), keys)
+
+
 def import_presets(
     payload: Any,
     *,
@@ -262,51 +368,9 @@ def import_presets(
     Duplicate key is `(name, character_id)` — matching `upsert`. When
     `overwrite` is False, existing entries are left untouched and counted in
     `skipped`; when True, they are replaced and counted in `overwritten`."""
-    report = ImportReport()
-    if not isinstance(payload, dict):
-        report.errors.append("Payload is not a JSON object")
-        return report
-    if payload.get("schema") != EXPORT_SCHEMA:
-        report.errors.append(f"Unknown schema: {payload.get('schema')!r}")
-        return report
-    if payload.get("type") != "builds":
-        report.errors.append(
-            f"Wrong type: expected 'builds', got {payload.get('type')!r}"
-        )
-        return report
-
-    items = payload.get("items")
-    if not isinstance(items, list):
-        report.errors.append("Payload 'items' is missing or not a list")
-        return report
-
-    existing = load_all(path)
-    key_index: dict[tuple[str, str], int] = {
-        (p.name, p.character_id): i for i, p in enumerate(existing)
-    }
-    changed = False
-    for raw in items:
-        try:
-            preset = Preset.from_json(raw)
-        except Exception as e:
-            report.errors.append(f"Invalid preset: {e}")
-            continue
-        key = (preset.name, preset.character_id)
-        if key in key_index:
-            if overwrite:
-                existing[key_index[key]] = preset
-                report.overwritten += 1
-                changed = True
-            else:
-                report.skipped += 1
-        else:
-            key_index[key] = len(existing)
-            existing.append(preset)
-            report.imported += 1
-            changed = True
-
-    if changed:
-        save_all(existing, path)
+    merged, report = import_into_list(load_all(path), payload, overwrite=overwrite)
+    if report.imported or report.overwritten:
+        save_all(merged, path)
     return report
 
 

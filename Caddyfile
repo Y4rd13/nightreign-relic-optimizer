@@ -1,23 +1,40 @@
 # Single-port reverse proxy for Hugging Face Spaces (and any single-port host).
-# Reflex serves the Next.js frontend on :3000 and the backend Socket.IO
-# WebSocket on :8000. HF Spaces only routes traffic to one port (7860), so
-# Caddy fronts both: backend paths to :8000, everything else to the frontend.
+#
+# Reflex 0.8's prod model: `reflex run --env prod --backend-only` runs the
+# Socket.IO/FastAPI backend on :8000, and the frontend is a *static* Vite /
+# React-Router bundle exported at build time to /app/.web/build/client. Reflex
+# does NOT run a frontend server on :3000 in prod, so Caddy serves that static
+# bundle directly (with compression + long-lived caching) and proxies only the
+# backend's event/upload/health endpoints to :8000. HF Spaces exposes one port
+# (7860).
 {
 	admin off
 	auto_https off
 }
 
 :7860 {
+	# Compress everything on the wire. The bundle is ~3 MB of JS/CSS
+	# uncompressed; gzip/zstd cuts that ~5x. Caddy skips the WebSocket
+	# upgrade automatically, so /_event streaming is unaffected.
+	encode zstd gzip
+
+	# Backend endpoints: event WebSocket, file uploads, health ping.
 	# Use 127.0.0.1 (not "localhost"): Reflex binds IPv4 only, so "localhost"
 	# makes Caddy try [::1] first, fail, then retry IPv4 on every new conn.
-	# Reflex backend endpoints: event WebSocket, file uploads, health ping.
 	@backend path /_event* /_upload* /ping*
 	handle @backend {
 		reverse_proxy 127.0.0.1:8000
 	}
 
-	# Everything else is the compiled frontend.
+	# Everything else: the statically exported frontend (SPA).
 	handle {
-		reverse_proxy 127.0.0.1:3000
+		root * /app/.web/build/client
+		# Hashed, immutable bundle files — cache hard so repeat visits skip
+		# the re-download entirely.
+		@assets path /assets/*
+		header @assets Cache-Control "public, max-age=31536000, immutable"
+		# SPA fallback: unknown paths resolve to index.html (client routing).
+		try_files {path} /index.html
+		file_server
 	}
 }

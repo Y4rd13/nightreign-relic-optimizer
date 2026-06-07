@@ -8,6 +8,7 @@ resulting build is cached into `build_slots` (list of dicts) for rendering.
 
 from __future__ import annotations
 
+import asyncio
 import re
 from dataclasses import asdict
 from typing import Any, Optional
@@ -19,9 +20,9 @@ from src import characters as chars_mod
 from src import my_relics as my_relics_mod
 from src import presets as presets_mod
 from src import stats as stats_mod
-from src.constraints import MODE_DEEP_NIGHT, MODE_STANDARD
+from src.constraints import MODE_DEEP_NIGHT, MODE_STANDARD, RelicBuild
 from dataclasses import fields as _dc_fields
-from src.damage_model import PlayContext, compute as _compute_contrib, naked_baseline
+from src.damage_model import BuildContribution, PlayContext, compute as _compute_contrib, naked_baseline
 from src.defensive_stats import compute_defensive_stats
 from src.effects_db import is_bundle_only_effect
 from src.effects_db import (
@@ -617,7 +618,15 @@ class State(rx.State):
     # set_character and by delete_preset when the active name matches.
     active_preset_name: str = ""
 
-    # ── computed build cache (populated by recompute()) ───────────
+    # ── solve status ──────────────────────────────────────────────
+    # `solving` (public) drives the "Optimizing…" spinner. The two underscore
+    # vars are backend-only (never synced to the client); they coordinate the
+    # single per-session background worker (see _request_solve / solve_loop).
+    solving: bool = False
+    _solve_requested: bool = False
+    _solve_loop_started: bool = False
+
+    # ── computed build cache (populated by solve_loop → _apply_build) ──
     build_slots: list[SlotData] = []
     damage_total: float = 0.0
     hammer_mult: float = 1.0
@@ -1465,10 +1474,70 @@ class State(rx.State):
             seed_offset=self.explore_seed,
         )
 
-    def recompute(self):
-        cfg = self._cfg()
-        build, contrib = optimize(cfg)
+    def _request_solve(self) -> None:
+        """Flag that a re-solve is needed; the background `solve_loop` picks it
+        up. Replaces the old blocking `recompute()`. Keeping this a plain
+        synchronous setter means every interaction handler — including the ones
+        that chain others (e.g. toggle_slot_lock → lock_slot) — stays a normal
+        sync method with no await/generator semantics."""
+        self._solve_requested = True
+        self.solving = True
 
+    @rx.event(background=True)
+    async def solve_loop(self):
+        """Single per-session worker that owns the optimizer. Runs the
+        CPU-bound optimize() in a worker thread so the event loop (UI +
+        WebSocket) never blocks, and coalesces bursts of changes into one
+        solve. The cheap post-solve assembly (_apply_build) runs under the
+        state lock. Started once via on_page_load."""
+        async with self:
+            if self._solve_loop_started:
+                return
+            self._solve_loop_started = True
+        while True:
+            async with self:
+                pending = self._solve_requested
+                if pending:
+                    self._solve_requested = False
+                    cfg = self._cfg()
+            if not pending:
+                await asyncio.sleep(0.1)
+                continue
+            # Heavy: off the event loop AND outside the state lock. Safe to run
+            # concurrently across sessions — the solver seeds a local
+            # random.Random and its effect caches are pure (see CLAUDE.md).
+            try:
+                build, contrib = await asyncio.to_thread(optimize, cfg)
+                async with self:
+                    self._apply_build(cfg, build, contrib)
+            except Exception:
+                # Never let one bad solve kill the worker (that would freeze the
+                # spinner forever); drop this result and keep serving.
+                pass
+            async with self:
+                # A change landed mid-solve → keep the spinner up and loop again;
+                # otherwise we're idle.
+                if not self._solve_requested:
+                    self.solving = False
+
+    @rx.event
+    def on_page_load(self):
+        """Page on_load: ensure the worker is running and request the first
+        solve (build_slots is empty until that first solve completes)."""
+        self._solve_requested = True
+        self.solving = True
+        return State.solve_loop
+
+    def _apply_build(
+        self,
+        cfg: OptimizerConfig,
+        build: list[RelicBuild],
+        contrib: BuildContribution,
+    ) -> None:
+        """Assemble UI state from a finished solve. Extracted from the old
+        synchronous recompute() so the CPU-bound optimize() can run off the
+        event loop (see solve_loop). Everything here is cheap (~tens of ms)
+        and reads/writes self, so it runs under the state lock."""
         # Compute display ordering per slot: locked attrs at their lock
         # positions (by attr_idx), then solver-picked attrs by sort_index.
         # This is the visual order the UI will render AND the ordering
@@ -1745,7 +1814,7 @@ class State(rx.State):
         # Presets are per-character; a loaded Undertaker preset must not
         # be overwritable after the user switches to Guardian.
         self.active_preset_name = ""
-        self.recompute()
+        self._request_solve()
 
     def set_mode(self, m: str):
         if m == self.mode:
@@ -1761,11 +1830,11 @@ class State(rx.State):
                 k: v for k, v in self.debuff_picks.items()
                 if int(k) < 3
             }
-        self.recompute()
+        self._request_solve()
 
     def set_vessel(self, vid: str):
         self.vessel_id = "" if vid == "__none__" else vid
-        self.recompute()
+        self._request_solve()
 
     def set_custom_color(self, slot_idx: int, color: str):
         colors = list(self.custom_vessel_colors)
@@ -1774,7 +1843,7 @@ class State(rx.State):
         colors[slot_idx] = color
         self.custom_vessel_colors = colors
         if self.vessel_id == CUSTOM_VESSEL:
-            self.recompute()
+            self._request_solve()
 
     # ═════════════════════════════════════════════════════════════
     # EVENTS — playstyle sliders
@@ -1802,12 +1871,12 @@ class State(rx.State):
 
     def commit_slider(self, field: str, v: list[float]):
         self.drag_slider(field, v)
-        self.recompute()
+        self._request_solve()
 
     def toggle_hammers(self, v: bool):
-        self.three_hammers = bool(v); self.recompute()
+        self.three_hammers = bool(v); self._request_solve()
     def toggle_dual(self, v: bool):
-        self.dual_wielding = bool(v); self.recompute()
+        self.dual_wielding = bool(v); self._request_solve()
 
     # ── playstyle / weapons overrides ─────────────────────────────
     def toggle_weapon(self, weapon: str):
@@ -1821,7 +1890,7 @@ class State(rx.State):
         else:
             current.add(weapon)
         self.weapon_types_override = sorted(current)
-        self.recompute()
+        self._request_solve()
 
     def toggle_playstyle_tag(self, tag: str):
         current = set(self.playstyle_tags_override) if self.playstyle_tags_override else set(
@@ -1832,14 +1901,14 @@ class State(rx.State):
         else:
             current.add(tag)
         self.playstyle_tags_override = sorted(current)
-        self.recompute()
+        self._request_solve()
 
     def reset_playstyle_weapons(self):
         """Clear overrides → fall back to character JSON defaults."""
         self.weapon_types_override = []
         self.playstyle_tags_override = []
         self.damage_scaling_override = {}
-        self.recompute()
+        self._request_solve()
 
     # ── damage scaling weight per stat ────────────────────────────
     def set_stat_scaling(self, stat: str, v: list[float]):
@@ -1857,7 +1926,7 @@ class State(rx.State):
 
     def set_stat_scaling_commit(self, stat: str, v: list[float]):
         self.set_stat_scaling(stat, v)
-        self.recompute()
+        self._request_solve()
 
     # ── build goal weights (damage/survival/utility/team) ─────────
     def _set_goal_axis(self, axis: str, value: float):
@@ -1893,17 +1962,17 @@ class State(rx.State):
         self._set_goal_axis("team", v[0])
 
     def set_goal_damage_commit(self, v: list[float]):
-        self._set_goal_axis("damage", v[0]); self.recompute()
+        self._set_goal_axis("damage", v[0]); self._request_solve()
     def set_goal_survival_commit(self, v: list[float]):
-        self._set_goal_axis("survival", v[0]); self.recompute()
+        self._set_goal_axis("survival", v[0]); self._request_solve()
     def set_goal_utility_commit(self, v: list[float]):
-        self._set_goal_axis("utility", v[0]); self.recompute()
+        self._set_goal_axis("utility", v[0]); self._request_solve()
     def set_goal_team_commit(self, v: list[float]):
-        self._set_goal_axis("team", v[0]); self.recompute()
+        self._set_goal_axis("team", v[0]); self._request_solve()
 
     def reset_build_goals(self):
         self.build_goal_weights_override = {}
-        self.recompute()
+        self._request_solve()
 
     # ── team composition ──────────────────────────────────────────
     def set_party_size(self, size: int):
@@ -1918,7 +1987,7 @@ class State(rx.State):
         while len(current) < needed:
             current.append("")   # empty slot — user picks via dropdown
         self.party_members_override = current
-        self.recompute()
+        self._request_solve()
 
     def set_party_member(self, slot_idx: int, cid: str):
         """Pick a character for the Nth team-mate slot (0 or 1)."""
@@ -1934,11 +2003,11 @@ class State(rx.State):
         else:
             current[slot_idx] = cid
         self.party_members_override = current
-        self.recompute()
+        self._request_solve()
 
     def reset_party(self):
         self.party_members_override = []
-        self.recompute()
+        self._request_solve()
 
     # ═════════════════════════════════════════════════════════════
     # EVENTS — locks, exclusions
@@ -1978,11 +2047,11 @@ class State(rx.State):
     def lock_attr(self, slot_idx: int, attr_idx: int, effect_id: int):
         self.locked_picks[_k(slot_idx, attr_idx)] = effect_id
         self._normalize_slot_locks(slot_idx)
-        self.recompute()
+        self._request_solve()
 
     def unlock_all(self):
         self.locked_picks = {}
-        self.recompute()
+        self._request_solve()
 
     def lock_slot(self, slot_idx: int):
         """Lock every currently-displayed attr in this slot. After this the
@@ -1997,7 +2066,7 @@ class State(rx.State):
             picks[_k(slot_idx, attr_i)] = int(a.id)
         self.locked_picks = picks
         self._normalize_slot_locks(slot_idx)
-        self.recompute()
+        self._request_solve()
 
     def unlock_slot(self, slot_idx: int):
         """Remove every lock in this slot so the solver can freely re-roll it."""
@@ -2005,7 +2074,7 @@ class State(rx.State):
             k: v for k, v in self.locked_picks.items()
             if int(k.split(",")[0]) != slot_idx
         }
-        self.recompute()
+        self._request_solve()
 
     def toggle_slot_lock(self, slot_idx: int):
         """Smart toggle used by the slot-header lock button.
@@ -2048,19 +2117,19 @@ class State(rx.State):
         else:
             picks = {**self.locked_picks, key: target_eid}
         self.locked_picks = picks
-        self.recompute()
+        self._request_solve()
 
     def reset_playstyle_field(self, field_name: str):
         """Restore a single playstyle slider/toggle to its default."""
         if field_name in PLAYSTYLE_DEFAULTS:
             setattr(self, field_name, PLAYSTYLE_DEFAULTS[field_name])
-            self.recompute()
+            self._request_solve()
 
     def reset_playstyle_all(self):
         """Restore every playstyle slider/toggle to the defaults at once."""
         for k, v in PLAYSTYLE_DEFAULTS.items():
             setattr(self, k, v)
-        self.recompute()
+        self._request_solve()
 
     # ── dormant powers ────────────────────────────────────────
     def cycle_dormant(self, buff_id: int):
@@ -2076,11 +2145,11 @@ class State(rx.State):
         else:
             picks[key] = nxt
         self.dormant_picks = picks
-        self.recompute()
+        self._request_solve()
 
     def clear_dormant(self):
         self.dormant_picks = {}
-        self.recompute()
+        self._request_solve()
 
     # ── UI prefs ──────────────────────────────────────────────
     def toggle_charts(self):
@@ -2092,22 +2161,22 @@ class State(rx.State):
         the default seeds happened to miss."""
         import random as _r
         self.explore_seed = _r.randint(1, 1_000_000)
-        self.recompute()
+        self._request_solve()
 
     def reset_explore_seed(self):
         """Back to the deterministic default solver path."""
         if self.explore_seed != 0:
             self.explore_seed = 0
-            self.recompute()
+            self._request_solve()
 
     def exclude(self, eid: int):
         if eid not in self.excluded_ids:
             self.excluded_ids = self.excluded_ids + [eid]
-            self.recompute()
+            self._request_solve()
 
     def reset_excluded(self):
         self.excluded_ids = []
-        self.recompute()
+        self._request_solve()
 
     # ═════════════════════════════════════════════════════════════
     # EVENTS — edit dialog
@@ -2259,7 +2328,7 @@ class State(rx.State):
                 picks = dict(self.debuff_picks)
                 picks[key] = int(curse_id)
                 self.debuff_picks = picks
-            self.recompute()
+            self._request_solve()
         self.close_debuff()
 
     @rx.var
@@ -2305,7 +2374,7 @@ class State(rx.State):
                 self.locked_picks.pop(_k(self.named_slot_idx, ai), None)
             # Also drop any pinned debuff so the slot returns to "solver-driven".
             self.debuff_picks.pop(str(self.named_slot_idx), None)
-            self.recompute()
+            self._request_solve()
         elif relic_id.startswith("my_relic:"):
             my_id = relic_id[len("my_relic:"):]
             r = my_relics_mod.get_in_list(
@@ -2325,14 +2394,14 @@ class State(rx.State):
                     self.debuff_picks = picks
                 else:
                     self.debuff_picks.pop(str(self.named_slot_idx), None)
-                self.recompute()
+                self._request_solve()
         else:
             for r in chars_mod.named_relics_for(self.character_id):
                 if r["id"] == relic_id:
                     if r.get("attrs_verified") and r.get("attrs"):
                         for ai, eid in enumerate(r["attrs"]):
                             self.locked_picks[_k(self.named_slot_idx, ai)] = eid
-                        self.recompute()
+                        self._request_solve()
                     break
         self.close_named()
 
@@ -2671,7 +2740,7 @@ class State(rx.State):
         if p.build_goal_weights:
             self.build_goal_weights_override = dict(p.build_goal_weights)
         self.active_preset_name = name
-        self.recompute()
+        self._request_solve()
         return rx.toast.success(f"Loaded '{name}' ({p.total_boss_window:.2f} dmg)")
 
     def delete_preset(self, name: str):

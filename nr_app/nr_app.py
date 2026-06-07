@@ -234,6 +234,6 @@ app = rx.App(
 app.add_custom_reflex_cloud_config = None  # ignore unused
 
 
-@rx.page(route="/", title="Nightreign · Relic Optimizer", on_load=State.recompute)
+@rx.page(route="/", title="Nightreign · Relic Optimizer", on_load=State.on_page_load)
 def root() -> rx.Component:
     return index()

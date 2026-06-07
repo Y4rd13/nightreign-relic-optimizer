@@ -271,6 +271,17 @@ def hero() -> rx.Component:
                     align="center",
                     margin_top="4px",
                 ),
+                rx.cond(
+                    State.solving,
+                    rx.hstack(
+                        rx.spinner(size="1", color=PAL["mauve"]),
+                        rx.text("Optimizing…", color=PAL["mauve"],
+                                font_size="0.62rem", font_weight="700",
+                                letter_spacing="0.06em"),
+                        spacing="1", align="center", margin_top="3px",
+                    ),
+                    rx.box(),
+                ),
                 rx.tooltip(
                     rx.hstack(
                         rx.text("≈", color=PAL["overlay0"],
